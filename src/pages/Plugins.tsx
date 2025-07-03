@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import { Search, Filter, Star, Download, Heart, ExternalLink, DollarSign } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -206,11 +207,11 @@ export default function Plugins() {
         {/* Plugins Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPlugins.map((plugin, index) => (
-            <Card 
-              key={plugin.id}
-              className="bg-card/50 backdrop-blur-sm border-border hover:border-primary/50 transition-all duration-300 group hover:shadow-elegant cursor-pointer animate-slide-up"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
+            <Link key={plugin.id} to={`/plugins/${plugin.name.toLowerCase().replace(/\s+/g, '-')}`}>
+              <Card 
+                className="bg-card/50 backdrop-blur-sm border-border hover:border-primary/50 transition-all duration-300 group hover:shadow-elegant cursor-pointer animate-slide-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform">
@@ -277,8 +278,9 @@ export default function Plugins() {
                     <Heart className="w-4 h-4" />
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 

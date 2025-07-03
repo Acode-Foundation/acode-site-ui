@@ -1,6 +1,6 @@
 import { Github, Twitter, Heart, ExternalLink } from "lucide-react"
 import { Link } from "react-router-dom"
-import acodeLogoLight from "@/assets/acode-logo.png"
+import acodeLogoSvg from "@/assets/acode-logo.svg"
 
 const footerLinks = {
   product: [
@@ -31,7 +31,7 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <img src={acodeLogoLight} alt="Acode" className="h-8 w-8" />
+              <img src={acodeLogoSvg} alt="Acode" className="h-8 w-8" />
               <span className="font-bold text-xl bg-gradient-primary bg-clip-text text-transparent">
                 Acode
               </span>

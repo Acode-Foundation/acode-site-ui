@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { ArrowRight, Star, GitFork, Download, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import acodeLogoLight from "@/assets/acode-logo.png"
+import acodeLogoSvg from "@/assets/acode-logo.svg"
 
 interface GitHubStats {
   stars: number
@@ -33,7 +33,7 @@ export function HeroSection() {
           {/* Logo and Badge */}
           <div className="flex justify-center mb-8">
             <img 
-              src={acodeLogoLight} 
+              src={acodeLogoSvg} 
               alt="Acode" 
               className="h-24 w-24 animate-glow"
             />

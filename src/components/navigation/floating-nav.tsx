@@ -4,7 +4,7 @@ import { Moon, Sun, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/ui/theme-provider"
 import { cn } from "@/lib/utils"
-import acodeLogoLight from "@/assets/acode-logo.png"
+import acodeLogoSvg from "@/assets/acode-logo.svg"
 
 const navItems = [
   { name: "FAQ", href: "/faq" },
@@ -44,7 +44,7 @@ export function FloatingNav() {
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2 group">
           <img 
-            src={acodeLogoLight} 
+            src={acodeLogoSvg} 
             alt="Acode" 
             className="h-8 w-8 transition-transform duration-300 group-hover:scale-110"
           />

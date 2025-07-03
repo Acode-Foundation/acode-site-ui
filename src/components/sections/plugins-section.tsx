@@ -67,11 +67,11 @@ export function PluginsSection() {
         {/* Featured Plugins Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredPlugins.map((plugin, index) => (
-            <Card 
-              key={plugin.name}
-              className="bg-card/50 backdrop-blur-sm border-border hover:border-primary/50 transition-all duration-300 group hover:shadow-elegant animate-slide-up cursor-pointer"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
+            <Link key={plugin.name} to={`/plugins/${plugin.name.toLowerCase().replace(/\s+/g, '-')}`}>
+              <Card 
+                className="bg-card/50 backdrop-blur-sm border-border hover:border-primary/50 transition-all duration-300 group hover:shadow-elegant animate-slide-up cursor-pointer"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform">
@@ -115,7 +115,8 @@ export function PluginsSection() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+              </Card>
+            </Link>
           ))}
         </div>
 

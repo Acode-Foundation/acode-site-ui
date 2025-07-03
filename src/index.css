@@ -18,13 +18,13 @@
     --primary: 263 70% 50%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 240 4% 16%;
+    --secondary: 212 100% 50%;
     --secondary-foreground: 0 0% 98%;
 
     --muted: 240 5% 6%;
     --muted-foreground: 240 5% 64.9%;
 
-    --accent: 263 70% 50%;
+    --accent: 212 100% 50%;
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 72% 51%;
@@ -36,16 +36,16 @@
 
     --radius: 0.75rem;
 
-    /* Acode Brand Colors */
-    --acode-blue: 220 91% 51%;
+    /* Acode Brand Colors - Modern Blue & Purple */
+    --acode-blue: 212 100% 50%;
     --acode-purple: 263 70% 50%;
     --acode-purple-light: 263 70% 60%;
     --acode-dark: 240 10% 3.9%;
     --acode-darker: 240 15% 2%;
     
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--acode-blue)), hsl(var(--acode-purple)));
-    --gradient-secondary: linear-gradient(135deg, hsl(var(--acode-purple)), hsl(var(--acode-purple-light)));
+    --gradient-primary: linear-gradient(135deg, hsl(var(--acode-purple)), hsl(var(--acode-blue)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--acode-blue)), hsl(var(--acode-purple-light)));
     --gradient-dark: linear-gradient(180deg, hsl(var(--acode-dark)), hsl(var(--acode-darker)));
     
     /* Glows and Effects */
