@@ -1,0 +1,183 @@
+import { useState } from "react"
+import { Eye, EyeOff, LogIn, Github, Mail, Lock } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Link } from "react-router-dom"
+import { useToast } from "@/hooks/use-toast"
+
+export default function Login() {
+  const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    
+    // Simulate login
+    setTimeout(() => {
+      setIsLoading(false)
+      toast({
+        title: "Login successful!",
+        description: "Welcome back to Acode.",
+      })
+    }, 1000)
+  }
+
+  const handleSocialLogin = (provider: string) => {
+    toast({
+      title: `${provider} login`,
+      description: "Social login functionality coming soon!",
+    })
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <LogIn className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold mb-2">
+            Welcome back
+          </h1>
+          <p className="text-muted-foreground">
+            Sign in to your Acode account
+          </p>
+        </div>
+
+        <Card className="bg-card/50 backdrop-blur-sm border-border">
+          <CardHeader className="space-y-1 pb-4">
+            <div className="space-y-2">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => handleSocialLogin("GitHub")}
+              >
+                <Github className="w-4 h-4 mr-2" />
+                Continue with GitHub
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => handleSocialLogin("Google")}
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Continue with Google
+              </Button>
+            </div>
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <Separator />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="bg-background/50"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="bg-background/50 pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Link 
+                  to="/forgot-password" 
+                  className="text-sm text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-primary hover:shadow-glow-primary transition-all duration-300"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Signing in...
+                  </div>
+                ) : (
+                  <>
+                    <Lock className="w-4 h-4 mr-2" />
+                    Sign In
+                  </>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center text-sm">
+              <span className="text-muted-foreground">Don't have an account? </span>
+              <Link to="/register" className="text-primary hover:underline">
+                Sign up
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Demo Credentials */}
+        <Card className="mt-4 bg-muted/20 border-muted">
+          <CardContent className="p-4">
+            <p className="text-sm text-muted-foreground text-center mb-2">
+              Demo credentials for testing:
+            </p>
+            <div className="text-xs text-muted-foreground space-y-1">
+              <div><strong>Email:</strong> demo@acode.app</div>
+              <div><strong>Password:</strong> demo123</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
