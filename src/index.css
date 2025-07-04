@@ -15,16 +15,16 @@
     --popover: 240 5% 6%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 263 70% 50%;
+    --primary: 212 100% 55%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 212 100% 50%;
+    --secondary: 263 70% 50%;
     --secondary-foreground: 0 0% 98%;
 
     --muted: 240 5% 6%;
     --muted-foreground: 240 5% 64.9%;
 
-    --accent: 212 100% 50%;
+    --accent: 212 100% 55%;
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 72% 51%;
@@ -36,22 +36,22 @@
 
     --radius: 0.75rem;
 
-    /* Acode Brand Colors - Modern Blue & Purple */
-    --acode-blue: 212 100% 50%;
-    --acode-purple: 263 70% 50%;
-    --acode-purple-light: 263 70% 60%;
+    /* Acode Brand Colors - Modern Blue Focus */
+    --acode-blue: 212 100% 55%;
+    --acode-blue-light: 212 90% 65%;
+    --acode-blue-dark: 212 100% 45%;
     --acode-dark: 240 10% 3.9%;
     --acode-darker: 240 15% 2%;
     
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--acode-purple)), hsl(var(--acode-blue)));
-    --gradient-secondary: linear-gradient(135deg, hsl(var(--acode-blue)), hsl(var(--acode-purple-light)));
+    --gradient-primary: linear-gradient(135deg, hsl(var(--acode-blue)), hsl(var(--acode-blue-light)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--acode-blue-dark)), hsl(var(--acode-blue)));
     --gradient-dark: linear-gradient(180deg, hsl(var(--acode-dark)), hsl(var(--acode-darker)));
     
     /* Glows and Effects */
-    --glow-primary: 0 0 40px hsl(var(--acode-purple) / 0.3);
+    --glow-primary: 0 0 40px hsl(var(--acode-blue) / 0.3);
     --glow-blue: 0 0 40px hsl(var(--acode-blue) / 0.3);
-    --shadow-elegant: 0 10px 30px -10px hsl(var(--acode-purple) / 0.4);
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--acode-blue) / 0.4);
     
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

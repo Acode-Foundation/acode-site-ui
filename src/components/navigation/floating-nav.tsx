@@ -30,31 +30,31 @@ export function FloatingNav() {
   return (
     <nav
       className={cn(
-        "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300",
+        "fixed top-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 max-w-6xl w-full mx-auto px-4",
         isScrolled
-          ? "bg-card/80 backdrop-blur-lg border border-border shadow-elegant"
-          : "bg-card/60 backdrop-blur-md"
+          ? "bg-card/90 backdrop-blur-xl border border-border/50 shadow-2xl"
+          : "bg-card/70 backdrop-blur-lg border border-border/30"
       )}
       style={{
-        borderRadius: "var(--radius)",
-        padding: "0.75rem 1.5rem",
+        borderRadius: "1rem",
+        padding: "1rem 2rem",
       }}
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between w-full">
         {/* Logo */}
-        <Link to="/" className="flex items-center space-x-2 group">
+        <Link to="/" className="flex items-center space-x-3 group">
           <img 
             src={acodeLogoSvg} 
             alt="Acode" 
-            className="h-8 w-8 transition-transform duration-300 group-hover:scale-110"
+            className="h-10 w-10 transition-transform duration-300 group-hover:scale-110"
           />
-          <span className="font-bold text-xl bg-gradient-primary bg-clip-text text-transparent">
+          <span className="font-bold text-2xl bg-gradient-primary bg-clip-text text-transparent">
             Acode
           </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-6">
+        <div className="hidden lg:flex items-center space-x-8">
           {navItems.map((item) => (
             <div key={item.name}>
               {item.external ? (
@@ -63,10 +63,8 @@ export function FloatingNav() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
-                    "text-sm font-medium transition-colors duration-200 hover:text-primary",
-                    "relative after:absolute after:bottom-0 after:left-0 after:h-0.5",
-                    "after:w-0 after:bg-gradient-primary after:transition-all after:duration-300",
-                    "hover:after:w-full"
+                    "text-base font-medium transition-all duration-200 hover:text-primary px-4 py-2 rounded-lg hover:bg-secondary/10",
+                    "relative"
                   )}
                 >
                   {item.name}
@@ -75,11 +73,9 @@ export function FloatingNav() {
                 <Link
                   to={item.href}
                   className={cn(
-                    "text-sm font-medium transition-colors duration-200 hover:text-primary",
-                    "relative after:absolute after:bottom-0 after:left-0 after:h-0.5",
-                    "after:w-0 after:bg-gradient-primary after:transition-all after:duration-300",
-                    "hover:after:w-full",
-                    location.pathname === item.href && "text-primary after:w-full"
+                    "text-base font-medium transition-all duration-200 hover:text-primary px-4 py-2 rounded-lg hover:bg-secondary/10",
+                    "relative",
+                    location.pathname === item.href && "text-primary bg-secondary/20"
                   )}
                 >
                   {item.name}
@@ -93,10 +89,10 @@ export function FloatingNav() {
             variant="ghost"
             size="sm"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className="h-8 w-8 p-0 hover:bg-secondary transition-colors duration-200"
+            className="h-10 w-10 p-0 hover:bg-secondary/20 transition-colors duration-200 rounded-lg"
           >
-            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             <span className="sr-only">Toggle theme</span>
           </Button>
         </div>
@@ -105,21 +101,21 @@ export function FloatingNav() {
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 w-8 p-0 md:hidden"
+          className="h-10 w-10 p-0 lg:hidden"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? (
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           ) : (
-            <Menu className="h-4 w-4" />
+            <Menu className="h-5 w-5" />
           )}
         </Button>
       </div>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="mt-4 pt-4 border-t border-border md:hidden">
-          <div className="flex flex-col space-y-3">
+        <div className="mt-6 pt-6 border-t border-border lg:hidden">
+          <div className="flex flex-col space-y-4">
             {navItems.map((item) => (
               <div key={item.name}>
                 {item.external ? (
@@ -127,7 +123,7 @@ export function FloatingNav() {
                     href={item.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-medium transition-colors duration-200 hover:text-primary block"
+                    className="text-base font-medium transition-colors duration-200 hover:text-primary block py-2"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {item.name}
@@ -136,7 +132,7 @@ export function FloatingNav() {
                   <Link
                     to={item.href}
                     className={cn(
-                      "text-sm font-medium transition-colors duration-200 hover:text-primary block",
+                      "text-base font-medium transition-colors duration-200 hover:text-primary block py-2",
                       location.pathname === item.href && "text-primary"
                     )}
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -150,11 +146,11 @@ export function FloatingNav() {
               variant="ghost"
               size="sm"
               onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-              className="justify-start h-8 px-0 hover:bg-secondary transition-colors duration-200"
+              className="justify-start h-10 px-0 hover:bg-secondary/20 transition-colors duration-200 mt-4"
             >
-              <Sun className="h-4 w-4 mr-2 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-4 w-4 ml-6 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="ml-6">Toggle theme</span>
+              <Sun className="h-5 w-5 mr-2 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 ml-7 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="ml-7">Toggle theme</span>
             </Button>
           </div>
         </div>

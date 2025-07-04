@@ -54,8 +54,8 @@ export default {
 				},
 				acode: {
 					blue: 'hsl(var(--acode-blue))',
-					purple: 'hsl(var(--acode-purple))',
-					'purple-light': 'hsl(var(--acode-purple-light))',
+					'blue-light': 'hsl(var(--acode-blue-light))',
+					'blue-dark': 'hsl(var(--acode-blue-dark))',
 					dark: 'hsl(var(--acode-dark))',
 					darker: 'hsl(var(--acode-darker))'
 				}

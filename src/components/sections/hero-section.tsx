@@ -21,102 +21,123 @@ export function HeroSection() {
   }, [])
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden min-h-screen flex items-center">
       {/* Background Effects */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-acode-purple/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-acode-blue/20 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-acode-blue/20 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-acode-blue-light/15 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
       </div>
 
-      <div className="container mx-auto px-4 py-20 relative z-10">
-        <div className="text-center max-w-4xl mx-auto">
-          {/* Logo and Badge */}
-          <div className="flex justify-center mb-8">
-            <img 
-              src={acodeLogoSvg} 
-              alt="Acode" 
-              className="h-24 w-24 animate-glow"
-            />
-          </div>
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left Content */}
+          <div className="text-left space-y-8">
+            {/* Badge */}
+            <Badge variant="secondary" className="bg-secondary/50 backdrop-blur-sm border border-border/50">
+              <Star className="w-3 h-3 mr-1" />
+              {githubStats.stars.toLocaleString()} stars on GitHub
+            </Badge>
 
-          <Badge variant="secondary" className="mb-6 bg-secondary/50 backdrop-blur-sm">
-            <Star className="w-3 h-3 mr-1" />
-            {githubStats.stars.toLocaleString()} stars on GitHub
-          </Badge>
+            {/* Main Heading */}
+            <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight animate-slide-up">
+              It's time to make your{" "}
+              <span className="bg-gradient-primary bg-clip-text text-transparent">
+                software
+              </span>
+            </h1>
 
-          {/* Main Heading */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-slide-up">
-            <span className="bg-gradient-primary bg-clip-text text-transparent">
-              Code
-            </span>{" "}
-            <span className="text-foreground">anywhere,</span>
-            <br />
-            <span className="text-foreground">anytime</span>
-          </h1>
+            {/* Subtitle */}
+            <p className="text-xl text-muted-foreground max-w-lg animate-slide-up" style={{ animationDelay: "0.2s" }}>
+              What do you want to code today? Writing, editing, debugging software on the go? Everything just works.
+            </p>
 
-          {/* Subtitle */}
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: "0.2s" }}>
-            A powerful, feature-rich code editor for Android. Write, edit, and manage your code on the go with syntax highlighting, plugins, and more.
-          </p>
-
-          {/* GitHub Stats */}
-          <div className="flex justify-center space-x-6 mb-10 animate-slide-up" style={{ animationDelay: "0.4s" }}>
-            <div className="flex items-center space-x-2 bg-card/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-border">
-              <Star className="w-4 h-4 text-yellow-500" />
-              <span className="font-semibold">{githubStats.stars.toLocaleString()}</span>
-              <span className="text-muted-foreground">stars</span>
+            {/* Download Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 animate-slide-up" style={{ animationDelay: "0.4s" }}>
+              <Button size="lg" className="bg-gradient-primary hover:shadow-glow-primary transition-all duration-300 group text-lg px-8 py-4">
+                <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                Download
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              
+              <Button variant="outline" size="lg" className="border-border hover:bg-secondary/20 group text-lg px-8 py-4">
+                <Download className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                F-Droid
+              </Button>
             </div>
-            <div className="flex items-center space-x-2 bg-card/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-border">
-              <GitFork className="w-4 h-4 text-blue-500" />
-              <span className="font-semibold">{githubStats.forks.toLocaleString()}</span>
-              <span className="text-muted-foreground">forks</span>
+
+            {/* GitHub Stats */}
+            <div className="flex space-x-6 animate-slide-up" style={{ animationDelay: "0.6s" }}>
+              <div className="flex items-center space-x-2">
+                <Star className="w-4 h-4 text-yellow-500" />
+                <span className="font-semibold">{githubStats.stars.toLocaleString()}</span>
+                <span className="text-muted-foreground text-sm">stars</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <GitFork className="w-4 h-4 text-primary" />
+                <span className="font-semibold">{githubStats.forks.toLocaleString()}</span>
+                <span className="text-muted-foreground text-sm">forks</span>
+              </div>
             </div>
           </div>
 
-          {/* Download Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up" style={{ animationDelay: "0.6s" }}>
-            <Button size="lg" className="bg-gradient-primary hover:shadow-glow-primary transition-all duration-300 group">
-              <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-              Get on Play Store
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            
-            <Button variant="outline" size="lg" className="border-border hover:bg-secondary/50 group">
-              <Download className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-              Download F-Droid
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </div>
+          {/* Right Content - App Showcase */}
+          <div className="relative lg:h-[600px] flex items-center justify-center animate-slide-up" style={{ animationDelay: "0.8s" }}>
+            {/* Code Editor Preview */}
+            <div className="relative bg-card/50 backdrop-blur-sm border border-border rounded-2xl p-8 shadow-2xl max-w-lg w-full">
+              <div className="flex items-center space-x-2 mb-6">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                <span className="text-sm text-muted-foreground ml-4">main.js</span>
+              </div>
+              <div className="font-mono text-sm space-y-2">
+                <div className="text-blue-400">import { <span className="text-yellow-400">useState</span> } from <span className="text-green-400">'react'</span>;</div>
+                <div className="text-blue-400">import { <span className="text-yellow-400">editor</span> } from <span className="text-green-400">'./acode'</span>;</div>
+                <div className="h-4"></div>
+                <div className="text-purple-400">function <span className="text-yellow-400">App</span>() {'{'}</div>
+                <div className="pl-4 text-blue-400">const [<span className="text-white">code</span>, <span className="text-white">setCode</span>] = <span className="text-yellow-400">useState</span>(<span className="text-green-400">&apos;&apos;</span>);</div>
+                <div className="h-2"></div>
+                <div className="pl-4 text-blue-400">return (</div>
+                <div className="pl-8 text-white">&lt;<span className="text-red-400">CodeEditor</span></div>
+                <div className="pl-12 text-white"><span className="text-blue-400">value</span>=<span className="text-green-400">{'{'}{'{'}code{'}'}</span></div>
+                <div className="pl-12 text-white"><span className="text-blue-400">onChange</span>=<span className="text-green-400">{'{'}{'{'}setCode{'}'}</span></div>
+                <div className="pl-8 text-white">/&gt;</div>
+                <div className="pl-4 text-white">);</div>
+                <div className="text-purple-400">{'}'}</div>
+              </div>
+            </div>
 
-          {/* Version Info */}
-          <p className="text-sm text-muted-foreground mt-6 animate-fade-in" style={{ animationDelay: "0.8s" }}>
-            Latest version: 1.8.5 • Compatible with Android 5.0+
+            {/* Floating Elements */}
+            <div className="absolute -top-8 -right-8 bg-card/80 backdrop-blur-sm border border-border rounded-lg p-4 shadow-lg animate-float">
+              <div className="flex items-center space-x-2 text-sm">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-green-400">Syntax Check</span>
+              </div>
+            </div>
+
+            <div className="absolute -bottom-8 -left-8 bg-card/80 backdrop-blur-sm border border-border rounded-lg p-4 shadow-lg animate-float" style={{ animationDelay: "1s" }}>
+              <div className="flex items-center space-x-2 text-sm">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-blue-400">Auto Complete</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Version Info */}
+        <div className="text-center mt-16 animate-fade-in" style={{ animationDelay: "1s" }}>
+          <p className="text-sm text-muted-foreground">
+            Latest version: 1.8.5 • Compatible with Android 5.0+ • Trusted by 2M+ developers
           </p>
         </div>
       </div>
 
-      {/* Code Preview Background */}
+      {/* Animated Background Grid */}
       <div className="absolute inset-0 opacity-5 overflow-hidden pointer-events-none">
-        <pre className="text-xs leading-relaxed p-8 font-mono">
-          {`function initializeEditor() {
-  const editor = new CodeEditor({
-    theme: 'acode-dark',
-    language: 'javascript',
-    fontSize: 14,
-    tabSize: 2,
-    wordWrap: true,
-    lineNumbers: true,
-    autoCompletion: true,
-    syntaxHighlighting: true
-  });
-  
-  editor.onDidChangeContent(() => {
-    saveFile(editor.getValue());
-  });
-  
-  return editor;
-}`}
-        </pre>
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+          backgroundSize: '30px 30px'
+        }}></div>
       </div>
     </section>
   )
