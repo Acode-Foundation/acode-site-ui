@@ -80,9 +80,23 @@ const fallbackPlugins: Plugin[] = [
   }
 ]
 
-const fetchPlugins = async (): Promise<Plugin[]> => {
+const fetchPlugins = async (filter: 'default' | 'most-downloaded' | 'newest' = 'default'): Promise<Plugin[]> => {
   try {
-    const response = await fetch('https://acode.app/api/plugins')
+    let url = 'https://acode.app/api/plugins'
+    
+    switch (filter) {
+      case 'default':
+        url = 'https://acode.app/api/plugins?explore=random'
+        break
+      case 'most-downloaded':
+        url = 'https://acode.app/api/plugins?orderBy=downloads'
+        break
+      case 'newest':
+        url = 'https://acode.app/api/plugins?orderBy=newest'
+        break
+    }
+    
+    const response = await fetch(url)
     if (!response.ok) {
       throw new Error('Failed to fetch plugins')
     }
@@ -94,10 +108,10 @@ const fetchPlugins = async (): Promise<Plugin[]> => {
   }
 }
 
-export const usePlugins = () => {
+export const usePlugins = (filter: 'default' | 'most-downloaded' | 'newest' = 'default') => {
   return useQuery({
-    queryKey: ['plugins'],
-    queryFn: fetchPlugins,
+    queryKey: ['plugins', filter],
+    queryFn: () => fetchPlugins(filter),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
@@ -111,7 +125,7 @@ export const useFeaturedPlugins = () => {
   return useQuery({
     queryKey: ['plugins', 'featured'],
     queryFn: async () => {
-      const plugins = await fetchPlugins()
+      const plugins = await fetchPlugins('default')
       return plugins.slice(0, 4) // Return first 4 as featured
     },
     staleTime: 10 * 60 * 1000, // 10 minutes

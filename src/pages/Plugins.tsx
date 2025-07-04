@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Search, Filter, ExternalLink, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,35 +11,36 @@ import { usePluginFilters } from "@/hooks/use-plugin-filters"
 
 
 const filters = [
-  { value: "all", label: "All Plugins" },
-  { value: "new", label: "New" },
+  { value: "default", label: "Default" },
   { value: "most-downloaded", label: "Most Downloaded" },
-  { value: "featured", label: "Featured" },
+  { value: "newest", label: "New" },
   { value: "free", label: "Free" },
   { value: "paid", label: "Paid" }
 ]
 
-const categories = [
-  "All Categories",
-  "Version Control",
-  "Productivity", 
-  "Customization",
-  "Web Dev",
-  "Database",
-  "Tools"
-]
-
 export default function Plugins() {
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedFilter, setSelectedFilter] = useState("all")
-  const [selectedCategory, setSelectedCategory] = useState("All Categories")
+  const [selectedFilter, setSelectedFilter] = useState("default")
 
-  const { data: plugins = [], isLoading, error } = usePlugins()
+  // Determine API filter type
+  const apiFilter = ['default', 'most-downloaded', 'newest'].includes(selectedFilter) 
+    ? selectedFilter as 'default' | 'most-downloaded' | 'newest' 
+    : 'default'
+
+  const { data: plugins = [], isLoading, error } = usePlugins(apiFilter)
   
-  const filteredPlugins = usePluginFilters(plugins, {
-    searchQuery,
-    selectedFilter,
-    selectedCategory
+  // Filter for free/paid plugins
+  const categoryFilteredPlugins = useMemo(() => {
+    if (selectedFilter === 'free') {
+      return plugins.filter(plugin => plugin.price === 0)
+    } else if (selectedFilter === 'paid') {
+      return plugins.filter(plugin => plugin.price > 0)
+    }
+    return plugins
+  }, [plugins, selectedFilter])
+  
+  const filteredPlugins = usePluginFilters(categoryFilteredPlugins, {
+    searchQuery
   })
 
   if (isLoading) {
@@ -124,7 +125,7 @@ export default function Plugins() {
         {/* Results Count */}
         <div className="flex justify-between items-center mb-6">
           <p className="text-muted-foreground">
-            Showing {filteredPlugins.length} of {plugins.length} plugins
+            Showing {filteredPlugins.length} of {categoryFilteredPlugins.length} plugins
           </p>
           <Button variant="outline" size="sm">
             <ExternalLink className="w-4 h-4 mr-2" />
