@@ -65,15 +65,15 @@ export function HeroModern() {
 
           {/* Main Heading */}
           <h1 className="text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-8 animate-slide-up" style={{ animationDelay: "0.2s" }}>
-            It's time to make your{" "}
+            Code
             <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              software
+              {" "}anywhere, anytime
             </span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12 animate-slide-up" style={{ animationDelay: "0.4s" }}>
-            What do you want to code today? Writing, editing, debugging software on the go? Everything just works.
+            A powerful, feature-rich code editor for Android. Write, edit, and manage your code on the go with syntax highlighting, plugins, and more.
           </p>
 
           {/* Download Buttons */}
@@ -105,7 +105,7 @@ export function HeroModern() {
           </div>
 
           {/* Version Info */}
-          <div className="mt-16 animate-fade-in" style={{ animationDelay: "1s" }}>
+          <div className="mt-16 mb-4 animate-fade-in" style={{ animationDelay: "1s" }}>
             <p className="text-sm text-muted-foreground">
               Latest version: 1.8.5 • Compatible with Android 5.0+ • Trusted by 2M+ developers
             </p>
