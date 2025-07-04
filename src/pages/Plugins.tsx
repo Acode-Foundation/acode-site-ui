@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { Search, Filter, Star, Download, Heart, ExternalLink, DollarSign, Loader2, Verified } from "lucide-react"
+import { Search, Filter, ExternalLink, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { MainLayout } from "@/components/layout/main-layout"
+import { PluginCard } from "@/components/ui/plugin-card"
 
 interface Plugin {
   id: string
@@ -187,13 +185,13 @@ export default function Plugins() {
                 placeholder="Search plugins, authors, keywords..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 bg-background/80 border-border/50 rounded-lg text-base"
+                className="pl-12 h-12 bg-background/80 border-border/50 rounded-lg text-base focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
             {/* Filter */}
             <Select value={selectedFilter} onValueChange={setSelectedFilter}>
-              <SelectTrigger className="w-full lg:w-48 h-12 bg-background/80 border-border/50 rounded-lg">
+              <SelectTrigger className="w-full lg:w-48 h-12 bg-background/80 border-border/50 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20">
                 <Filter className="w-4 h-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
@@ -222,87 +220,7 @@ export default function Plugins() {
         {/* Plugins Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredPlugins.map((plugin, index) => (
-            <Link key={plugin.id} to={`/plugins/${plugin.id}`}>
-              <Card 
-                className="bg-card/60 backdrop-blur-lg border border-border/50 hover:border-primary/50 transition-all duration-300 group hover:shadow-elegant cursor-pointer animate-slide-up overflow-hidden"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="relative">
-                      <img 
-                        src={plugin.icon} 
-                        alt={plugin.name}
-                        className="w-12 h-12 rounded-lg group-hover:scale-110 transition-transform bg-gradient-primary p-0.5"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          target.nextElementSibling?.classList.remove('hidden');
-                        }}
-                      />
-                      <div className="hidden w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform">
-                        {plugin.name.charAt(0)}
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end space-y-1">
-                      {plugin.votes_up > 20 && (
-                        <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-xs">
-                          <Star className="w-3 h-3 mr-1" />
-                          Popular
-                        </Badge>
-                      )}
-                      <Badge variant="outline" className="text-xs">
-                        v{plugin.version}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-semibold text-base group-hover:text-primary transition-colors truncate">
-                      {plugin.name}
-                    </h3>
-                    <div className="flex items-center space-x-1">
-                      <p className="text-sm text-muted-foreground truncate">
-                        by {plugin.author}
-                      </p>
-                      {plugin.author_verified === 1 && (
-                        <Verified className="w-3 h-3 text-primary" />
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="pt-0">
-                  <div className="flex items-center justify-between text-sm mb-4">
-                    <span className={`font-medium ${plugin.price === 0 ? 'text-green-400' : 'text-primary'}`}>
-                      {plugin.price === 0 ? 'Free' : `$${plugin.price}`}
-                    </span>
-                    <div className="flex items-center space-x-1 text-muted-foreground">
-                      <Badge variant="outline" className="text-xs px-1">
-                        {plugin.license}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <div className="flex items-center space-x-1">
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-3 h-3 text-green-400" />
-                        <span className="text-green-400">{plugin.votes_up}</span>
-                      </div>
-                      <div className="flex items-center space-x-1 ml-2">
-                        <Star className="w-3 h-3 text-red-400 rotate-180" />
-                        <span className="text-red-400">{plugin.votes_down}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Download className="w-3 h-3" />
-                      <span>{plugin.downloads.toLocaleString()}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+            <PluginCard key={plugin.id} plugin={plugin} index={index} />
           ))}
         </div>
 

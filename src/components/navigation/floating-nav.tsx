@@ -10,7 +10,7 @@ const navItems = [
   { name: "FAQ", href: "/faq" },
   { name: "Plugins", href: "/plugins" },
   { name: "Docs", href: "https://docs.acode.app", external: true },
-  { name: "Login", href: "/login" },
+  { name: "Registration", href: "/registration" },
 ]
 
 export function FloatingNav() {
@@ -54,7 +54,7 @@ export function FloatingNav() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center space-x-1">
+        <div className="hidden lg:flex items-center space-x-8">
           {navItems.map((item) => (
             <div key={item.name}>
               {item.external ? (
@@ -63,8 +63,9 @@ export function FloatingNav() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
-                    "text-sm font-medium transition-all duration-200 hover:text-primary px-4 py-2 rounded-lg hover:bg-primary/10",
-                    "relative"
+                    "text-sm font-medium transition-all duration-200 hover:text-primary px-4 py-2 relative",
+                    "before:absolute before:bottom-1 before:left-1/2 before:w-0 before:h-0.5 before:bg-primary before:transition-all before:duration-200",
+                    "hover:before:w-6 hover:before:-translate-x-1/2"
                   )}
                 >
                   {item.name}
@@ -73,7 +74,7 @@ export function FloatingNav() {
                   <Link
                     to={item.href}
                     className={cn(
-                      "text-sm font-medium transition-all duration-200 hover:text-primary px-4 py-2 rounded-lg relative hover:bg-primary/10",
+                      "text-sm font-medium transition-all duration-200 hover:text-primary px-4 py-2 relative",
                       "before:absolute before:bottom-1 before:left-1/2 before:w-0 before:h-0.5 before:bg-primary before:transition-all before:duration-200",
                       location.pathname === item.href 
                         ? "text-primary before:w-6 before:-translate-x-1/2" 
@@ -91,7 +92,7 @@ export function FloatingNav() {
             variant="ghost"
             size="sm"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className="h-9 w-9 p-0 hover:bg-primary/10 transition-colors duration-200 rounded-lg ml-4"
+            className="h-9 w-9 p-0 hover:bg-primary/10 transition-colors duration-200 rounded-lg"
           >
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -149,11 +150,11 @@ export function FloatingNav() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                className="w-full justify-start h-10 px-3 hover:bg-primary/10 transition-colors duration-200"
+                className="w-full justify-center h-10 px-3 hover:bg-primary/10 transition-colors duration-200"
               >
-                <Sun className="h-4 w-4 mr-3 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-4 w-4 ml-3 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="ml-7">Toggle theme</span>
+                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Toggle theme</span>
               </Button>
             </div>
           </div>
