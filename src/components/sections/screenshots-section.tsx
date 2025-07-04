@@ -5,8 +5,8 @@ export function ScreenshotsSection() {
     <section className="py-20 relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/2 left-1/3 w-96 h-96 bg-acode-purple/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-acode-blue/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/3 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -17,33 +17,24 @@ export function ScreenshotsSection() {
             <span className="bg-gradient-primary bg-clip-text text-transparent"> every device</span>
           </h2>
           <p className="text-xl text-muted-foreground">
-            Acode adapts perfectly to any screen size, from phones to tablets to desktop displays.
+            Experience seamless coding across all your devices with our responsive design and adaptive interface.
           </p>
         </div>
 
         {/* Device Showcase */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
           {/* Mobile View */}
           <div className="text-center animate-slide-up">
             <div className="relative mx-auto mb-6">
-              <div className="w-64 h-96 bg-gradient-to-b from-card/80 to-card/40 rounded-3xl border border-border p-4 backdrop-blur-sm shadow-elegant">
-                <div className="w-full h-full bg-acode-darker rounded-2xl p-3 relative overflow-hidden">
-                  {/* Mobile Screenshot Mockup */}
-                  <div className="text-xs font-mono text-green-400 mb-2">~/projects/my-app</div>
-                  <div className="space-y-1 text-xs font-mono">
-                    <div className="text-blue-400">import</div>
-                    <div className="text-purple-400">function App() {"{"}</div>
-                    <div className="text-white pl-4">return (</div>
-                    <div className="text-yellow-400 pl-8">&lt;div&gt;</div>
-                    <div className="text-white pl-12">Hello World</div>
-                    <div className="text-yellow-400 pl-8">&lt;/div&gt;</div>
-                    <div className="text-white pl-4">)</div>
-                    <div className="text-purple-400">{"}"}</div>
-                  </div>
-                  <div className="absolute bottom-2 left-3 right-3 h-8 bg-secondary/50 rounded-lg flex items-center px-2">
-                    <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                    <div className="text-xs text-muted-foreground">index.js</div>
-                  </div>
+              <img 
+                src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                alt="Mobile coding interface"
+                className="w-64 h-96 object-cover rounded-3xl border border-border/50 shadow-elegant"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent rounded-3xl" />
+              <div className="absolute bottom-4 left-4 right-4">
+                <div className="text-xs font-semibold text-white bg-black/50 backdrop-blur-sm rounded px-2 py-1">
+                  Mobile Editor
                 </div>
               </div>
             </div>
@@ -56,33 +47,15 @@ export function ScreenshotsSection() {
           {/* Tablet View */}
           <div className="text-center animate-slide-up" style={{ animationDelay: "0.2s" }}>
             <div className="relative mx-auto mb-6">
-              <div className="w-80 h-60 bg-gradient-to-b from-card/80 to-card/40 rounded-2xl border border-border p-3 backdrop-blur-sm shadow-elegant">
-                <div className="w-full h-full bg-acode-darker rounded-xl p-4 relative overflow-hidden">
-                  {/* Tablet Screenshot Mockup */}
-                  <div className="flex">
-                    <div className="w-1/4 border-r border-border pr-2">
-                      <div className="text-xs text-muted-foreground mb-2">Files</div>
-                      <div className="space-y-1 text-xs">
-                        <div className="text-blue-400">📁 src</div>
-                        <div className="text-white pl-2">📄 App.js</div>
-                        <div className="text-white pl-2">📄 index.js</div>
-                        <div className="text-blue-400">📁 public</div>
-                      </div>
-                    </div>
-                    <div className="flex-1 pl-3">
-                      <div className="text-xs font-mono text-green-400 mb-2">App.js</div>
-                      <div className="space-y-1 text-xs font-mono">
-                        <div className="text-blue-400">import React from 'react';</div>
-                        <div className="text-purple-400">const App = () =&gt; {"{"}</div>
-                        <div className="text-white pl-2">return (</div>
-                        <div className="text-yellow-400 pl-4">&lt;div className="app"&gt;</div>
-                        <div className="text-white pl-6">Welcome to Acode</div>
-                        <div className="text-yellow-400 pl-4">&lt;/div&gt;</div>
-                        <div className="text-white pl-2">);</div>
-                        <div className="text-purple-400">{"}"}</div>
-                      </div>
-                    </div>
-                  </div>
+              <img 
+                src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                alt="Tablet coding interface"
+                className="w-80 h-60 object-cover rounded-2xl border border-border/50 shadow-elegant"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent rounded-2xl" />
+              <div className="absolute bottom-4 left-4 right-4">
+                <div className="text-xs font-semibold text-white bg-black/50 backdrop-blur-sm rounded px-2 py-1">
+                  Tablet Interface
                 </div>
               </div>
             </div>
@@ -95,42 +68,15 @@ export function ScreenshotsSection() {
           {/* Desktop View */}
           <div className="text-center animate-slide-up" style={{ animationDelay: "0.4s" }}>
             <div className="relative mx-auto mb-6">
-              <div className="w-80 h-48 bg-gradient-to-b from-card/80 to-card/40 rounded-xl border border-border p-2 backdrop-blur-sm shadow-elegant">
-                <div className="w-full h-full bg-acode-darker rounded-lg p-3 relative overflow-hidden">
-                  {/* Desktop Screenshot Mockup */}
-                  <div className="flex">
-                    <div className="w-1/5 border-r border-border pr-1">
-                      <div className="text-xs text-muted-foreground mb-1">Explorer</div>
-                      <div className="space-y-1 text-xs">
-                        <div className="text-blue-400">📁 components</div>
-                        <div className="text-blue-400">📁 pages</div>
-                        <div className="text-white">📄 App.js</div>
-                        <div className="text-white">📄 index.js</div>
-                      </div>
-                    </div>
-                    <div className="flex-1 pl-2">
-                      <div className="flex space-x-2 mb-1">
-                        <div className="bg-secondary/50 px-2 py-1 rounded text-xs">App.js</div>
-                        <div className="bg-secondary/30 px-2 py-1 rounded text-xs">index.js</div>
-                      </div>
-                      <div className="space-y-1 text-xs font-mono">
-                        <div><span className="text-gray-500">1</span> <span className="text-blue-400">import</span> <span className="text-yellow-400">'./App.css'</span></div>
-                        <div><span className="text-gray-500">2</span></div>
-                        <div><span className="text-gray-500">3</span> <span className="text-purple-400">function</span> <span className="text-blue-300">App</span>() {"{"}</div>
-                        <div><span className="text-gray-500">4</span>   <span className="text-purple-400">return</span> (</div>
-                        <div><span className="text-gray-500">5</span>     <span className="text-yellow-400">&lt;div</span> <span className="text-blue-300">className</span>=<span className="text-green-400">"App"</span><span className="text-yellow-400">&gt;</span></div>
-                        <div><span className="text-gray-500">6</span>       <span className="text-white">Coding on mobile!</span></div>
-                      </div>
-                    </div>
-                    <div className="w-1/4 border-l border-border pl-1">
-                      <div className="text-xs text-muted-foreground mb-1">Plugins</div>
-                      <div className="space-y-1 text-xs">
-                        <div className="text-green-400">✓ Git Manager</div>
-                        <div className="text-green-400">✓ AI Assistant</div>
-                        <div className="text-blue-400">⚡ Live Preview</div>
-                      </div>
-                    </div>
-                  </div>
+              <img 
+                src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                alt="Desktop coding interface"
+                className="w-80 h-48 object-cover rounded-xl border border-border/50 shadow-elegant"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent rounded-xl" />
+              <div className="absolute bottom-4 left-4 right-4">
+                <div className="text-xs font-semibold text-white bg-black/50 backdrop-blur-sm rounded px-2 py-1">
+                  Desktop Environment
                 </div>
               </div>
             </div>

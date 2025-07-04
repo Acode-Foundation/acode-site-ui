@@ -185,13 +185,13 @@ export default function Plugins() {
                 placeholder="Search plugins, authors, keywords..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 bg-background/80 border-border/50 rounded-lg text-base focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="pl-12 h-12 bg-background/80 border-border/50 rounded-lg text-base focus:border-primary focus:ring-primary"
               />
             </div>
 
             {/* Filter */}
             <Select value={selectedFilter} onValueChange={setSelectedFilter}>
-              <SelectTrigger className="w-full lg:w-48 h-12 bg-background/80 border-border/50 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20">
+              <SelectTrigger className="w-full lg:w-48 h-12 bg-background/80 border-border/50 rounded-lg focus:border-primary focus:ring-primary">
                 <Filter className="w-4 h-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
@@ -203,6 +203,17 @@ export default function Plugins() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+        </div>
+
+        {/* Ads Section */}
+        <div className="mb-8">
+          <div className="bg-gradient-primary/10 border border-primary/20 rounded-lg p-6 text-center">
+            <h3 className="text-lg font-semibold mb-2">Boost Your Productivity</h3>
+            <p className="text-muted-foreground mb-4">Discover premium plugins and themes to enhance your coding experience</p>
+            <Button variant="outline" className="border-primary/50 hover:bg-primary/10">
+              Explore Premium
+            </Button>
           </div>
         </div>
 

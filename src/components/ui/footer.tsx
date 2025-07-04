@@ -2,34 +2,23 @@ import { Github, Twitter, Heart, ExternalLink } from "lucide-react"
 import { Link } from "react-router-dom"
 import acodeLogoSvg from "@/assets/acode-logo.svg"
 
-const footerLinks = {
-  product: [
-    { name: "Features", href: "/#features" },
-    { name: "Plugins", href: "/plugins" },
-    { name: "Documentation", href: "https://docs.acode.app", external: true },
-    { name: "Changelog", href: "/changelog" }
-  ],
-  support: [
-    { name: "FAQ", href: "/faq" },
-    { name: "Community", href: "https://discord.gg/acode", external: true },
-    { name: "Bug Reports", href: "https://github.com/deadlyjack/Acode/issues", external: true },
-    { name: "Contact", href: "/contact" }
-  ],
-  company: [
-    { name: "About", href: "/about" },
-    { name: "Privacy", href: "/privacy" },
-    { name: "Terms", href: "/terms" },
-    { name: "License", href: "/license" }
-  ]
-}
+const footerLinks = [
+  { name: "FAQ", href: "/faq" },
+  { name: "Plugins", href: "/plugins" },
+  { name: "Documentation", href: "https://docs.acode.app", external: true },
+  { name: "Privacy Policy", href: "/privacy" },
+  { name: "Terms & Conditions", href: "/terms" },
+  { name: "GitHub", href: "https://github.com/deadlyjack/Acode", external: true },
+  { name: "Discord", href: "https://discord.gg/acode", external: true }
+]
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/50 bg-background/50 backdrop-blur-sm">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row justify-between items-center">
+    <footer className="border-t border-border/20 bg-background/95 backdrop-blur-sm">
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex flex-col items-center text-center space-y-8">
           {/* Brand */}
-          <div className="flex items-center space-x-3 mb-6 md:mb-0">
+          <div className="flex items-center space-x-3">
             <img src={acodeLogoSvg} alt="Acode" className="h-8 w-8" />
             <span className="font-bold text-xl bg-gradient-primary bg-clip-text text-transparent">
               Acode
@@ -37,36 +26,36 @@ export function Footer() {
           </div>
 
           {/* Links */}
-          <div className="flex flex-wrap justify-center md:justify-end items-center gap-6 text-sm">
-            <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors">
-              FAQ
-            </Link>
-            <Link to="/plugins" className="text-muted-foreground hover:text-primary transition-colors">
-              Plugins
-            </Link>
-            <a 
-              href="https://docs.acode.app" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              Docs
-            </a>
-            <a 
-              href="https://github.com/deadlyjack/Acode" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              GitHub
-            </a>
+          <div className="flex flex-wrap justify-center items-center gap-8 text-sm">
+            {footerLinks.map((link) => (
+              <div key={link.name}>
+                {link.external ? (
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {link.name}
+                  </a>
+                ) : (
+                  <Link
+                    to={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                )}
+              </div>
+            ))}
           </div>
-        </div>
 
-        <div className="border-t border-border/50 mt-8 pt-6 text-center">
-          <p className="text-muted-foreground text-sm">
-            © 2024 Acode. Made with <Heart className="w-4 h-4 mx-1 text-primary inline" /> for developers
-          </p>
+          {/* Copyright */}
+          <div className="pt-6 border-t border-border/20 w-full">
+            <p className="text-muted-foreground text-sm">
+              © 2024 Acode. Made with <Heart className="w-4 h-4 mx-1 text-primary inline" /> for developers
+            </p>
+          </div>
         </div>
       </div>
     </footer>

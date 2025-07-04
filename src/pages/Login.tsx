@@ -20,13 +20,17 @@ export default function Login() {
     e.preventDefault()
     setIsLoading(true)
     
-    // Simulate login
+    // Demo login logic - redirect to dashboard with hardcoded credentials
     setTimeout(() => {
       setIsLoading(false)
-      toast({
-        title: "Login successful!",
-        description: "Welcome back to Acode.",
-      })
+      if (email === "demo@acode.app" && password === "demo123") {
+        window.location.href = "/dashboard"
+      } else {
+        toast({
+          title: "Login failed",
+          description: "Please use the demo credentials provided below.",
+        })
+      }
     }, 1000)
   }
 
