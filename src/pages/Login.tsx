@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { MainLayout } from "@/components/layout/main-layout"
 import { Link } from "react-router-dom"
 import { useToast } from "@/hooks/use-toast"
 
@@ -37,7 +38,8 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+    <MainLayout>
+      <div className="min-h-screen flex items-center justify-center py-12 px-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -179,5 +181,6 @@ export default function Login() {
         </Card>
       </div>
     </div>
+    </MainLayout>
   )
 }

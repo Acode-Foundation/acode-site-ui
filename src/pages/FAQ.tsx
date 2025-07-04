@@ -3,6 +3,7 @@ import { Search, HelpCircle, MessageCircle, ExternalLink } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { MainLayout } from "@/components/layout/main-layout"
 import { useState } from "react"
 
 const faqs = [
@@ -65,7 +66,8 @@ export default function FAQ() {
   )
 
   return (
-    <div className="min-h-screen py-8">
+    <MainLayout>
+      <div className="min-h-screen py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-12">
@@ -175,5 +177,6 @@ export default function FAQ() {
         </Card>
       </div>
     </div>
+    </MainLayout>
   )
 }

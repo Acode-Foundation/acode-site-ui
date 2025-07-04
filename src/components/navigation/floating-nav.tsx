@@ -30,7 +30,7 @@ export function FloatingNav() {
   return (
     <nav
       className={cn(
-        "fixed top-4 left-4 right-4 lg:left-1/2 lg:right-auto lg:transform lg:-translate-x-1/2 z-50 transition-all duration-300 lg:max-w-5xl lg:w-auto",
+        "fixed top-4 left-4 right-4 lg:left-1/2 lg:right-auto lg:transform lg:-translate-x-1/2 z-50 transition-all duration-300 lg:max-w-6xl lg:w-auto",
         isScrolled
           ? "bg-card/95 backdrop-blur-xl border border-border/50 shadow-2xl"
           : "bg-card/80 backdrop-blur-lg border border-border/30"
@@ -54,7 +54,7 @@ export function FloatingNav() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center space-x-8">
+        <div className="hidden lg:flex items-center space-x-1">
           {navItems.map((item) => (
             <div key={item.name}>
               {item.external ? (
@@ -63,7 +63,7 @@ export function FloatingNav() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
-                    "text-base font-medium transition-all duration-200 hover:text-primary px-4 py-2 rounded-lg hover:bg-secondary/10",
+                    "text-sm font-medium transition-all duration-200 hover:text-primary px-4 py-2 rounded-lg hover:bg-primary/10",
                     "relative"
                   )}
                 >
@@ -73,8 +73,8 @@ export function FloatingNav() {
                   <Link
                     to={item.href}
                     className={cn(
-                      "text-sm font-medium transition-all duration-200 hover:text-primary px-3 py-2 rounded-lg relative",
-                      "before:absolute before:bottom-0 before:left-1/2 before:w-0 before:h-0.5 before:bg-primary before:transition-all before:duration-200",
+                      "text-sm font-medium transition-all duration-200 hover:text-primary px-4 py-2 rounded-lg relative hover:bg-primary/10",
+                      "before:absolute before:bottom-1 before:left-1/2 before:w-0 before:h-0.5 before:bg-primary before:transition-all before:duration-200",
                       location.pathname === item.href 
                         ? "text-primary before:w-6 before:-translate-x-1/2" 
                         : "hover:before:w-6 hover:before:-translate-x-1/2"
@@ -91,7 +91,7 @@ export function FloatingNav() {
             variant="ghost"
             size="sm"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className="h-8 w-8 p-0 hover:bg-accent/10 transition-colors duration-200 rounded-lg border border-border/30"
+            className="h-9 w-9 p-0 hover:bg-primary/10 transition-colors duration-200 rounded-lg ml-4"
           >
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -144,16 +144,18 @@ export function FloatingNav() {
                 )}
               </div>
             ))}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-              className="justify-start h-10 px-0 hover:bg-secondary/20 transition-colors duration-200 mt-4"
-            >
-              <Sun className="h-5 w-5 mr-2 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-5 w-5 ml-7 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="ml-7">Toggle theme</span>
-            </Button>
+            <div className="pt-4 border-t border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                className="w-full justify-start h-10 px-3 hover:bg-primary/10 transition-colors duration-200"
+              >
+                <Sun className="h-4 w-4 mr-3 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-4 w-4 ml-3 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="ml-7">Toggle theme</span>
+              </Button>
+            </div>
           </div>
         </div>
       )}

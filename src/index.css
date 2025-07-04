@@ -92,6 +92,23 @@
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 212 100% 55%;
+
+    /* Acode Brand Colors - Light Mode */
+    --acode-blue: 212 100% 55%;
+    --acode-blue-light: 212 90% 65%;
+    --acode-blue-dark: 212 100% 45%;
+    --acode-dark: 0 0% 100%;
+    --acode-darker: 240 4.8% 95.9%;
+    
+    /* Gradients - Light Mode */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--acode-blue)), hsl(var(--acode-blue-light)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--acode-blue-dark)), hsl(var(--acode-blue)));
+    --gradient-dark: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+    
+    /* Glows and Effects - Light Mode */
+    --glow-primary: 0 0 40px hsl(var(--acode-blue) / 0.2);
+    --glow-blue: 0 0 40px hsl(var(--acode-blue) / 0.2);
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--acode-blue) / 0.3);
   }
 }
 

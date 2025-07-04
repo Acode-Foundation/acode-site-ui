@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { MainLayout } from "@/components/layout/main-layout"
 
 export default function ForgotPassword() {
   const [emailSent, setEmailSent] = useState(false)
@@ -17,7 +18,8 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-dark flex items-center justify-center p-4">
+    <MainLayout>
+      <div className="min-h-screen flex items-center justify-center p-4">
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-acode-purple/20 rounded-full blur-3xl animate-float" />
@@ -125,5 +127,6 @@ export default function ForgotPassword() {
         </Card>
       </div>
     </div>
+    </MainLayout>
   )
 }
