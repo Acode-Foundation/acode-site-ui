@@ -167,28 +167,6 @@ export function TestimonialsSection() {
             ))}
           </div>
         </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20 max-w-3xl mx-auto">
-          <div className="text-center">
-            <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-              10K+
-            </div>
-            <p className="text-muted-foreground">Happy Developers</p>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-              4.8/5
-            </div>
-            <p className="text-muted-foreground">Average Rating</p>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-              50+
-            </div>
-            <p className="text-muted-foreground">Countries</p>
-          </div>
-        </div>
       </div>
     </section>
   )
