@@ -1,99 +1,33 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { Search, Filter, Star, Download, Heart, ExternalLink, DollarSign } from "lucide-react"
+import { Search, Filter, Star, Download, Heart, ExternalLink, DollarSign, Loader2, Verified } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { MainLayout } from "@/components/layout/main-layout"
 
-// Mock plugin data
-const plugins = [
-  {
-    id: 1,
-    name: "Git Manager",
-    description: "Complete Git integration for mobile development with commit, push, pull, and branch management",
-    author: "DevTools Team",
-    downloads: "50.2k",
-    rating: 4.8,
-    price: "Free",
-    category: "Version Control",
-    keywords: ["git", "version control", "github"],
-    status: "approved",
-    featured: true,
-    lastUpdated: "2 days ago"
-  },
-  {
-    id: 2,
-    name: "AI Assistant",
-    description: "Code completion and suggestions powered by AI. Get intelligent code suggestions as you type",
-    author: "AI Innovations",
-    downloads: "32.1k",
-    rating: 4.9,
-    price: "$2.99",
-    category: "Productivity",
-    keywords: ["ai", "completion", "suggestions"],
-    status: "approved",
-    featured: true,
-    lastUpdated: "1 week ago"
-  },
-  {
-    id: 3,
-    name: "Theme Studio",
-    description: "Create and customize your own editor themes with live preview and export functionality",
-    author: "Theme Masters",
-    downloads: "28.5k",
-    rating: 4.7,
-    price: "Free",
-    category: "Customization",
-    keywords: ["theme", "colors", "customization"],
-    status: "approved",
-    featured: true,
-    lastUpdated: "3 days ago"
-  },
-  {
-    id: 4,
-    name: "Live Preview",
-    description: "Real-time preview for web development with hot reload and device synchronization",
-    author: "WebDev Pro",
-    downloads: "45.8k",
-    rating: 4.8,
-    price: "$1.99",
-    category: "Web Dev",
-    keywords: ["preview", "web", "html", "css"],
-    status: "approved",
-    featured: true,
-    lastUpdated: "5 days ago"
-  },
-  {
-    id: 5,
-    name: "Code Formatter",
-    description: "Format your code automatically with support for multiple languages and style guides",
-    author: "Format Co",
-    downloads: "38.2k",
-    rating: 4.6,
-    price: "Free",
-    category: "Productivity",
-    keywords: ["format", "beautify", "style"],
-    status: "approved",
-    featured: false,
-    lastUpdated: "1 week ago"
-  },
-  {
-    id: 6,
-    name: "Database Explorer",
-    description: "Connect and manage databases directly from your mobile editor",
-    author: "DB Tools",
-    downloads: "15.3k",
-    rating: 4.5,
-    price: "$4.99",
-    category: "Database",
-    keywords: ["database", "sql", "mysql"],
-    status: "approved",
-    featured: false,
-    lastUpdated: "2 weeks ago"
-  }
-]
+interface Plugin {
+  id: string
+  sku: string
+  icon: string
+  name: string
+  price: number
+  author: string
+  user_id: number
+  version: string
+  keywords: string
+  license: string
+  votes_up: number
+  downloads: number
+  repository: string | null
+  votes_down: number
+  comment_count: number
+  author_verified: number
+  min_version_code: number
+}
+
 
 const filters = [
   { value: "all", label: "All Plugins" },
@@ -115,28 +49,58 @@ const categories = [
 ]
 
 export default function Plugins() {
+  const [plugins, setPlugins] = useState<Plugin[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedFilter, setSelectedFilter] = useState("all")
   const [selectedCategory, setSelectedCategory] = useState("All Categories")
 
+  useEffect(() => {
+    const fetchPlugins = async () => {
+      try {
+        const response = await fetch('https://acode.app/api/plugins')
+        const data = await response.json()
+        setPlugins(data)
+      } catch (error) {
+        console.error('Failed to fetch plugins:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPlugins()
+  }, [])
+
   const filteredPlugins = plugins.filter(plugin => {
+    const keywords = JSON.parse(plugin.keywords || '[]')
     const matchesSearch = plugin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         plugin.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         plugin.keywords.some(keyword => keyword.toLowerCase().includes(searchQuery.toLowerCase()))
+                         plugin.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         keywords.some((keyword: string) => keyword.toLowerCase().includes(searchQuery.toLowerCase()))
     
     const matchesFilter = selectedFilter === "all" ||
-                         (selectedFilter === "featured" && plugin.featured) ||
-                         (selectedFilter === "free" && plugin.price === "Free") ||
-                         (selectedFilter === "paid" && plugin.price !== "Free")
+                         (selectedFilter === "new") ||
+                         (selectedFilter === "most-downloaded" && plugin.downloads > 10000) ||
+                         (selectedFilter === "featured" && plugin.votes_up > 20) ||
+                         (selectedFilter === "free" && plugin.price === 0) ||
+                         (selectedFilter === "paid" && plugin.price > 0)
     
-    const matchesCategory = selectedCategory === "All Categories" || plugin.category === selectedCategory
-
-    return matchesSearch && matchesFilter && matchesCategory
+    return matchesSearch && matchesFilter
   })
 
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    )
+  }
+
   return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto px-4">
+    <MainLayout>
+      <div className="min-h-screen py-8">
+        <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -149,22 +113,22 @@ export default function Plugins() {
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-card/50 backdrop-blur-sm border border-border rounded-2xl p-6 mb-8">
+        <div className="bg-card/60 backdrop-blur-lg border border-border/50 rounded-xl p-6 mb-8 shadow-lg">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
-                placeholder="Search plugins..."
+                placeholder="Search plugins, authors, keywords..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-background/50"
+                className="pl-12 h-12 bg-background/80 border-border/50 rounded-lg text-base"
               />
             </div>
 
             {/* Filter */}
             <Select value={selectedFilter} onValueChange={setSelectedFilter}>
-              <SelectTrigger className="w-full lg:w-48 bg-background/50">
+              <SelectTrigger className="w-full lg:w-48 h-12 bg-background/80 border-border/50 rounded-lg">
                 <Filter className="w-4 h-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
@@ -172,20 +136,6 @@ export default function Plugins() {
                 {filters.map(filter => (
                   <SelectItem key={filter.value} value={filter.value}>
                     {filter.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Category */}
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full lg:w-48 bg-background/50">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map(category => (
-                  <SelectItem key={category} value={category}>
-                    {category}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -205,94 +155,100 @@ export default function Plugins() {
         </div>
 
         {/* Plugins Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredPlugins.map((plugin, index) => (
-            <Link key={plugin.id} to={`/plugins/${plugin.name.toLowerCase().replace(/\s+/g, '-')}`}>
+            <Link key={plugin.id} to={`/plugins/${plugin.id}`}>
               <Card 
-                className="bg-card/50 backdrop-blur-sm border-border hover:border-primary/50 transition-all duration-300 group hover:shadow-elegant cursor-pointer animate-slide-up"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className="bg-card/60 backdrop-blur-lg border border-border/50 hover:border-primary/50 transition-all duration-300 group hover:shadow-elegant cursor-pointer animate-slide-up overflow-hidden"
+                style={{ animationDelay: `${index * 0.05}s` }}
               >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform">
-                    {plugin.name.charAt(0)}
-                  </div>
-                  <div className="flex flex-col items-end space-y-1">
-                    {plugin.featured && (
-                      <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
-                        <Star className="w-3 h-3 mr-1" />
-                        Featured
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div className="relative">
+                      <img 
+                        src={plugin.icon} 
+                        alt={plugin.name}
+                        className="w-12 h-12 rounded-lg group-hover:scale-110 transition-transform bg-gradient-primary p-0.5"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          target.nextElementSibling?.classList.remove('hidden');
+                        }}
+                      />
+                      <div className="hidden w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform">
+                        {plugin.name.charAt(0)}
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end space-y-1">
+                      {plugin.votes_up > 20 && (
+                        <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-xs">
+                          <Star className="w-3 h-3 mr-1" />
+                          Popular
+                        </Badge>
+                      )}
+                      <Badge variant="outline" className="text-xs">
+                        v{plugin.version}
                       </Badge>
-                    )}
-                    <Badge variant="outline" className="text-xs">
-                      {plugin.category}
-                    </Badge>
+                    </div>
                   </div>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
-                    {plugin.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    by {plugin.author}
-                  </p>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="pt-0">
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                  {plugin.description}
-                </p>
-                
-                <div className="flex items-center justify-between text-sm mb-3">
-                  <span className={`font-medium ${plugin.price === 'Free' ? 'text-green-400' : 'text-primary'}`}>
-                    {plugin.price === 'Free' ? (
-                      'Free'
-                    ) : (
-                      <span className="flex items-center">
-                        <DollarSign className="w-3 h-3 mr-1" />
-                        {plugin.price.replace('$', '')}
-                      </span>
-                    )}
-                  </span>
-                  <span className="text-muted-foreground">
-                    Updated {plugin.lastUpdated}
-                  </span>
-                </div>
-                
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <div className="flex items-center space-x-1">
-                    <Star className="w-3 h-3 text-yellow-400 fill-current" />
-                    <span>{plugin.rating}</span>
+                  
+                  <div>
+                    <h3 className="font-semibold text-base group-hover:text-primary transition-colors truncate">
+                      {plugin.name}
+                    </h3>
+                    <div className="flex items-center space-x-1">
+                      <p className="text-sm text-muted-foreground truncate">
+                        by {plugin.author}
+                      </p>
+                      {plugin.author_verified === 1 && (
+                        <Verified className="w-3 h-3 text-primary" />
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <Download className="w-3 h-3" />
-                    <span>{plugin.downloads}</span>
+                </CardHeader>
+                
+                <CardContent className="pt-0">
+                  <div className="flex items-center justify-between text-sm mb-4">
+                    <span className={`font-medium ${plugin.price === 0 ? 'text-green-400' : 'text-primary'}`}>
+                      {plugin.price === 0 ? 'Free' : `$${plugin.price}`}
+                    </span>
+                    <div className="flex items-center space-x-1 text-muted-foreground">
+                      <Badge variant="outline" className="text-xs px-1">
+                        {plugin.license}
+                      </Badge>
+                    </div>
                   </div>
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="p-1 h-auto hover:text-red-400 transition-colors"
-                  >
-                    <Heart className="w-4 h-4" />
-                  </Button>
-                </div>
+                  
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <div className="flex items-center space-x-1">
+                      <div className="flex items-center space-x-1">
+                        <Star className="w-3 h-3 text-green-400" />
+                        <span className="text-green-400">{plugin.votes_up}</span>
+                      </div>
+                      <div className="flex items-center space-x-1 ml-2">
+                        <Star className="w-3 h-3 text-red-400 rotate-180" />
+                        <span className="text-red-400">{plugin.votes_down}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Download className="w-3 h-3" />
+                      <span>{plugin.downloads.toLocaleString()}</span>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </Link>
           ))}
         </div>
 
-        {/* Load More */}
-        {filteredPlugins.length === plugins.length && (
-          <div className="text-center mt-12">
-            <Button variant="outline" size="lg">
-              Load More Plugins
-            </Button>
+        {/* No Results */}
+        {filteredPlugins.length === 0 && !loading && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-lg">No plugins found matching your criteria.</p>
           </div>
         )}
       </div>
     </div>
+    </MainLayout>
   )
 }
