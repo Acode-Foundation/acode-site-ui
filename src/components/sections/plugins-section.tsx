@@ -1,64 +1,12 @@
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
 import { PluginCard } from "@/components/ui/plugin-card"
-
-const featuredPlugins = [
-  {
-    id: "foxdebug.gitmanager",
-    icon: "https://acode.foxdebug.com/plugin-icon/foxdebug.gitmanager",
-    name: "Git Manager",
-    price: 2.99,
-    author: "FoxDebug",
-    version: "1.5.2",
-    license: "GPL-3.0",
-    votes_up: 67,
-    downloads: 124876,
-    votes_down: 5,
-    author_verified: 1
-  },
-  {
-    id: "bajrangcoder.acodex",
-    icon: "https://acode.foxdebug.com/plugin-icon/bajrangcoder.acodex",
-    name: "AcodeX - Terminal",
-    price: 0,
-    author: "Raunak Raj",
-    version: "3.1.11",
-    license: "MIT",
-    votes_up: 28,
-    downloads: 157972,
-    votes_down: 3,
-    author_verified: 1
-  },
-  {
-    id: "deadlyjack.console",
-    icon: "https://acode.foxdebug.com/plugin-icon/deadlyjack.console",
-    name: "Console",
-    price: 0,
-    author: "DeadlyJack",
-    version: "2.1.0",
-    license: "MIT",
-    votes_up: 45,
-    downloads: 89532,
-    votes_down: 2,
-    author_verified: 1
-  },
-  {
-    id: "theme.studio",
-    icon: "https://acode.foxdebug.com/plugin-icon/theme.studio",
-    name: "Theme Studio",
-    price: 1.99,
-    author: "ThemeStudio",
-    version: "2.0.5",
-    license: "MIT",
-    votes_up: 32,
-    downloads: 45821,
-    votes_down: 1,
-    author_verified: 0
-  }
-]
+import { useFeaturedPlugins } from "@/hooks/use-plugins"
 
 export function PluginsSection() {
+  const { data: featuredPlugins = [], isLoading } = useFeaturedPlugins()
+
   return (
     <section className="py-20 relative">
       <div className="container mx-auto px-4">
@@ -80,11 +28,17 @@ export function PluginsSection() {
         </div>
 
         {/* Featured Plugins Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredPlugins.map((plugin, index) => (
-            <PluginCard key={plugin.id} plugin={plugin} index={index} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {featuredPlugins.map((plugin, index) => (
+              <PluginCard key={plugin.id} plugin={plugin} index={index} />
+            ))}
+          </div>
+        )}
 
         {/* Plugin Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
