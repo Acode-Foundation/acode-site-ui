@@ -15,6 +15,8 @@ import Signup from "./pages/Signup";
 import Registration from "./pages/Registration";
 import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
+import Earnings from "./pages/Earnings";
+import DeveloperProfile from "./pages/DeveloperProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -49,6 +51,8 @@ const App = () => (
                 <Route path="/registration" element={<Registration />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/earnings" element={<Earnings />} />
+                <Route path="/developer/:username" element={<DeveloperProfile />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </MainLayout>
