@@ -65,10 +65,12 @@ export function HeroModern() {
 
           {/* Main Heading */}
           <h1 className="text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-8 animate-slide-up" style={{ animationDelay: "0.2s" }}>
-            Code
             <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              {" "}anywhere, anytime
+              Code
             </span>
+            {" "}anywhere,
+            <br />
+            anytime
           </h1>
 
           {/* Subtitle */}

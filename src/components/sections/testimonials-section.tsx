@@ -99,27 +99,10 @@ export function TestimonialsSection() {
                     "{testimonials[currentIndex].content}"
                   </blockquote>
                   
-                  {/* Rating */}
-                  <div className="flex items-center mb-6">
-                    {Array.from({ length: testimonials[currentIndex].rating }).map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  
                   {/* Author Info */}
-                  <div className="flex items-center">
-                    <img 
-                      src={testimonials[currentIndex].avatar} 
-                      alt={testimonials[currentIndex].name}
-                      className="w-16 h-16 rounded-full mr-4 bg-secondary"
-                    />
-                    <div>
-                      <div className="font-semibold text-lg text-foreground">
-                        {testimonials[currentIndex].name}
-                      </div>
-                      <div className="text-muted-foreground">
-                        {testimonials[currentIndex].role} at {testimonials[currentIndex].company}
-                      </div>
+                  <div className="text-center">
+                    <div className="font-semibold text-lg text-foreground">
+                      — {testimonials[currentIndex].name}
                     </div>
                   </div>
                 </div>
