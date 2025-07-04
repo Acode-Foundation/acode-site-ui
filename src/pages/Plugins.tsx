@@ -60,6 +60,7 @@ export default function Plugins() {
       try {
         const response = await fetch('https://acode.app/api/plugins')
         const data = await response.json()
+        console.log(data)
         setPlugins(data)
       } catch (error) {
         console.error('Failed to fetch plugins:', error)
