@@ -41,7 +41,7 @@ export function FloatingNav() {
         padding: "0.75rem 1.5rem",
       }}
     >
-      <div className="flex items-center justify-between w-full">
+      <div className="flex items-center w-full max-w-7xl mx-auto">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-3 group">
           <img 
@@ -55,45 +55,47 @@ export function FloatingNav() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center space-x-1 ml-auto mr-8">
-          {navItems.map((item) => (
-            <div key={item.name}>
-              {item.external ? (
+        <div className="hidden lg:flex items-center justify-between flex-1 ml-12">
+          <div className="flex items-center space-x-6">
+            {navItems.map((item) => (
+              <div key={item.name}>
+                {item.external ? (
                   <a
                     href={item.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
-                      "text-sm font-medium transition-all duration-200 hover:text-primary px-4 py-2 relative",
+                      "text-sm font-medium transition-all duration-200 hover:text-primary px-3 py-2 relative",
                       "before:absolute before:bottom-1 before:left-1/2 before:w-0 before:h-0.5 before:bg-primary before:transition-all before:duration-200",
                       "hover:before:w-6 hover:before:-translate-x-1/2"
                     )}
                   >
                     {item.name}
                   </a>
-              ) : (
+                ) : (
                   <Link
                     to={item.href}
                     className={cn(
-                      "text-sm font-medium transition-all duration-200 hover:text-primary px-4 py-2 relative",
+                      "text-sm font-medium transition-all duration-200 hover:text-primary px-3 py-2 relative",
                       "before:absolute before:bottom-1 before:left-1/2 before:w-0 before:h-0.5 before:bg-primary before:transition-all before:duration-200",
                       location.pathname === item.href 
                         ? "text-primary before:w-6 before:-translate-x-1/2" 
                         : "hover:before:w-6 hover:before:-translate-x-1/2"
                     )}
                   >
-                  {item.name}
-                </Link>
-              )}
-            </div>
-          ))}
+                    {item.name}
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
           
           {/* Theme Toggle */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className="h-9 w-9 p-0 hover:bg-primary/10 transition-colors duration-200 rounded-lg ml-4"
+            className="h-9 w-9 p-0 hover:bg-primary/10 transition-colors duration-200 rounded-lg"
           >
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
