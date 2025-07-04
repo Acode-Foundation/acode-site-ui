@@ -41,7 +41,7 @@ export function FloatingNav() {
         padding: "0.75rem 1.5rem",
       }}
     >
-      <div className="flex items-center w-full max-w-7xl mx-auto">
+      <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-3 group">
           <img 
@@ -55,8 +55,8 @@ export function FloatingNav() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center justify-between flex-1 ml-12">
-          <div className="flex items-center space-x-6">
+        <div className="hidden lg:flex items-center space-x-8">
+          <div className="flex items-center space-x-2">
             {navItems.map((item) => (
               <div key={item.name}>
                 {item.external ? (
@@ -104,18 +104,20 @@ export function FloatingNav() {
         </div>
 
         {/* Mobile Menu Button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-10 w-10 p-0 lg:hidden"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? (
-            <X className="h-5 w-5" />
-          ) : (
-            <Menu className="h-5 w-5" />
-          )}
-        </Button>
+        <div className="lg:hidden ml-auto">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-10 w-10 p-0"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
