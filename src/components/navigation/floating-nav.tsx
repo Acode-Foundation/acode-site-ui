@@ -33,8 +33,8 @@ export function FloatingNav() {
       className={cn(
         "fixed top-1 left-4 right-4 lg:left-1/2 lg:right-auto lg:transform lg:-translate-x-1/2 z-50 transition-all duration-300 lg:max-w-7xl lg:w-auto",
         isScrolled
-          ? "bg-card/95 backdrop-blur-sm border border-border/50 shadow-2xl"
-          : "bg-card/60 backdrop-blur-sm border border-border/30"
+          ? "bg-card/95 backdrop-blur-lg border border-border/50 shadow-2xl"
+          : "bg-card/60 backdrop-blur-lg border border-border/30"
       )}
       style={{
         borderRadius: "1rem",
