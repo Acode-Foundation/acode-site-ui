@@ -171,4 +171,326 @@
   .hover-glow:hover {
     box-shadow: var(--glow-primary);
   }
+
+  /* Markdown content styles */
+  .markdown-content {
+    @apply max-w-none;
+  }
+
+  .markdown-content h1,
+  .markdown-content h2,
+  .markdown-content h3,
+  .markdown-content h4,
+  .markdown-content h5,
+  .markdown-content h6 {
+    @apply mt-6 mb-4 font-semibold leading-tight;
+  }
+
+  .markdown-content h1 {
+    @apply text-2xl pb-3 border-b border-border;
+  }
+
+  .markdown-content h2 {
+    @apply text-xl pb-2 border-b border-border;
+  }
+
+  .markdown-content h3 {
+    @apply text-lg;
+  }
+
+  .markdown-content h4 {
+    @apply text-base;
+  }
+
+  .markdown-content h5 {
+    @apply text-sm;
+  }
+
+  .markdown-content h6 {
+    @apply text-xs text-muted-foreground;
+  }
+
+  .markdown-content p {
+    @apply mt-0 mb-4 text-foreground leading-relaxed;
+  }
+
+  .markdown-content a {
+    @apply text-primary no-underline hover:underline;
+  }
+
+  .markdown-content strong,
+  .markdown-content b {
+    @apply text-foreground font-semibold;
+  }
+
+  .markdown-content em {
+    @apply text-foreground italic;
+  }
+
+  .markdown-content code:not(pre code) {
+    @apply bg-muted text-foreground px-1 py-0.5 rounded text-sm font-mono;
+    font-size: 85%;
+  }
+
+  .markdown-content pre {
+    @apply bg-muted border border-border rounded-lg p-4 overflow-x-auto mb-4 text-sm;
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+    line-height: 1.45;
+  }
+
+  .markdown-content pre code {
+    @apply bg-transparent px-0 py-0 text-foreground border-0;
+    font-size: 100%;
+  }
+
+  .markdown-content blockquote {
+    @apply border-l-4 border-border pl-4 text-muted-foreground my-4;
+    margin: 0;
+  }
+
+  .markdown-content blockquote > :first-child {
+    @apply mt-0;
+  }
+
+  .markdown-content blockquote > :last-child {
+    @apply mb-0;
+  }
+
+  .markdown-content ul,
+  .markdown-content ol {
+    @apply mt-0 mb-4 pl-8 text-foreground;
+  }
+
+  .markdown-content ul {
+    list-style-type: disc;
+  }
+
+  .markdown-content ol {
+    list-style-type: decimal;
+  }
+
+  .markdown-content ul ul,
+  .markdown-content ul ol,
+  .markdown-content ol ol,
+  .markdown-content ol ul {
+    @apply mt-0 mb-0;
+  }
+
+  .markdown-content ul ul {
+    list-style-type: circle;
+  }
+
+  .markdown-content ul ul ul,
+  .markdown-content ul ol ol,
+  .markdown-content ol ul ol,
+  .markdown-content ol ol ol {
+    list-style-type: square;
+  }
+
+  .markdown-content li {
+    @apply my-1;
+  }
+
+  .markdown-content li + li {
+    @apply mt-1;
+  }
+
+  .markdown-content li > p {
+    @apply mt-4;
+  }
+
+  .markdown-content hr {
+    @apply border-0 bg-border my-6;
+    height: 0.25em;
+    padding: 0;
+    margin: 1.5rem 0;
+    background-color: hsl(var(--border));
+    border: 0;
+  }
+
+  .markdown-content hr::before {
+    display: table;
+    content: "";
+  }
+
+  .markdown-content hr::after {
+    display: table;
+    clear: both;
+    content: "";
+  }
+  
+  .markdown-content table {
+    @apply border-collapse w-full mb-4 block max-w-full overflow-auto;
+    border-spacing: 0;
+    width: max-content;
+  }
+
+  .markdown-content th {
+    @apply border border-border bg-muted p-3 text-left font-semibold;
+  }
+
+  .markdown-content td {
+    @apply border border-border p-3;
+  }
+
+  .markdown-content tr {
+    @apply border-t border-border;
+  }
+
+  .markdown-content tr:nth-child(2n) {
+    @apply bg-muted/30;
+  }
+
+  .markdown-content td > :last-child {
+    @apply mb-0;
+  }
+
+  .markdown-content img {
+    @apply rounded-lg max-w-full h-auto mb-4;
+    box-sizing: content-box;
+  }
+
+  .markdown-content kbd {
+    @apply bg-muted text-foreground px-2 py-1 rounded text-xs font-mono border border-border;
+    display: inline-block;
+    line-height: 10px;
+    vertical-align: middle;
+    box-shadow: inset 0 -1px 0 hsl(var(--border));
+  }
+
+  .markdown-content details {
+    @apply border border-border rounded-lg p-4 mb-4;
+  }
+
+  .markdown-content summary {
+    @apply font-semibold text-foreground cursor-pointer hover:text-primary transition-colors mb-2;
+  }
+
+  .markdown-content details[open] summary {
+    @apply mb-4;
+  }
+
+  .markdown-content details > *:not(summary) {
+    @apply mt-2;
+  }
+
+  .markdown-content abbr[title] {
+    @apply border-b-0;
+    text-decoration: underline dotted;
+  }
+
+  .markdown-content mark {
+    @apply bg-yellow-200 text-yellow-900 px-1 py-0.5 rounded;
+  }
+
+  .markdown-content small {
+    font-size: 90%;
+  }
+
+  .markdown-content sub,
+  .markdown-content sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+
+  .markdown-content sub {
+    bottom: -0.25em;
+  }
+
+  .markdown-content sup {
+    top: -0.5em;
+  }
+
+  .markdown-content dfn {
+    @apply italic;
+  }
+
+  .markdown-content figure {
+    @apply mx-10 my-4;
+  }
+
+  .markdown-content figcaption {
+    @apply text-sm text-muted-foreground text-center mt-2;
+  }
+
+  .markdown-content dl {
+    @apply p-0;
+  }
+
+  .markdown-content dt {
+    @apply p-0 mt-4 text-base italic font-semibold;
+  }
+
+  .markdown-content dd {
+    @apply px-4 mb-4;
+  }
+
+  .markdown-content .octicon {
+    @apply inline-block align-text-bottom;
+    fill: currentColor;
+    overflow: visible !important;
+  }
+
+  /* GitHub Alerts */
+  .markdown-content .markdown-alert {
+    @apply p-4 mb-4 border-l-4 bg-muted/30;
+  }
+
+  .markdown-content .markdown-alert > :first-child {
+    @apply mt-0;
+  }
+
+  .markdown-content .markdown-alert > :last-child {
+    @apply mb-0;
+  }
+
+  .markdown-content .markdown-alert-title {
+    @apply flex font-medium items-center leading-none mb-2;
+  }
+
+  .markdown-content .markdown-alert-title .octicon {
+    @apply mr-2 inline-block align-text-bottom;
+  }
+
+  .markdown-content .markdown-alert-note {
+    @apply border-l-blue-500;
+  }
+
+  .markdown-content .markdown-alert-note .markdown-alert-title {
+    @apply text-blue-500;
+  }
+
+  .markdown-content .markdown-alert-important {
+    @apply border-l-purple-500;
+  }
+
+  .markdown-content .markdown-alert-important .markdown-alert-title {
+    @apply text-purple-500;
+  }
+
+  .markdown-content .markdown-alert-warning {
+    @apply border-l-yellow-500;
+  }
+
+  .markdown-content .markdown-alert-warning .markdown-alert-title {
+    @apply text-yellow-500;
+  }
+
+  .markdown-content .markdown-alert-tip {
+    @apply border-l-green-500;
+  }
+
+  .markdown-content .markdown-alert-tip .markdown-alert-title {
+    @apply text-green-500;
+  }
+
+  .markdown-content .markdown-alert-caution {
+    @apply border-l-red-500;
+  }
+
+  .markdown-content .markdown-alert-caution .markdown-alert-title {
+    @apply text-red-500;
+  }
 }

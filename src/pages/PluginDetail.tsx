@@ -7,7 +7,10 @@ import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useQuery } from "@tanstack/react-query"
-import ReactMarkdown from 'react-markdown'
+import MarkdownIt from 'markdown-it'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github-dark.css'
+import MarkdownItGitHubAlerts from "markdown-it-github-alerts";
 
 interface PluginData {
   id: string
@@ -68,6 +71,22 @@ const fetchReviews = async (pluginId: string): Promise<Review[]> => {
   }
   return response.json()
 }
+
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  highlight: function (str, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return '<pre><code class="hljs">' +
+          hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+          '</code></pre>';
+      } catch (__) { }
+    }
+  
+    return '<pre><code class="hljs">' + md.utils.escapeHtml(str) + '</code></pre>';
+  }
+}).use(MarkdownItGitHubAlerts);
 
 export default function PluginDetail() {
   const { id } = useParams()
@@ -257,21 +276,10 @@ export default function PluginDetail() {
                     <CardTitle>Description</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="prose prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-code:text-primary prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-pre:border prose-blockquote:border-l-primary prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic">
-                      <ReactMarkdown 
-                        components={{
-                          // Handle HTML content safely
-                          div: ({ children }) => <div>{children}</div>,
-                          span: ({ children }) => <span>{children}</span>,
-                          p: ({ children }) => <p className="mb-4">{children}</p>,
-                          h1: ({ children }) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
-                          h2: ({ children }) => <h2 className="text-xl font-semibold mb-3">{children}</h2>,
-                          h3: ({ children }) => <h3 className="text-lg font-medium mb-2">{children}</h3>,
-                        }}
-                      >
-                        {plugin.description}
-                      </ReactMarkdown>
-                    </div>
+                    <div 
+                      className="markdown-content"
+                      dangerouslySetInnerHTML={{ __html: md.render(plugin.description) }}
+                    />
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -355,24 +363,10 @@ export default function PluginDetail() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="prose prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-code:text-primary prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-pre:border prose-blockquote:border-l-primary prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-ul:text-muted-foreground prose-ol:text-muted-foreground">
-                      <ReactMarkdown 
-                        components={{
-                          // Handle HTML content safely
-                          div: ({ children }) => <div>{children}</div>,
-                          span: ({ children }) => <span>{children}</span>,
-                          p: ({ children }) => <p className="mb-4">{children}</p>,
-                          h1: ({ children }) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
-                          h2: ({ children }) => <h2 className="text-xl font-semibold mb-3">{children}</h2>,
-                          h3: ({ children }) => <h3 className="text-lg font-medium mb-2">{children}</h3>,
-                          ul: ({ children }) => <ul className="list-disc pl-6 mb-4 space-y-1">{children}</ul>,
-                          ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-1">{children}</ol>,
-                          li: ({ children }) => <li className="text-muted-foreground">{children}</li>,
-                        }}
-                      >
-                        {plugin.changelogs || 'No changelog available for this version.'}
-                      </ReactMarkdown>
-                    </div>
+                    <div 
+                      className="markdown-content"
+                      dangerouslySetInnerHTML={{ __html: md.render(plugin.changelogs || 'No changelog available for this version.') }}
+                    />
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -412,9 +406,6 @@ export default function PluginDetail() {
                                   @{plugin.author_github}
                                 </a>
                               </Button>
-                            )}
-                            {plugin.author_email && (
-                              <span className="text-xs">Contact: {plugin.author_email}</span>
                             )}
                           </div>
                         </div>
