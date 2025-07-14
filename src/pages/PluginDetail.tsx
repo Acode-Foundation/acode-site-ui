@@ -1,10 +1,11 @@
 import { useParams, Link } from "react-router-dom"
-import { ArrowLeft, Star, Download, Heart, Shield, Code, User, ExternalLink, Github } from "lucide-react"
+import { ArrowLeft, Star, Download, Heart, Shield, Code, User, ExternalLink, Github, MessageSquare, ThumbsUp, ThumbsDown, Calendar, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useQuery } from "@tanstack/react-query"
 import ReactMarkdown from 'react-markdown'
 
@@ -33,10 +34,36 @@ interface PluginData {
   author_github: string
 }
 
+interface Contributor {
+  name: string
+  github: string
+  role: string
+}
+
+interface Comment {
+  id: string
+  comment: string
+  vote: number
+  user_id: number
+  plugin_id: string
+  created_at: string
+  updated_at: string
+  author_reply: string | null
+  user_name: string
+}
+
 const fetchPlugin = async (pluginId: string): Promise<PluginData> => {
   const response = await fetch(`https://acode.app/api/plugin/${pluginId}`)
   if (!response.ok) {
     throw new Error('Plugin not found')
+  }
+  return response.json()
+}
+
+const fetchComments = async (pluginId: string): Promise<Comment[]> => {
+  const response = await fetch(`https://acode.app/api/comment/${pluginId}`)
+  if (!response.ok) {
+    return []
   }
   return response.json()
 }
@@ -47,6 +74,12 @@ export default function PluginDetail() {
   const { data: plugin, isLoading, error } = useQuery({
     queryKey: ['plugin', id],
     queryFn: () => fetchPlugin(id!),
+    enabled: !!id,
+  })
+
+  const { data: comments = [] } = useQuery({
+    queryKey: ['comments', id],
+    queryFn: () => fetchComments(id!),
     enabled: !!id,
   })
 
@@ -74,65 +107,120 @@ export default function PluginDetail() {
     )
   }
 
+  const contributors: Contributor[] = plugin.contributors 
+    ? JSON.parse(plugin.contributors || '[]')
+    : []
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  }
+
+  const getVoteIcon = (vote: number) => {
+    if (vote === 1) return <ThumbsUp className="w-4 h-4 text-green-500" />
+    if (vote === -1) return <ThumbsDown className="w-4 h-4 text-red-500" />
+    return null
+  }
+
   return (
     <div className="min-h-screen bg-gradient-dark">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link to="/plugins" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4 transition-colors">
+          <Link to="/plugins" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Plugins
           </Link>
           
-          <div className="flex flex-col md:flex-row gap-6">
-            {plugin.icon ? (
-              <img 
-                src={plugin.icon} 
-                alt={plugin.name}
-                className="w-20 h-20 rounded-xl object-cover"
-              />
-            ) : (
-              <div className="w-20 h-20 bg-gradient-primary rounded-xl flex items-center justify-center text-white font-bold text-2xl">
-                {plugin.name.charAt(0)}
-              </div>
-            )}
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Plugin Icon */}
+            <div className="flex-shrink-0">
+              {plugin.icon ? (
+                <img 
+                  src={plugin.icon} 
+                  alt={plugin.name}
+                  className="w-24 h-24 rounded-2xl object-cover shadow-lg"
+                />
+              ) : (
+                <div className="w-24 h-24 bg-gradient-primary rounded-2xl flex items-center justify-center text-white font-bold text-3xl shadow-lg">
+                  {plugin.name.charAt(0)}
+                </div>
+              )}
+            </div>
             
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <h1 className="text-3xl font-bold">{plugin.name}</h1>
-                {plugin.author_verified === 1 && (
-                  <Shield className="w-5 h-5 text-green-500" />
-                )}
+            {/* Plugin Info */}
+            <div className="flex-1 space-y-4">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-4xl font-bold">{plugin.name}</h1>
+                  {plugin.author_verified === 1 && (
+                    <Badge variant="secondary" className="bg-green-500/10 text-green-500 border-green-500/20">
+                      <Shield className="w-3 h-3 mr-1" />
+                      Verified
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                  <span>by</span>
+                  <Link 
+                    to={`/developer/${plugin.user_id}`}
+                    className="text-primary hover:underline font-medium"
+                  >
+                    {plugin.author}
+                  </Link>
+                  <span>•</span>
+                  <span>v{plugin.version}</span>
+                </div>
               </div>
               
-              <div className="flex flex-wrap items-center gap-4 mb-4">
-                <div className="flex items-center space-x-1">
-                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                  <span className="font-medium">{plugin.votes_up}</span>
-                  <span className="text-muted-foreground">({plugin.comment_count} comments)</span>
+              {/* Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-card/50 rounded-lg p-3 border">
+                  <div className="flex items-center gap-2">
+                    <ThumbsUp className="w-4 h-4 text-green-500" />
+                    <span className="font-bold">{plugin.votes_up}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">Upvotes</div>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <Download className="w-4 h-4" />
-                  <span>{plugin.downloads.toLocaleString()} downloads</span>
+                <div className="bg-card/50 rounded-lg p-3 border">
+                  <div className="flex items-center gap-2">
+                    <Download className="w-4 h-4 text-blue-500" />
+                    <span className="font-bold">{plugin.downloads.toLocaleString()}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">Downloads</div>
                 </div>
-                <Badge variant="outline">
-                  {JSON.parse(plugin.keywords || '[]')[0] || 'Plugin'}
-                </Badge>
-                <span className={`font-medium ${plugin.price === 0 ? 'text-green-400' : 'text-primary'}`}>
-                  {plugin.price === 0 ? 'Free' : `$${plugin.price}`}
-                </span>
+                <div className="bg-card/50 rounded-lg p-3 border">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-purple-500" />
+                    <span className="font-bold">{plugin.comment_count}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">Reviews</div>
+                </div>
+                <div className="bg-card/50 rounded-lg p-3 border">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <span className={`font-bold ${plugin.price === 0 ? 'text-green-400' : 'text-primary'}`}>
+                      {plugin.price === 0 ? 'Free' : `$${plugin.price}`}
+                    </span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">Price</div>
+                </div>
               </div>
               
-              <div className="flex gap-3">
-                <Button className="bg-gradient-primary hover:shadow-glow-primary">
-                  <Download className="w-4 h-4 mr-2" />
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3">
+                <Button size="lg" className="bg-gradient-primary hover:shadow-glow-primary">
+                  <Download className="w-5 h-5 mr-2" />
                   Install Plugin
                 </Button>
                 {plugin.repository && (
-                  <Button variant="outline" asChild>
+                  <Button variant="outline" size="lg" asChild>
                     <a href={plugin.repository} target="_blank" rel="noopener noreferrer">
-                      <Github className="w-4 h-4 mr-2" />
-                      View Source
+                      <Github className="w-5 h-5 mr-2" />
+                      Source Code
                     </a>
                   </Button>
                 )}
@@ -143,47 +231,181 @@ export default function PluginDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="reviews">Reviews</TabsTrigger>
                 <TabsTrigger value="changelog">Changelog</TabsTrigger>
+                <TabsTrigger value="contributors">Contributors</TabsTrigger>
               </TabsList>
               
               <TabsContent value="overview" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>About this plugin</CardTitle>
+                    <CardTitle>Description</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="prose prose-invert max-w-none">
                       <ReactMarkdown>{plugin.description}</ReactMarkdown>
                     </div>
-                    
-                    {plugin.keywords && (
-                      <div className="mt-6">
-                        <h4 className="font-semibold mb-3">Keywords</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {JSON.parse(plugin.keywords || '[]').map((keyword: string, index: number) => (
-                            <Badge key={index} variant="secondary">
-                              {keyword}
-                            </Badge>
-                          ))}
-                        </div>
+                  </CardContent>
+                </Card>
+
+                {plugin.keywords && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Keywords</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-wrap gap-2">
+                        {JSON.parse(plugin.keywords || '[]').map((keyword: string, index: number) => (
+                          <Badge key={index} variant="secondary" className="text-sm">
+                            {keyword}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="reviews">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageSquare className="w-5 h-5" />
+                      Reviews ({comments.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {comments.length > 0 ? (
+                      <div className="space-y-4">
+                        {comments.map((comment) => (
+                          <div key={comment.id} className="border-b border-border/50 pb-4 last:border-b-0">
+                            <div className="flex items-start gap-3">
+                              <Avatar className="w-8 h-8">
+                                <AvatarFallback className="bg-gradient-primary text-white text-sm">
+                                  {comment.user_name?.charAt(0) || 'U'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-medium">{comment.user_name || 'Anonymous'}</span>
+                                  {getVoteIcon(comment.vote)}
+                                  <span className="text-sm text-muted-foreground">
+                                    {formatDate(comment.created_at)}
+                                  </span>
+                                </div>
+                                {comment.comment && (
+                                  <p className="text-sm">{comment.comment}</p>
+                                )}
+                                {comment.author_reply && (
+                                  <div className="mt-2 p-3 bg-muted/50 rounded-lg">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <Badge variant="outline" className="text-xs">Developer Reply</Badge>
+                                    </div>
+                                    <p className="text-sm">{comment.author_reply}</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                        <p>No reviews yet. Be the first to review this plugin!</p>
                       </div>
                     )}
                   </CardContent>
                 </Card>
               </TabsContent>
               
-              <TabsContent value="changelog" className="space-y-4">
+              <TabsContent value="changelog">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Version {plugin.version}</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calendar className="w-5 h-5" />
+                      Changelog - Version {plugin.version}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="prose prose-invert max-w-none">
-                      <ReactMarkdown>{plugin.changelogs || 'No changelog available'}</ReactMarkdown>
+                      <ReactMarkdown>{plugin.changelogs || 'No changelog available for this version.'}</ReactMarkdown>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="contributors">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="w-5 h-5" />
+                      Contributors ({contributors.length + 1})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {/* Main Author */}
+                      <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
+                        <Avatar className="w-10 h-10">
+                          <AvatarFallback className="bg-gradient-primary text-white">
+                            {plugin.author.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{plugin.author}</span>
+                            <Badge variant="default" className="text-xs">Author</Badge>
+                            {plugin.author_verified === 1 && (
+                              <Shield className="w-4 h-4 text-green-500" />
+                            )}
+                          </div>
+                          {plugin.author_github && (
+                            <Button variant="link" size="sm" className="p-0 h-auto" asChild>
+                              <a href={`https://github.com/${plugin.author_github}`} target="_blank" rel="noopener noreferrer">
+                                <Github className="w-4 h-4 mr-1" />
+                                @{plugin.author_github}
+                              </a>
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Contributors */}
+                      {contributors.map((contributor, index) => (
+                        <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
+                          <Avatar className="w-10 h-10">
+                            <AvatarFallback className="bg-secondary">
+                              {contributor.name.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">{contributor.name}</span>
+                              <Badge variant="outline" className="text-xs">{contributor.role}</Badge>
+                            </div>
+                            {contributor.github && (
+                              <Button variant="link" size="sm" className="p-0 h-auto" asChild>
+                                <a href={`https://github.com/${contributor.github}`} target="_blank" rel="noopener noreferrer">
+                                  <Github className="w-4 h-4 mr-1" />
+                                  @{contributor.github}
+                                </a>
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+
+                      {contributors.length === 0 && (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                          <p>No additional contributors listed.</p>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -193,40 +415,43 @@ export default function PluginDetail() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Plugin Information */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Code className="w-5 h-5 mr-2" />
-                  Plugin Information
+                  Information
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between">
+              <CardContent className="space-y-3">
+                <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Version</span>
-                  <span className="font-medium">{plugin.version}</span>
+                  <Badge variant="outline">{plugin.version}</Badge>
                 </div>
                 <Separator />
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">License</span>
                   <span className="font-medium">{plugin.license}</span>
                 </div>
                 <Separator />
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Votes</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Likes</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-green-500">{plugin.votes_up}</span>
-                    <span className="text-muted-foreground">/</span>
-                    <span className="text-red-500">{plugin.votes_down}</span>
+                    <ThumbsUp className="w-4 h-4 text-green-500" />
+                    <span className="text-green-500 font-medium">{plugin.votes_up}</span>
+                    <ThumbsDown className="w-4 h-4 text-red-500" />
+                    <span className="text-red-500 font-medium">{plugin.votes_down}</span>
                   </div>
                 </div>
                 <Separator />
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">SKU</span>
-                  <span className="font-medium text-sm">{plugin.sku}</span>
+                  <code className="text-sm bg-muted px-2 py-1 rounded">{plugin.sku}</code>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Developer */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -236,16 +461,28 @@ export default function PluginDetail() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center text-white font-bold">
-                    {plugin.author.charAt(0).toUpperCase()}
-                  </div>
+                  <Avatar className="w-12 h-12">
+                    <AvatarFallback className="bg-gradient-primary text-white font-bold">
+                      {plugin.author.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                   <div>
-                    <p className="font-medium">{plugin.author}</p>
-                    <p className="text-sm text-muted-foreground">Plugin Developer</p>
+                    <Link 
+                      to={`/developer/${plugin.user_id}`}
+                      className="font-medium hover:text-primary transition-colors"
+                    >
+                      {plugin.author}
+                    </Link>
+                    <div className="flex items-center gap-1">
+                      <p className="text-sm text-muted-foreground">Plugin Developer</p>
+                      {plugin.author_verified === 1 && (
+                        <Shield className="w-3 h-3 text-green-500" />
+                      )}
+                    </div>
                   </div>
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {plugin.author_email && (
                     <Button variant="outline" size="sm" asChild>
                       <a href={`mailto:${plugin.author_email}`}>
@@ -265,6 +502,7 @@ export default function PluginDetail() {
               </CardContent>
             </Card>
 
+            {/* Security */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -273,7 +511,7 @@ export default function PluginDetail() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-center space-x-2">
                     <div className={`w-2 h-2 rounded-full ${plugin.author_verified === 1 ? 'bg-green-500' : 'bg-red-500'}`} />
                     <span className="text-sm">
