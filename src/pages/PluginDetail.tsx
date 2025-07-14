@@ -185,7 +185,7 @@ export default function PluginDetail() {
                 <div className="flex items-center gap-2 text-muted-foreground mb-4">
                   <span>by</span>
                   <Link 
-                    to={`/developer/${plugin.user_id}`}
+                    to={`/developer/${plugin.author_email}`}
                     className="text-primary hover:underline font-medium flex items-center gap-1"
                   >
                     {plugin.author}

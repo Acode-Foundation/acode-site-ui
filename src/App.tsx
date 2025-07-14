@@ -52,7 +52,7 @@ const App = () => (
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/earnings" element={<Earnings />} />
-                <Route path="/developer/:username" element={<DeveloperProfile />} />
+                <Route path="/developer/:email" element={<DeveloperProfile />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </MainLayout>
