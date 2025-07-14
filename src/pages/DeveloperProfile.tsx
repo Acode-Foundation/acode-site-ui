@@ -48,8 +48,8 @@ const fetchDeveloper = async (email: string): Promise<Developer> => {
   return response.json()
 }
 
-const fetchDeveloperPlugins = async (email: string): Promise<Plugin[]> => {
-  const response = await fetch(`https://acode.app/api/plugins?user=${email}`)
+const fetchDeveloperPlugins = async (userId: string): Promise<Plugin[]> => {
+  const response = await fetch(`https://acode.app/api/plugins?user=${userId}`)
   if (!response.ok) {
     return []
   }
@@ -66,9 +66,9 @@ export default function DeveloperProfile() {
   })
 
   const { data: plugins = [], isLoading: isPluginsLoading } = useQuery({
-    queryKey: ['developer-plugins', email],
-    queryFn: () => fetchDeveloperPlugins(email!),
-    enabled: !!email,
+    queryKey: ['developer-plugins', developer?.id],
+    queryFn: () => fetchDeveloperPlugins(developer!.id.toString()),
+    enabled: !!developer?.id,
   })
 
   if (isDeveloperLoading) {
