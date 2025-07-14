@@ -127,17 +127,6 @@ export default function Plugins() {
           </div>
         </div>
 
-        {/* Ads Section */}
-        <div className="mb-8">
-          <div className="bg-gradient-primary/10 border border-primary/20 rounded-lg p-6 text-center">
-            <h3 className="text-lg font-semibold mb-2">Boost Your Productivity</h3>
-            <p className="text-muted-foreground mb-4">Discover premium plugins and themes to enhance your coding experience</p>
-            <Button variant="outline" className="border-primary/50 hover:bg-primary/10">
-              Explore Premium
-            </Button>
-          </div>
-        </div>
-
         {/* Results Count */}
         <div className="flex justify-between items-center mb-6">
           <p className="text-muted-foreground">
