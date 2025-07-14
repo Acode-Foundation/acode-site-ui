@@ -5,11 +5,30 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { MainLayout } from "@/components/layout/main-layout"
 import { useState, useEffect } from "react"
+import MarkdownIt from 'markdown-it'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github-dark.css'
 
 interface FAQ {
   q: string
   a: string
 }
+
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  highlight: function (str, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return '<pre><code class="hljs">' +
+          hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+          '</code></pre>';
+      } catch (__) { }
+    }
+
+    return '<pre><code class="hljs">' + md.utils.escapeHtml(str) + '</code></pre>';
+  }
+});
 
 export default function FAQ() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -89,7 +108,10 @@ export default function FAQ() {
                       {faq.q}
                     </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground">
-                      <div dangerouslySetInnerHTML={{ __html: faq.a }} />
+                      <div 
+                        className="markdown-content"
+                        dangerouslySetInnerHTML={{ __html: md.render(faq.a) }} 
+                      />
                     </AccordionContent>
                   </AccordionItem>
                 ))}
