@@ -1,51 +1,79 @@
-import { useState, useMemo } from "react"
-import { Search, Filter, ExternalLink, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MainLayout } from "@/components/layout/main-layout"
-import { PluginCard } from "@/components/ui/plugin-card"
-import { PluginCardSkeleton } from "@/components/ui/plugin-card-skeleton"
-import { usePlugins } from "@/hooks/use-plugins"
-import { usePluginFilters } from "@/hooks/use-plugin-filters"
-
-
-const filters = [
-  { value: "default", label: "Default" },
-  { value: "most-downloaded", label: "Most Downloaded" },
-  { value: "newest", label: "New" },
-  { value: "free", label: "Free" },
-  { value: "paid", label: "Paid" }
-]
-
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { Search, Filter, ExternalLink, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MainLayout } from "@/components/layout/main-layout";
+import { PluginCard } from "@/components/ui/plugin-card";
+import { PluginCardSkeleton } from "@/components/ui/plugin-card-skeleton";
+import { usePlugins } from "@/hooks/use-plugins";
+import { usePluginFilters } from "@/hooks/use-plugin-filters";
+const filters = [{
+  value: "default",
+  label: "Default"
+}, {
+  value: "most-downloaded",
+  label: "Most Downloaded"
+}, {
+  value: "newest",
+  label: "Newest"
+}, {
+  value: "recently-updated",
+  label: "Recently Updated"
+}, {
+  value: "free",
+  label: "Free"
+}, {
+  value: "paid",
+  label: "Paid"
+}];
 export default function Plugins() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedFilter, setSelectedFilter] = useState("default")
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("default");
 
   // Determine API filter type
-  const apiFilter = ['default', 'most-downloaded', 'newest'].includes(selectedFilter) 
-    ? selectedFilter as 'default' | 'most-downloaded' | 'newest' 
-    : 'default'
+  const apiFilter = ['default', 'most-downloaded', 'newest', 'recently-updated'].includes(selectedFilter) ? selectedFilter as 'default' | 'most-downloaded' | 'newest' | 'recently-updated' : 'default';
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    error
+  } = usePlugins(apiFilter);
 
-  const { data: plugins = [], isLoading, error } = usePlugins(apiFilter)
-  
+  // Flatten all pages into a single array
+  const allPlugins = useMemo(() => {
+    return data?.pages.flatMap(page => page) || [];
+  }, [data]);
+
   // Filter for free/paid plugins
   const categoryFilteredPlugins = useMemo(() => {
     if (selectedFilter === 'free') {
-      return plugins.filter(plugin => plugin.price === 0)
+      return allPlugins.filter(plugin => plugin.price === 0);
     } else if (selectedFilter === 'paid') {
-      return plugins.filter(plugin => plugin.price > 0)
+      return allPlugins.filter(plugin => plugin.price > 0);
     }
-    return plugins
-  }, [plugins, selectedFilter])
-  
+    return allPlugins;
+  }, [allPlugins, selectedFilter]);
   const filteredPlugins = usePluginFilters(categoryFilteredPlugins, {
     searchQuery
-  })
+  });
 
+  // Infinite scroll implementation
+  const handleScroll = useCallback(() => {
+    if (window.innerHeight + document.documentElement.scrollTop + 1000 >= document.documentElement.scrollHeight) {
+      if (hasNextPage && !isFetchingNextPage && !searchQuery) {
+        fetchNextPage();
+      }
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, searchQuery]);
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
   if (isLoading) {
-    return (
-      <MainLayout>
+    return <MainLayout>
         <div className="min-h-screen py-8">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
@@ -55,18 +83,15 @@ export default function Plugins() {
               </h1>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <PluginCardSkeleton key={i} />
-              ))}
+              {Array.from({
+              length: 12
+            }).map((_, i) => <PluginCardSkeleton key={i} />)}
             </div>
           </div>
         </div>
-      </MainLayout>
-    )
+      </MainLayout>;
   }
-
-  return (
-    <MainLayout>
+  return <MainLayout>
       <div className="min-h-screen py-8">
         <div className="container mx-auto px-4">
         {/* Header */}
@@ -75,9 +100,7 @@ export default function Plugins() {
             Plugin
             <span className="bg-gradient-primary bg-clip-text text-transparent"> Marketplace</span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Discover and install plugins to extend Acode's functionality. From Git integration to AI assistance.
-          </p>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Discover and install plugins to extend Acode's functionality. </p>
         </div>
 
         {/* Search and Filters */}
@@ -86,12 +109,7 @@ export default function Plugins() {
             {/* Search */}
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                placeholder="Search plugins, authors, keywords..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 bg-background/80 border-border/50 rounded-lg text-base focus:border-primary focus:ring-primary"
-              />
+              <Input placeholder="Search plugins, authors, keywords..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-12 h-12 bg-background/80 border-border/50 rounded-lg text-base focus:border-primary focus:ring-primary" />
             </div>
 
             {/* Filter */}
@@ -101,24 +119,11 @@ export default function Plugins() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {filters.map(filter => (
-                  <SelectItem key={filter.value} value={filter.value}>
+                {filters.map(filter => <SelectItem key={filter.value} value={filter.value}>
                     {filter.label}
-                  </SelectItem>
-                ))}
+                  </SelectItem>)}
               </SelectContent>
             </Select>
-          </div>
-        </div>
-
-        {/* Ads Section */}
-        <div className="mb-8">
-          <div className="bg-gradient-primary/10 border border-primary/20 rounded-lg p-6 text-center">
-            <h3 className="text-lg font-semibold mb-2">Boost Your Productivity</h3>
-            <p className="text-muted-foreground mb-4">Discover premium plugins and themes to enhance your coding experience</p>
-            <Button variant="outline" className="border-primary/50 hover:bg-primary/10">
-              Explore Premium
-            </Button>
           </div>
         </div>
 
@@ -135,19 +140,27 @@ export default function Plugins() {
 
         {/* Plugins Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredPlugins.map((plugin, index) => (
-            <PluginCard key={plugin.id} plugin={plugin} index={index} />
-          ))}
+          {filteredPlugins.map((plugin, index) => <PluginCard key={plugin.id} plugin={plugin} index={index} />)}
         </div>
 
+        {/* Loading More Indicator */}
+        {isFetchingNextPage && <div className="flex justify-center items-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin mr-2" />
+            <span className="text-muted-foreground">Loading more plugins...</span>
+          </div>}
+
+        {/* Load More Button (fallback for infinite scroll) */}
+        {!searchQuery && hasNextPage && !isFetchingNextPage && filteredPlugins.length > 0 && <div className="flex justify-center mt-8">
+            <Button onClick={() => fetchNextPage()} variant="outline" className="px-8">
+              Load More Plugins
+            </Button>
+          </div>}
+
         {/* No Results */}
-        {filteredPlugins.length === 0 && !isLoading && (
-          <div className="text-center py-12">
+        {filteredPlugins.length === 0 && !isLoading && <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">No plugins found matching your criteria.</p>
-          </div>
-        )}
+          </div>}
       </div>
     </div>
-    </MainLayout>
-  )
+    </MainLayout>;
 }

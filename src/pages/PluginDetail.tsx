@@ -1,118 +1,146 @@
 import { useParams, Link } from "react-router-dom"
-import { ArrowLeft, Star, Download, Heart, Shield, Code, Calendar, User } from "lucide-react"
+import { Star, Download, Shield, Github, MessageSquare, ThumbsUp, ThumbsDown, Calendar, Users, CheckCircle, Tag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useQuery } from "@tanstack/react-query"
+import MarkdownIt from 'markdown-it'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github-dark.css'
+import MarkdownItGitHubAlerts from "markdown-it-github-alerts";
 
-// Hardcoded plugin data
-const pluginData = {
-  "git-manager": {
-    name: "Git Manager",
-    description: "Complete Git integration for mobile development with full version control capabilities",
-    longDescription: "Git Manager provides complete Git integration for Acode, allowing you to manage repositories, commit changes, create branches, and collaborate with teams directly from your mobile device. Features include visual diff viewer, merge conflict resolution, and remote repository sync.",
-    downloads: "50.2k",
-    rating: 4.8,
-    reviews: 342,
-    price: "Free",
-    category: "Version Control",
-    author: "deadlyjack",
-    version: "2.1.4",
-    license: "MIT",
-    size: "2.1 MB",
-    lastUpdated: "2024-01-15",
-    compatibility: "Acode 1.8.0+",
-    features: [
-      "Full Git repository management",
-      "Visual diff viewer",
-      "Branch creation and switching",
-      "Merge conflict resolution",
-      "Remote repository sync",
-      "Commit history viewer",
-      "Tag management",
-      "Stash support"
-    ],
-    changelog: [
-      {
-        version: "2.1.4",
-        date: "2024-01-15",
-        changes: [
-          "Fixed merge conflict resolution",
-          "Improved performance on large repositories",
-          "Added support for LFS files"
-        ]
-      },
-      {
-        version: "2.1.3",
-        date: "2024-01-01",
-        changes: [
-          "Added dark theme support",
-          "Fixed authentication issues",
-          "Performance improvements"
-        ]
-      }
-    ],
-    screenshots: [
-      "/api/placeholder/300/200",
-      "/api/placeholder/300/200",
-      "/api/placeholder/300/200"
-    ]
-  },
-  "ai-assistant": {
-    name: "AI Assistant",
-    description: "Code completion and suggestions powered by AI",
-    longDescription: "AI Assistant brings the power of artificial intelligence to your coding workflow. Get intelligent code completion, suggestions, and explanations as you write code.",
-    downloads: "32.1k",
-    rating: 4.9,
-    reviews: 156,
-    price: "$2.99",
-    category: "Productivity",
-    author: "acode-dev",
-    version: "1.5.2",
-    license: "Commercial",
-    size: "5.2 MB",
-    lastUpdated: "2024-01-20",
-    compatibility: "Acode 1.8.0+",
-    features: [
-      "Intelligent code completion",
-      "Code explanations",
-      "Bug detection",
-      "Refactoring suggestions",
-      "Multi-language support",
-      "Context-aware suggestions"
-    ],
-    changelog: [
-      {
-        version: "1.5.2",
-        date: "2024-01-20",
-        changes: [
-          "Improved AI model accuracy",
-          "Added support for TypeScript",
-          "Faster response times"
-        ]
-      }
-    ],
-    screenshots: [
-      "/api/placeholder/300/200",
-      "/api/placeholder/300/200"
-    ]
-  }
+interface PluginData {
+  id: string
+  sku: string
+  icon: string
+  name: string
+  price: number
+  author: string
+  user_id: number
+  version: string
+  keywords: string
+  license: string
+  votes_up: number
+  downloads: number
+  repository: string | null
+  votes_down: number
+  comment_count: number
+  author_verified: number
+  min_version_code: number
+  changelogs: string
+  contributors: string
+  description: string
+  author_email: string
+  author_github: string
 }
+
+interface Contributor {
+  name: string
+  github: string
+  role: string
+}
+
+interface Review {
+  id: number
+  plugin_id: string
+  user_id: number
+  comment: string
+  vote: number
+  created_at: string
+  updated_at: string
+  author_reply: string
+  name: string
+  github: string
+}
+
+const fetchPlugin = async (pluginId: string): Promise<PluginData> => {
+  const response = await fetch(`https://acode.app/api/plugin/${pluginId}`)
+  if (!response.ok) {
+    throw new Error('Plugin not found')
+  }
+  return response.json()
+}
+
+const fetchReviews = async (pluginId: string): Promise<Review[]> => {
+  const response = await fetch(`https://acode.app/api/comment/${pluginId}`)
+  if (!response.ok) {
+    return []
+  }
+  return response.json()
+}
+
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  highlight: function (str, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return '<pre><code class="hljs">' +
+          hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+          '</code></pre>';
+      } catch (__) { }
+    }
+  
+    return '<pre><code class="hljs">' + md.utils.escapeHtml(str) + '</code></pre>';
+  }
+}).use(MarkdownItGitHubAlerts);
 
 export default function PluginDetail() {
   const { id } = useParams()
-  const plugin = pluginData[id as keyof typeof pluginData]
+  
+  const { data: plugin, isLoading, error } = useQuery({
+    queryKey: ['plugin', id],
+    queryFn: () => fetchPlugin(id!),
+    enabled: !!id,
+  })
 
-  if (!plugin) {
+  const { data: reviews = [] } = useQuery({
+    queryKey: ['reviews', id],
+    queryFn: () => fetchReviews(id!),
+    enabled: !!id,
+  })
+
+  if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold mb-4">Plugin Not Found</h1>
-        <Link to="/plugins">
-          <Button>Back to Plugins</Button>
-        </Link>
+      <div className="min-h-screen bg-gradient-dark flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading plugin...</p>
+        </div>
       </div>
     )
+  }
+
+  if (error || !plugin) {
+    return (
+      <div className="min-h-screen bg-gradient-dark flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Plugin Not Found</h1>
+          <p className="text-muted-foreground">The plugin you're looking for doesn't exist or has been removed.</p>
+        </div>
+      </div>
+    )
+  }
+
+  const contributors: Contributor[] = plugin.contributors 
+    ? JSON.parse(plugin.contributors || '[]')
+    : []
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  }
+
+  const getVoteIcon = (vote: number) => {
+    if (vote === 1) return <ThumbsUp className="w-4 h-4 text-green-500" />
+    if (vote === -1) return <ThumbsDown className="w-4 h-4 text-red-500" />
+    return null
   }
 
   return (
@@ -120,215 +148,306 @@ export default function PluginDetail() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link to="/plugins" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4 transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Plugins
-          </Link>
           
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="w-20 h-20 bg-gradient-primary rounded-xl flex items-center justify-center text-white font-bold text-2xl">
-              {plugin.name.charAt(0)}
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Plugin Icon */}
+            <div className="flex-shrink-0">
+              {plugin.icon ? (
+                <img 
+                  src={plugin.icon} 
+                  alt={plugin.name}
+                  className="w-24 h-24 rounded-2xl object-cover shadow-lg"
+                />
+              ) : (
+                <div className="w-24 h-24 bg-gradient-primary rounded-2xl flex items-center justify-center text-white font-bold text-3xl shadow-lg">
+                  {plugin.name.charAt(0)}
+                </div>
+              )}
             </div>
             
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-2">{plugin.name}</h1>
-              <p className="text-lg text-muted-foreground mb-4">{plugin.description}</p>
-              
-              <div className="flex flex-wrap items-center gap-4 mb-4">
-                <div className="flex items-center space-x-1">
-                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                  <span className="font-medium">{plugin.rating}</span>
-                  <span className="text-muted-foreground">({plugin.reviews} reviews)</span>
+            {/* Plugin Info */}
+            <div className="flex-1 space-y-4">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-4xl font-bold">{plugin.name}</h1>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="bg-muted/50 text-muted-foreground border">
+                      v{plugin.version}
+                    </Badge>
+                    <Badge className={`${plugin.price === 0 ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-primary/10 text-primary border-primary/20'}`}>
+                      {plugin.price === 0 ? 'Free' : `$${plugin.price}`}
+                    </Badge>
+                    <Badge variant="outline" className="bg-secondary/10 text-secondary border-secondary/20">
+                      {plugin.license}
+                    </Badge>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <Download className="w-4 h-4" />
-                  <span>{plugin.downloads} downloads</span>
+                <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                  <span>by</span>
+                  <Link 
+                    to={`/developer/${plugin.user_id}`}
+                    className="text-primary hover:underline font-medium flex items-center gap-1"
+                  >
+                    {plugin.author}
+                    {plugin.author_verified === 1 && (
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    )}
+                  </Link>
                 </div>
-                <Badge variant="outline">{plugin.category}</Badge>
-                <span className={`font-medium ${plugin.price === 'Free' ? 'text-green-400' : 'text-primary'}`}>
-                  {plugin.price}
-                </span>
+                
+                {/* Keywords */}
+                {plugin.keywords && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {JSON.parse(plugin.keywords || '[]').map((keyword: string, index: number) => (
+                      <Badge key={index} variant="outline" className="text-xs bg-muted/30 border-muted">
+                        <Tag className="w-3 h-3 mr-1" />
+                        {keyword}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
               
-              <div className="flex gap-3">
-                <Button className="bg-gradient-primary hover:shadow-glow-primary">
-                  <Download className="w-4 h-4 mr-2" />
+              {/* Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-card/50 rounded-lg p-3 border">
+                  <div className="flex items-center gap-2">
+                    <ThumbsUp className="w-4 h-4 text-green-500" />
+                    <span className="font-bold">{plugin.votes_up}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">Upvotes</div>
+                </div>
+                <div className="bg-card/50 rounded-lg p-3 border">
+                  <div className="flex items-center gap-2">
+                    <Download className="w-4 h-4 text-blue-500" />
+                    <span className="font-bold">{plugin.downloads.toLocaleString()}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">Downloads</div>
+                </div>
+                <div className="bg-card/50 rounded-lg p-3 border">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-purple-500" />
+                    <span className="font-bold">{plugin.comment_count}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">Reviews</div>
+                </div>
+                <div className="bg-card/50 rounded-lg p-3 border">
+                  <div className="flex items-center gap-2">
+                    <ThumbsDown className="w-4 h-4 text-red-500" />
+                    <span className="font-bold">{plugin.votes_down}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">Downvotes</div>
+                </div>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3">
+                <Button size="lg" className="bg-gradient-primary hover:shadow-glow-primary">
+                  <Download className="w-5 h-5 mr-2" />
                   Install Plugin
                 </Button>
-                <Button variant="outline">
-                  <Heart className="w-4 h-4 mr-2" />
-                  Add to Wishlist
-                </Button>
+                {plugin.repository && (
+                  <Button variant="outline" size="lg" asChild>
+                    <a href={plugin.repository} target="_blank" rel="noopener noreferrer">
+                      <Github className="w-5 h-5 mr-2" />
+                      Source Code
+                    </a>
+                  </Button>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <Tabs defaultValue="overview" className="w-full">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="changelog">Changelog</TabsTrigger>
                 <TabsTrigger value="reviews">Reviews</TabsTrigger>
-                <TabsTrigger value="screenshots">Screenshots</TabsTrigger>
+                <TabsTrigger value="changelog">Changelog</TabsTrigger>
+                <TabsTrigger value="contributors">Contributors</TabsTrigger>
               </TabsList>
               
               <TabsContent value="overview" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>About this plugin</CardTitle>
+                    <CardTitle>Description</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground mb-4">{plugin.longDescription}</p>
-                    
-                    <h4 className="font-semibold mb-3">Features</h4>
-                    <ul className="space-y-2">
-                      {plugin.features.map((feature, index) => (
-                        <li key={index} className="flex items-center space-x-2">
-                          <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                          <span className="text-muted-foreground">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <div 
+                      className="markdown-content"
+                      dangerouslySetInnerHTML={{ __html: md.render(plugin.description) }}
+                    />
                   </CardContent>
                 </Card>
               </TabsContent>
               
-              <TabsContent value="changelog" className="space-y-4">
-                {plugin.changelog.map((release, index) => (
-                  <Card key={index}>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">Version {release.version}</CardTitle>
-                        <span className="text-sm text-muted-foreground">{release.date}</span>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-1">
-                        {release.changes.map((change, changeIndex) => (
-                          <li key={changeIndex} className="flex items-start space-x-2">
-                            <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2" />
-                            <span className="text-muted-foreground">{change}</span>
-                          </li>
+              <TabsContent value="reviews">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageSquare className="w-5 h-5" />
+                      Reviews ({reviews.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {reviews.length > 0 ? (
+                      <div className="space-y-4">
+                        {reviews.map((review) => (
+                          <div key={review.id} className="border-b border-border/50 pb-4 last:border-b-0">
+                            <div className="flex items-start gap-3">
+                              <Avatar className="w-8 h-8">
+                                <AvatarFallback className="bg-gradient-primary text-white text-sm">
+                                  {review.name?.charAt(0) || 'U'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">{review.name || 'Anonymous'}</span>
+                                    {review.github && (
+                                      <Button variant="link" size="sm" className="p-0 h-auto text-xs" asChild>
+                                        <a href={`https://github.com/${review.github}`} target="_blank" rel="noopener noreferrer">
+                                          <Github className="w-3 h-3 mr-1" />
+                                          @{review.github}
+                                        </a>
+                                      </Button>
+                                    )}
+                                  </div>
+                                  {getVoteIcon(review.vote)}
+                                  <span className="text-sm text-muted-foreground">
+                                    {formatDate(review.created_at)}
+                                  </span>
+                                </div>
+                                {review.comment ? (
+                                  <p className="text-sm text-muted-foreground mb-2">{review.comment}</p>
+                                ) : (
+                                  <p className="text-sm text-muted-foreground/60 italic mb-2">
+                                    {review.vote === 1 ? 'Gave a thumbs up' : 'Gave a thumbs down'}
+                                  </p>
+                                )}
+                                {review.author_reply && (
+                                  <div className="mt-2 p-3 bg-muted/50 rounded-lg border">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
+                                        <CheckCircle className="w-3 h-3 mr-1" />
+                                        Developer Reply
+                                      </Badge>
+                                    </div>
+                                    <p className="text-sm">{review.author_reply}</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                        <p>No reviews yet. Be the first to review this plugin!</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               </TabsContent>
               
-              <TabsContent value="reviews" className="space-y-4">
+              <TabsContent value="changelog">
                 <Card>
-                  <CardContent className="pt-6">
-                    <div className="text-center py-8">
-                      <Star className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">Reviews coming soon</p>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calendar className="w-5 h-5" />
+                      Changelog - Version {plugin.version}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div 
+                      className="markdown-content"
+                      dangerouslySetInnerHTML={{ __html: md.render(plugin.changelogs || 'No changelog available for this version.') }}
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="contributors">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="w-5 h-5" />
+                      Contributors ({contributors.length + 1})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {/* Main Author */}
+                      <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-primary/10">
+                        <Avatar className="w-12 h-12">
+                          <AvatarFallback className="bg-gradient-primary text-white font-semibold">
+                            {plugin.author.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-lg">{plugin.author}</span>
+                            <Badge className="text-xs bg-primary/20 text-primary border-primary/30">
+                              Plugin Author
+                            </Badge>
+                            {plugin.author_verified === 1 && (
+                              <CheckCircle className="w-4 h-4 text-green-500" />
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                            {plugin.author_github && (
+                              <Button variant="link" size="sm" className="p-0 h-auto text-muted-foreground hover:text-primary" asChild>
+                                <a href={`https://github.com/${plugin.author_github}`} target="_blank" rel="noopener noreferrer">
+                                  <Github className="w-4 h-4 mr-1" />
+                                  @{plugin.author_github}
+                                </a>
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Additional Contributors */}
+                      {contributors.length > 0 && (
+                        <div className="space-y-3">
+                          <Separator />
+                          <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Additional Contributors</h4>
+                          {contributors.map((contributor, index) => (
+                            <div key={index} className="flex items-center gap-4 p-3 border rounded-lg hover:bg-muted/30 transition-colors">
+                              <Avatar className="w-10 h-10">
+                                <AvatarFallback className="bg-secondary font-medium">
+                                  {contributor.name.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-medium">{contributor.name}</span>
+                                  <Badge variant="outline" className="text-xs bg-muted border-muted-foreground/20">
+                                    {contributor.role}
+                                  </Badge>
+                                </div>
+                                {contributor.github && (
+                                  <Button variant="link" size="sm" className="p-0 h-auto text-muted-foreground hover:text-primary" asChild>
+                                    <a href={`https://github.com/${contributor.github}`} target="_blank" rel="noopener noreferrer">
+                                      <Github className="w-4 h-4 mr-1" />
+                                      @{contributor.github}
+                                    </a>
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
               </TabsContent>
-              
-              <TabsContent value="screenshots" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {plugin.screenshots.map((screenshot, index) => (
-                    <Card key={index}>
-                      <CardContent className="p-0">
-                        <img 
-                          src={screenshot} 
-                          alt={`Screenshot ${index + 1}`}
-                          className="w-full h-48 object-cover rounded-lg"
-                        />
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </TabsContent>
             </Tabs>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Code className="w-5 h-5 mr-2" />
-                  Plugin Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Version</span>
-                  <span className="font-medium">{plugin.version}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Size</span>
-                  <span className="font-medium">{plugin.size}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">License</span>
-                  <span className="font-medium">{plugin.license}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Compatibility</span>
-                  <span className="font-medium">{plugin.compatibility}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Last Updated</span>
-                  <span className="font-medium">{plugin.lastUpdated}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <User className="w-5 h-5 mr-2" />
-                  Developer
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center text-white font-bold">
-                    {plugin.author.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="font-medium">{plugin.author}</p>
-                    <p className="text-sm text-muted-foreground">Plugin Developer</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Shield className="w-5 h-5 mr-2" />
-                  Security
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full" />
-                    <span className="text-sm">Verified Publisher</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full" />
-                    <span className="text-sm">Scanned for Malware</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full" />
-                    <span className="text-sm">Open Source</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
