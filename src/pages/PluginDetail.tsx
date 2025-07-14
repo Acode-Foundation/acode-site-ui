@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom"
-import { ArrowLeft, Star, Download, Heart, Shield, Code, User, ExternalLink, Github, MessageSquare, ThumbsUp, ThumbsDown, Calendar, Users } from "lucide-react"
+import { Star, Download, Shield, Github, MessageSquare, ThumbsUp, ThumbsDown, Calendar, Users, CheckCircle, Tag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -40,16 +40,17 @@ interface Contributor {
   role: string
 }
 
-interface Comment {
-  id: string
+interface Review {
+  id: number
+  plugin_id: string
+  user_id: number
   comment: string
   vote: number
-  user_id: number
-  plugin_id: string
   created_at: string
   updated_at: string
-  author_reply: string | null
-  user_name: string
+  author_reply: string
+  name: string
+  github: string
 }
 
 const fetchPlugin = async (pluginId: string): Promise<PluginData> => {
@@ -60,7 +61,7 @@ const fetchPlugin = async (pluginId: string): Promise<PluginData> => {
   return response.json()
 }
 
-const fetchComments = async (pluginId: string): Promise<Comment[]> => {
+const fetchReviews = async (pluginId: string): Promise<Review[]> => {
   const response = await fetch(`https://acode.app/api/comment/${pluginId}`)
   if (!response.ok) {
     return []
@@ -77,9 +78,9 @@ export default function PluginDetail() {
     enabled: !!id,
   })
 
-  const { data: comments = [] } = useQuery({
-    queryKey: ['comments', id],
-    queryFn: () => fetchComments(id!),
+  const { data: reviews = [] } = useQuery({
+    queryKey: ['reviews', id],
+    queryFn: () => fetchReviews(id!),
     enabled: !!id,
   })
 
@@ -99,9 +100,7 @@ export default function PluginDetail() {
       <div className="min-h-screen bg-gradient-dark flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Plugin Not Found</h1>
-          <Link to="/plugins">
-            <Button>Back to Plugins</Button>
-          </Link>
+          <p className="text-muted-foreground">The plugin you're looking for doesn't exist or has been removed.</p>
         </div>
       </div>
     )
@@ -130,10 +129,6 @@ export default function PluginDetail() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link to="/plugins" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Plugins
-          </Link>
           
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Plugin Icon */}
@@ -156,24 +151,42 @@ export default function PluginDetail() {
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <h1 className="text-4xl font-bold">{plugin.name}</h1>
-                  {plugin.author_verified === 1 && (
-                    <Badge variant="secondary" className="bg-green-500/10 text-green-500 border-green-500/20">
-                      <Shield className="w-3 h-3 mr-1" />
-                      Verified
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="bg-muted/50 text-muted-foreground border">
+                      v{plugin.version}
                     </Badge>
-                  )}
+                    <Badge className={`${plugin.price === 0 ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-primary/10 text-primary border-primary/20'}`}>
+                      {plugin.price === 0 ? 'Free' : `$${plugin.price}`}
+                    </Badge>
+                    <Badge variant="outline" className="bg-secondary/10 text-secondary border-secondary/20">
+                      {plugin.license}
+                    </Badge>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground mb-4">
                   <span>by</span>
                   <Link 
                     to={`/developer/${plugin.user_id}`}
-                    className="text-primary hover:underline font-medium"
+                    className="text-primary hover:underline font-medium flex items-center gap-1"
                   >
                     {plugin.author}
+                    {plugin.author_verified === 1 && (
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    )}
                   </Link>
-                  <span>•</span>
-                  <span>v{plugin.version}</span>
                 </div>
+                
+                {/* Keywords */}
+                {plugin.keywords && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {JSON.parse(plugin.keywords || '[]').map((keyword: string, index: number) => (
+                      <Badge key={index} variant="outline" className="text-xs bg-muted/30 border-muted">
+                        <Tag className="w-3 h-3 mr-1" />
+                        {keyword}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
               
               {/* Stats */}
@@ -201,12 +214,10 @@ export default function PluginDetail() {
                 </div>
                 <div className="bg-card/50 rounded-lg p-3 border">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-yellow-500" />
-                    <span className={`font-bold ${plugin.price === 0 ? 'text-green-400' : 'text-primary'}`}>
-                      {plugin.price === 0 ? 'Free' : `$${plugin.price}`}
-                    </span>
+                    <ThumbsDown className="w-4 h-4 text-red-500" />
+                    <span className="font-bold">{plugin.votes_down}</span>
                   </div>
-                  <div className="text-sm text-muted-foreground">Price</div>
+                  <div className="text-sm text-muted-foreground">Downvotes</div>
                 </div>
               </div>
               
@@ -246,28 +257,23 @@ export default function PluginDetail() {
                     <CardTitle>Description</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="prose prose-invert max-w-none">
-                      <ReactMarkdown>{plugin.description}</ReactMarkdown>
+                    <div className="prose prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-code:text-primary prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-pre:border prose-blockquote:border-l-primary prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic">
+                      <ReactMarkdown 
+                        components={{
+                          // Handle HTML content safely
+                          div: ({ children }) => <div>{children}</div>,
+                          span: ({ children }) => <span>{children}</span>,
+                          p: ({ children }) => <p className="mb-4">{children}</p>,
+                          h1: ({ children }) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
+                          h2: ({ children }) => <h2 className="text-xl font-semibold mb-3">{children}</h2>,
+                          h3: ({ children }) => <h3 className="text-lg font-medium mb-2">{children}</h3>,
+                        }}
+                      >
+                        {plugin.description}
+                      </ReactMarkdown>
                     </div>
                   </CardContent>
                 </Card>
-
-                {plugin.keywords && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Keywords</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-wrap gap-2">
-                        {JSON.parse(plugin.keywords || '[]').map((keyword: string, index: number) => (
-                          <Badge key={index} variant="secondary" className="text-sm">
-                            {keyword}
-                          </Badge>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
               </TabsContent>
               
               <TabsContent value="reviews">
@@ -275,37 +281,54 @@ export default function PluginDetail() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <MessageSquare className="w-5 h-5" />
-                      Reviews ({comments.length})
+                      Reviews ({reviews.length})
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {comments.length > 0 ? (
+                    {reviews.length > 0 ? (
                       <div className="space-y-4">
-                        {comments.map((comment) => (
-                          <div key={comment.id} className="border-b border-border/50 pb-4 last:border-b-0">
+                        {reviews.map((review) => (
+                          <div key={review.id} className="border-b border-border/50 pb-4 last:border-b-0">
                             <div className="flex items-start gap-3">
                               <Avatar className="w-8 h-8">
                                 <AvatarFallback className="bg-gradient-primary text-white text-sm">
-                                  {comment.user_name?.charAt(0) || 'U'}
+                                  {review.name?.charAt(0) || 'U'}
                                 </AvatarFallback>
                               </Avatar>
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className="font-medium">{comment.user_name || 'Anonymous'}</span>
-                                  {getVoteIcon(comment.vote)}
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">{review.name || 'Anonymous'}</span>
+                                    {review.github && (
+                                      <Button variant="link" size="sm" className="p-0 h-auto text-xs" asChild>
+                                        <a href={`https://github.com/${review.github}`} target="_blank" rel="noopener noreferrer">
+                                          <Github className="w-3 h-3 mr-1" />
+                                          @{review.github}
+                                        </a>
+                                      </Button>
+                                    )}
+                                  </div>
+                                  {getVoteIcon(review.vote)}
                                   <span className="text-sm text-muted-foreground">
-                                    {formatDate(comment.created_at)}
+                                    {formatDate(review.created_at)}
                                   </span>
                                 </div>
-                                {comment.comment && (
-                                  <p className="text-sm">{comment.comment}</p>
+                                {review.comment ? (
+                                  <p className="text-sm text-muted-foreground mb-2">{review.comment}</p>
+                                ) : (
+                                  <p className="text-sm text-muted-foreground/60 italic mb-2">
+                                    {review.vote === 1 ? 'Gave a thumbs up' : 'Gave a thumbs down'}
+                                  </p>
                                 )}
-                                {comment.author_reply && (
-                                  <div className="mt-2 p-3 bg-muted/50 rounded-lg">
+                                {review.author_reply && (
+                                  <div className="mt-2 p-3 bg-muted/50 rounded-lg border">
                                     <div className="flex items-center gap-2 mb-1">
-                                      <Badge variant="outline" className="text-xs">Developer Reply</Badge>
+                                      <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
+                                        <CheckCircle className="w-3 h-3 mr-1" />
+                                        Developer Reply
+                                      </Badge>
                                     </div>
-                                    <p className="text-sm">{comment.author_reply}</p>
+                                    <p className="text-sm">{review.author_reply}</p>
                                   </div>
                                 )}
                               </div>
@@ -332,8 +355,23 @@ export default function PluginDetail() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="prose prose-invert max-w-none">
-                      <ReactMarkdown>{plugin.changelogs || 'No changelog available for this version.'}</ReactMarkdown>
+                    <div className="prose prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-code:text-primary prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-pre:border prose-blockquote:border-l-primary prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-ul:text-muted-foreground prose-ol:text-muted-foreground">
+                      <ReactMarkdown 
+                        components={{
+                          // Handle HTML content safely
+                          div: ({ children }) => <div>{children}</div>,
+                          span: ({ children }) => <span>{children}</span>,
+                          p: ({ children }) => <p className="mb-4">{children}</p>,
+                          h1: ({ children }) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
+                          h2: ({ children }) => <h2 className="text-xl font-semibold mb-3">{children}</h2>,
+                          h3: ({ children }) => <h3 className="text-lg font-medium mb-2">{children}</h3>,
+                          ul: ({ children }) => <ul className="list-disc pl-6 mb-4 space-y-1">{children}</ul>,
+                          ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-1">{children}</ol>,
+                          li: ({ children }) => <li className="text-muted-foreground">{children}</li>,
+                        }}
+                      >
+                        {plugin.changelogs || 'No changelog available for this version.'}
+                      </ReactMarkdown>
                     </div>
                   </CardContent>
                 </Card>
@@ -348,62 +386,70 @@ export default function PluginDetail() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {/* Main Author */}
-                      <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-                        <Avatar className="w-10 h-10">
-                          <AvatarFallback className="bg-gradient-primary text-white">
+                      <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-primary/10">
+                        <Avatar className="w-12 h-12">
+                          <AvatarFallback className="bg-gradient-primary text-white font-semibold">
                             {plugin.author.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{plugin.author}</span>
-                            <Badge variant="default" className="text-xs">Author</Badge>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-lg">{plugin.author}</span>
+                            <Badge className="text-xs bg-primary/20 text-primary border-primary/30">
+                              Plugin Author
+                            </Badge>
                             {plugin.author_verified === 1 && (
-                              <Shield className="w-4 h-4 text-green-500" />
+                              <CheckCircle className="w-4 h-4 text-green-500" />
                             )}
                           </div>
-                          {plugin.author_github && (
-                            <Button variant="link" size="sm" className="p-0 h-auto" asChild>
-                              <a href={`https://github.com/${plugin.author_github}`} target="_blank" rel="noopener noreferrer">
-                                <Github className="w-4 h-4 mr-1" />
-                                @{plugin.author_github}
-                              </a>
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Contributors */}
-                      {contributors.map((contributor, index) => (
-                        <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
-                          <Avatar className="w-10 h-10">
-                            <AvatarFallback className="bg-secondary">
-                              {contributor.name.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">{contributor.name}</span>
-                              <Badge variant="outline" className="text-xs">{contributor.role}</Badge>
-                            </div>
-                            {contributor.github && (
-                              <Button variant="link" size="sm" className="p-0 h-auto" asChild>
-                                <a href={`https://github.com/${contributor.github}`} target="_blank" rel="noopener noreferrer">
+                          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                            {plugin.author_github && (
+                              <Button variant="link" size="sm" className="p-0 h-auto text-muted-foreground hover:text-primary" asChild>
+                                <a href={`https://github.com/${plugin.author_github}`} target="_blank" rel="noopener noreferrer">
                                   <Github className="w-4 h-4 mr-1" />
-                                  @{contributor.github}
+                                  @{plugin.author_github}
                                 </a>
                               </Button>
                             )}
+                            {plugin.author_email && (
+                              <span className="text-xs">Contact: {plugin.author_email}</span>
+                            )}
                           </div>
                         </div>
-                      ))}
+                      </div>
 
-                      {contributors.length === 0 && (
-                        <div className="text-center py-8 text-muted-foreground">
-                          <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                          <p>No additional contributors listed.</p>
+                      {/* Additional Contributors */}
+                      {contributors.length > 0 && (
+                        <div className="space-y-3">
+                          <Separator />
+                          <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Additional Contributors</h4>
+                          {contributors.map((contributor, index) => (
+                            <div key={index} className="flex items-center gap-4 p-3 border rounded-lg hover:bg-muted/30 transition-colors">
+                              <Avatar className="w-10 h-10">
+                                <AvatarFallback className="bg-secondary font-medium">
+                                  {contributor.name.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-medium">{contributor.name}</span>
+                                  <Badge variant="outline" className="text-xs bg-muted border-muted-foreground/20">
+                                    {contributor.role}
+                                  </Badge>
+                                </div>
+                                {contributor.github && (
+                                  <Button variant="link" size="sm" className="p-0 h-auto text-muted-foreground hover:text-primary" asChild>
+                                    <a href={`https://github.com/${contributor.github}`} target="_blank" rel="noopener noreferrer">
+                                      <Github className="w-4 h-4 mr-1" />
+                                      @{contributor.github}
+                                    </a>
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       )}
                     </div>
