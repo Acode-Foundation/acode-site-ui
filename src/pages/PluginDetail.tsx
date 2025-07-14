@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom"
-import { Star, Download, Shield, Github, MessageSquare, ThumbsUp, ThumbsDown, Calendar, Users, CheckCircle, Tag } from "lucide-react"
+import { Star, Download, Shield, Github, MessageSquare, ThumbsUp, ThumbsDown, Calendar, Users, CheckCircle, Tag, AlertTriangle, Info, CheckCircle2, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -8,6 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useQuery } from "@tanstack/react-query"
 import ReactMarkdown from 'react-markdown'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import remarkGfm from 'remark-gfm'
 
 interface PluginData {
   id: string
@@ -122,6 +125,180 @@ export default function PluginDetail() {
     if (vote === 1) return <ThumbsUp className="w-4 h-4 text-green-500" />
     if (vote === -1) return <ThumbsDown className="w-4 h-4 text-red-500" />
     return null
+  }
+
+  // GitHub Alerts component
+  const GitHubAlert = ({ type, children }: { type: string; children: React.ReactNode }) => {
+    const alertTypes = {
+      note: { icon: Info, bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-500' },
+      tip: { icon: CheckCircle2, bg: 'bg-green-500/10', border: 'border-green-500/20', text: 'text-green-500' },
+      important: { icon: AlertTriangle, bg: 'bg-purple-500/10', border: 'border-purple-500/20', text: 'text-purple-500' },
+      warning: { icon: AlertTriangle, bg: 'bg-yellow-500/10', border: 'border-yellow-500/20', text: 'text-yellow-500' },
+      caution: { icon: XCircle, bg: 'bg-red-500/10', border: 'border-red-500/20', text: 'text-red-500' }
+    }
+    
+    const alert = alertTypes[type as keyof typeof alertTypes] || alertTypes.note
+    const Icon = alert.icon
+    
+    return (
+      <div className={`p-4 rounded-lg border ${alert.bg} ${alert.border} mb-4`}>
+        <div className="flex items-start gap-3">
+          <Icon className={`w-5 h-5 mt-0.5 ${alert.text}`} />
+          <div className="flex-1">
+            <div className={`font-semibold mb-1 ${alert.text} capitalize`}>{type}</div>
+            <div className="text-foreground">{children}</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Enhanced markdown components
+  const markdownComponents = {
+    // HTML elements - GitHub Alerts will be handled via preprocessing
+    div: ({ children, className, ...props }: any) => {
+      // Check for GitHub alert patterns in className
+      if (className?.includes('markdown-alert')) {
+        const type = className.split('markdown-alert-')[1] || 'note'
+        return <GitHubAlert type={type}>{children}</GitHubAlert>
+      }
+      return <div className={className} {...props}>{children}</div>
+    },
+    span: ({ children, className, ...props }: any) => (
+      <span className={className} {...props}>{children}</span>
+    ),
+    img: ({ src, alt, ...props }: any) => (
+      <img src={src} alt={alt} className="max-w-full h-auto rounded-lg my-4" {...props} />
+    ),
+    a: ({ href, children, ...props }: any) => (
+      <a 
+        href={href} 
+        className="text-primary hover:underline" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        {...props}
+      >
+        {children}
+      </a>
+    ),
+    
+    // Typography
+    p: ({ children }: any) => {
+      // Handle GitHub alerts in paragraph content
+      if (typeof children === 'string' && children.includes('[!')) {
+        const alertMatch = children.match(/\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*(.*)/)
+        if (alertMatch) {
+          const type = alertMatch[1].toLowerCase()
+          const content = alertMatch[2]
+          return <GitHubAlert type={type}>{content}</GitHubAlert>
+        }
+      }
+      return <p className="mb-4 text-foreground leading-relaxed">{children}</p>
+    },
+    h1: ({ children }: any) => <h1 className="text-3xl font-bold mb-6 text-foreground border-b border-border pb-2">{children}</h1>,
+    h2: ({ children }: any) => <h2 className="text-2xl font-semibold mb-4 text-foreground border-b border-border/50 pb-1">{children}</h2>,
+    h3: ({ children }: any) => <h3 className="text-xl font-medium mb-3 text-foreground">{children}</h3>,
+    h4: ({ children }: any) => <h4 className="text-lg font-medium mb-2 text-foreground">{children}</h4>,
+    h5: ({ children }: any) => <h5 className="text-base font-medium mb-2 text-foreground">{children}</h5>,
+    h6: ({ children }: any) => <h6 className="text-sm font-medium mb-2 text-foreground">{children}</h6>,
+    
+    // Lists
+    ul: ({ children }: any) => <ul className="list-disc pl-6 mb-4 space-y-1">{children}</ul>,
+    ol: ({ children }: any) => <ol className="list-decimal pl-6 mb-4 space-y-1">{children}</ol>,
+    li: ({ children }: any) => <li className="text-foreground">{children}</li>,
+    
+    // Code
+    code: ({ inline, className, children, ...props }: any) => {
+      const match = /language-(\w+)/.exec(className || '')
+      const language = match ? match[1] : ''
+      
+      if (!inline && language) {
+        return (
+          <div className="my-4">
+            <SyntaxHighlighter
+              style={oneDark}
+              language={language}
+              PreTag="div"
+              className="rounded-lg border"
+              customStyle={{
+                margin: 0,
+                background: 'hsl(var(--muted))',
+                border: '1px solid hsl(var(--border))',
+              }}
+              {...props}
+            >
+              {String(children).replace(/\n$/, '')}
+            </SyntaxHighlighter>
+          </div>
+        )
+      }
+      
+      return (
+        <code className="bg-muted text-primary px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+          {children}
+        </code>
+      )
+    },
+    
+    pre: ({ children }: any) => {
+      // If it's already handled by code component, return as is
+      if (children?.props?.className?.includes('language-')) {
+        return children
+      }
+      return (
+        <pre className="bg-muted p-4 rounded-lg border overflow-x-auto mb-4">
+          <code className="text-sm font-mono text-foreground">{children}</code>
+        </pre>
+      )
+    },
+    
+    // Blockquotes - Handle GitHub alerts here too
+    blockquote: ({ children }: any) => {
+      // Check if this is a GitHub alert blockquote
+      const content = Array.isArray(children) ? children.join(' ') : children
+      if (typeof content === 'string' && content.includes('[!')) {
+        const alertMatch = content.match(/\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/)
+        if (alertMatch) {
+          const type = alertMatch[1].toLowerCase()
+          const alertContent = content.replace(/\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/, '')
+          return <GitHubAlert type={type}>{alertContent}</GitHubAlert>
+        }
+      }
+      
+      return (
+        <blockquote className="border-l-4 border-primary pl-4 py-2 mb-4 bg-muted/30 rounded-r-lg italic text-muted-foreground">
+          {children}
+        </blockquote>
+      )
+    },
+    
+    // Tables
+    table: ({ children }: any) => (
+      <div className="overflow-x-auto mb-4">
+        <table className="w-full border-collapse border border-border rounded-lg">{children}</table>
+      </div>
+    ),
+    thead: ({ children }: any) => <thead className="bg-muted">{children}</thead>,
+    tbody: ({ children }: any) => <tbody>{children}</tbody>,
+    tr: ({ children }: any) => <tr className="border-b border-border">{children}</tr>,
+    th: ({ children }: any) => (
+      <th className="text-left p-3 font-semibold text-foreground border-r border-border last:border-r-0">
+        {children}
+      </th>
+    ),
+    td: ({ children }: any) => (
+      <td className="p-3 text-foreground border-r border-border last:border-r-0">
+        {children}
+      </td>
+    ),
+    
+    // Horizontal rule
+    hr: () => <hr className="border-border my-6" />,
+    
+    // Emphasis
+    strong: ({ children }: any) => <strong className="font-bold text-foreground">{children}</strong>,
+    em: ({ children }: any) => <em className="italic text-foreground">{children}</em>,
+    del: ({ children }: any) => <del className="line-through text-muted-foreground">{children}</del>,
   }
 
   return (
@@ -257,21 +434,19 @@ export default function PluginDetail() {
                     <CardTitle>Description</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="prose prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-code:text-primary prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-pre:border prose-blockquote:border-l-primary prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic">
-                      <ReactMarkdown 
-                        components={{
-                          // Handle HTML content safely
-                          div: ({ children }) => <div>{children}</div>,
-                          span: ({ children }) => <span>{children}</span>,
-                          p: ({ children }) => <p className="mb-4">{children}</p>,
-                          h1: ({ children }) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
-                          h2: ({ children }) => <h2 className="text-xl font-semibold mb-3">{children}</h2>,
-                          h3: ({ children }) => <h3 className="text-lg font-medium mb-2">{children}</h3>,
-                        }}
-                      >
-                        {plugin.description}
-                      </ReactMarkdown>
-                    </div>
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]}
+                      components={markdownComponents}
+                      allowedElements={[
+                        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                        'p', 'br', 'strong', 'em', 'del', 'code', 'pre',
+                        'ul', 'ol', 'li', 'blockquote', 'hr',
+                        'table', 'thead', 'tbody', 'tr', 'th', 'td',
+                        'a', 'img', 'div', 'span'
+                      ]}
+                    >
+                      {plugin.description}
+                    </ReactMarkdown>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -355,24 +530,19 @@ export default function PluginDetail() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="prose prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-code:text-primary prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-pre:border prose-blockquote:border-l-primary prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-ul:text-muted-foreground prose-ol:text-muted-foreground">
-                      <ReactMarkdown 
-                        components={{
-                          // Handle HTML content safely
-                          div: ({ children }) => <div>{children}</div>,
-                          span: ({ children }) => <span>{children}</span>,
-                          p: ({ children }) => <p className="mb-4">{children}</p>,
-                          h1: ({ children }) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
-                          h2: ({ children }) => <h2 className="text-xl font-semibold mb-3">{children}</h2>,
-                          h3: ({ children }) => <h3 className="text-lg font-medium mb-2">{children}</h3>,
-                          ul: ({ children }) => <ul className="list-disc pl-6 mb-4 space-y-1">{children}</ul>,
-                          ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-1">{children}</ol>,
-                          li: ({ children }) => <li className="text-muted-foreground">{children}</li>,
-                        }}
-                      >
-                        {plugin.changelogs || 'No changelog available for this version.'}
-                      </ReactMarkdown>
-                    </div>
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]}
+                      components={markdownComponents}
+                      allowedElements={[
+                        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                        'p', 'br', 'strong', 'em', 'del', 'code', 'pre',
+                        'ul', 'ol', 'li', 'blockquote', 'hr',
+                        'table', 'thead', 'tbody', 'tr', 'th', 'td',
+                        'a', 'img', 'div', 'span'
+                      ]}
+                    >
+                      {plugin.changelogs || 'No changelog available for this version.'}
+                    </ReactMarkdown>
                   </CardContent>
                 </Card>
               </TabsContent>
