@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect, useCallback } from "react"
 import { Search, Filter, ExternalLink, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,21 +27,47 @@ export default function Plugins() {
     ? selectedFilter as 'default' | 'most-downloaded' | 'newest' 
     : 'default'
 
-  const { data: plugins = [], isLoading, error } = usePlugins(apiFilter)
+  const { 
+    data, 
+    isLoading, 
+    isFetchingNextPage, 
+    hasNextPage, 
+    fetchNextPage,
+    error 
+  } = usePlugins(apiFilter)
+  
+  // Flatten all pages into a single array
+  const allPlugins = useMemo(() => {
+    return data?.pages.flatMap(page => page) || []
+  }, [data])
   
   // Filter for free/paid plugins
   const categoryFilteredPlugins = useMemo(() => {
     if (selectedFilter === 'free') {
-      return plugins.filter(plugin => plugin.price === 0)
+      return allPlugins.filter(plugin => plugin.price === 0)
     } else if (selectedFilter === 'paid') {
-      return plugins.filter(plugin => plugin.price > 0)
+      return allPlugins.filter(plugin => plugin.price > 0)
     }
-    return plugins
-  }, [plugins, selectedFilter])
+    return allPlugins
+  }, [allPlugins, selectedFilter])
   
   const filteredPlugins = usePluginFilters(categoryFilteredPlugins, {
     searchQuery
   })
+
+  // Infinite scroll implementation
+  const handleScroll = useCallback(() => {
+    if (window.innerHeight + document.documentElement.scrollTop + 1000 >= document.documentElement.scrollHeight) {
+      if (hasNextPage && !isFetchingNextPage && !searchQuery) {
+        fetchNextPage()
+      }
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, searchQuery])
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [handleScroll])
 
   if (isLoading) {
     return (
@@ -140,10 +166,38 @@ export default function Plugins() {
           ))}
         </div>
 
+        {/* Loading More Indicator */}
+        {isFetchingNextPage && (
+          <div className="flex justify-center items-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin mr-2" />
+            <span className="text-muted-foreground">Loading more plugins...</span>
+          </div>
+        )}
+
+        {/* Load More Button (fallback for infinite scroll) */}
+        {!searchQuery && hasNextPage && !isFetchingNextPage && filteredPlugins.length > 0 && (
+          <div className="flex justify-center mt-8">
+            <Button 
+              onClick={() => fetchNextPage()} 
+              variant="outline"
+              className="px-8"
+            >
+              Load More Plugins
+            </Button>
+          </div>
+        )}
+
         {/* No Results */}
         {filteredPlugins.length === 0 && !isLoading && (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">No plugins found matching your criteria.</p>
+          </div>
+        )}
+
+        {/* End of Results */}
+        {!hasNextPage && !searchQuery && filteredPlugins.length > 0 && (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">You've reached the end of the plugins list</p>
           </div>
         )}
       </div>

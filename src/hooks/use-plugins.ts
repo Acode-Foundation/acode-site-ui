@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 
 export interface Plugin {
   id: string
@@ -80,21 +80,24 @@ const fallbackPlugins: Plugin[] = [
   }
 ]
 
-const fetchPlugins = async (filter: 'default' | 'most-downloaded' | 'newest' = 'default'): Promise<Plugin[]> => {
+const fetchPlugins = async (filter: 'default' | 'most-downloaded' | 'newest' = 'default', page = 1): Promise<Plugin[]> => {
   try {
     let url = 'https://acode.app/api/plugins'
+    const params = new URLSearchParams({ page: page.toString(), limit: '20' })
     
     switch (filter) {
       case 'default':
-        url = 'https://acode.app/api/plugins?explore=random'
+        params.append('explore', 'random')
         break
       case 'most-downloaded':
-        url = 'https://acode.app/api/plugins?orderBy=downloads'
+        params.append('orderBy', 'downloads')
         break
       case 'newest':
-        url = 'https://acode.app/api/plugins?orderBy=newest'
+        params.append('orderBy', 'newest')
         break
     }
+    
+    url += '?' + params.toString()
     
     const response = await fetch(url, {
       method: 'GET',
@@ -114,14 +117,19 @@ const fetchPlugins = async (filter: 'default' | 'most-downloaded' | 'newest' = '
     return Array.isArray(data) ? data : []
   } catch (error) {
     console.warn('API fetch failed, using fallback plugins:', error)
-    return fallbackPlugins
+    return page === 1 ? fallbackPlugins : []
   }
 }
 
 export const usePlugins = (filter: 'default' | 'most-downloaded' | 'newest' = 'default') => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['plugins', filter],
-    queryFn: () => fetchPlugins(filter),
+    queryFn: ({ pageParam = 1 }) => fetchPlugins(filter, pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      // If last page has less than 20 items, we've reached the end
+      return lastPage.length === 20 ? allPages.length + 1 : undefined
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
