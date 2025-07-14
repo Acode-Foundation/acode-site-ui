@@ -1,9 +1,9 @@
 import { useParams, Link } from "react-router-dom"
-import { ArrowLeft, Github, Globe, Mail, MapPin, Calendar, Star, Download, Package, CheckCircle } from "lucide-react"
+import { Github, Globe, Mail, Calendar, Star, Download, Package, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { PluginCard } from "@/components/ui/plugin-card"
 import { useQuery } from "@tanstack/react-query"
 
@@ -88,12 +88,6 @@ export default function DeveloperProfile() {
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Developer Not Found</h1>
           <p className="text-muted-foreground mb-6">The developer profile you're looking for doesn't exist.</p>
-          <Link to="/plugins">
-            <Button variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Plugins
-            </Button>
-          </Link>
         </div>
       </div>
     )
@@ -107,21 +101,17 @@ export default function DeveloperProfile() {
   return (
     <div className="min-h-screen bg-gradient-dark">
       <div className="container mx-auto px-4 py-8">
-        {/* Back Button */}
-        <div className="mb-6">
-          <Link to="/plugins">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Plugins
-            </Button>
-          </Link>
-        </div>
-
         {/* Developer Header */}
         <Card className="mb-8">
           <CardContent className="p-8">
             <div className="flex flex-col md:flex-row gap-6">
               <Avatar className="w-24 h-24">
+                {developer.github ? (
+                  <AvatarImage 
+                    src={`https://avatars.githubusercontent.com/${developer.github}`} 
+                    alt={developer.name}
+                  />
+                ) : null}
                 <AvatarFallback className="text-2xl bg-gradient-primary text-white">
                   {developer.name.charAt(0).toUpperCase()}
                 </AvatarFallback>
