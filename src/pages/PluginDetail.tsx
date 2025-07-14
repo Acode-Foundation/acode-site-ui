@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useQuery } from "@tanstack/react-query"
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
@@ -171,13 +171,13 @@ export default function PluginDetail() {
                 <div className="flex items-center gap-3 mb-2">
                   <h1 className="text-4xl font-bold">{plugin.name}</h1>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="bg-muted/50 text-muted-foreground border">
+                    <Badge className="bg-primary/10 text-primary border-primary/20 text-sm px-3 py-1">
                       v{plugin.version}
                     </Badge>
-                    <Badge className={`${plugin.price === 0 ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-primary/10 text-primary border-primary/20'}`}>
+                    <Badge className={`${plugin.price === 0 ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-primary/10 text-primary border-primary/20'} text-sm px-3 py-1`}>
                       {plugin.price === 0 ? 'Free' : `$${plugin.price}`}
                     </Badge>
-                    <Badge variant="outline" className="bg-secondary/10 text-secondary border-secondary/20">
+                    <Badge className="bg-muted/50 text-muted-foreground border-muted text-sm px-3 py-1">
                       {plugin.license}
                     </Badge>
                   </div>
@@ -185,7 +185,7 @@ export default function PluginDetail() {
                 <div className="flex items-center gap-2 text-muted-foreground mb-4">
                   <span>by</span>
                   <Link 
-                    to={`/developer/${plugin.user_id}`}
+                    to={`/developer/${plugin.author_email}`}
                     className="text-primary hover:underline font-medium flex items-center gap-1"
                   >
                     {plugin.author}
@@ -382,8 +382,14 @@ export default function PluginDetail() {
                   <CardContent>
                     <div className="space-y-3">
                       {/* Main Author */}
-                      <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-primary/10">
+                       <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-primary/10">
                         <Avatar className="w-12 h-12">
+                          {plugin.author_github ? (
+                            <AvatarImage 
+                              src={`https://avatars.githubusercontent.com/${plugin.author_github}`} 
+                              alt={plugin.author}
+                            />
+                          ) : null}
                           <AvatarFallback className="bg-gradient-primary text-white font-semibold">
                             {plugin.author.charAt(0).toUpperCase()}
                           </AvatarFallback>
@@ -419,6 +425,12 @@ export default function PluginDetail() {
                           {contributors.map((contributor, index) => (
                             <div key={index} className="flex items-center gap-4 p-3 border rounded-lg hover:bg-muted/30 transition-colors">
                               <Avatar className="w-10 h-10">
+                                {contributor.github ? (
+                                  <AvatarImage 
+                                    src={`https://avatars.githubusercontent.com/${contributor.github}`} 
+                                    alt={contributor.name}
+                                  />
+                                ) : null}
                                 <AvatarFallback className="bg-secondary font-medium">
                                   {contributor.name.charAt(0).toUpperCase()}
                                 </AvatarFallback>

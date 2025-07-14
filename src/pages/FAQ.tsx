@@ -4,65 +4,63 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { MainLayout } from "@/components/layout/main-layout"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import MarkdownIt from 'markdown-it'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github-dark.css'
 
-const faqs = [
-  {
-    question: "What is Acode?",
-    answer: "Acode is a powerful, feature-rich code editor designed specifically for Android devices. It provides syntax highlighting for 100+ programming languages, plugin support, themes, and many other features that make coding on mobile devices efficient and enjoyable."
-  },
-  {
-    question: "Is Acode free to use?",
-    answer: "Yes, Acode is completely free and open-source. You can download it from the Google Play Store or F-Droid without any cost. Some premium plugins may have a cost, but the core editor is always free."
-  },
-  {
-    question: "Which programming languages are supported?",
-    answer: "Acode supports syntax highlighting and basic editing features for over 100 programming languages including JavaScript, Python, Java, C++, HTML, CSS, PHP, Ruby, Go, Rust, and many more. The language support is constantly expanding."
-  },
-  {
-    question: "How do I install plugins?",
-    answer: "You can install plugins directly from within the Acode app. Go to Settings > Plugins > Browse Plugins, search for the plugin you want, and tap Install. Some plugins may require additional permissions or setup."
-  },
-  {
-    question: "Can I use Acode for web development?",
-    answer: "Absolutely! Acode is excellent for web development. It supports HTML, CSS, JavaScript, and many web frameworks. You can also install plugins like Live Preview to see your changes in real-time."
-  },
-  {
-    question: "Does Acode support Git integration?",
-    answer: "Yes, through the Git Manager plugin, you can perform git operations like commit, push, pull, branch management, and more directly from your mobile device."
-  },
-  {
-    question: "How do I change themes?",
-    answer: "Go to Settings > Theme to choose from built-in themes. You can also install the Theme Studio plugin to create custom themes or download community-created themes from the plugin marketplace."
-  },
-  {
-    question: "Can I work with large projects?",
-    answer: "Yes, Acode is optimized to handle large projects efficiently. It features lazy loading, efficient memory management, and fast file searching to ensure smooth performance even with big codebases."
-  },
-  {
-    question: "Is there cloud storage integration?",
-    answer: "Acode supports working with local files and can integrate with cloud storage through plugins. You can connect to services like Google Drive, Dropbox, and others through the available plugins."
-  },
-  {
-    question: "How do I get support?",
-    answer: "You can get support through multiple channels: join our Discord community, post issues on GitHub, check the documentation at docs.acode.app, or reach out through the in-app feedback system."
-  },
-  {
-    question: "Can I contribute to Acode?",
-    answer: "Yes! Acode is open-source and welcomes contributions. You can contribute code, create plugins, report bugs, suggest features, or help with documentation. Check our GitHub repository for contribution guidelines."
-  },
-  {
-    question: "What Android version is required?",
-    answer: "Acode requires Android 5.0 (API level 21) or higher. The app is regularly tested on various Android versions to ensure compatibility and optimal performance."
+interface FAQ {
+  q: string
+  a: string
+}
+
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  highlight: function (str, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return '<pre><code class="hljs">' +
+          hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+          '</code></pre>';
+      } catch (__) { }
+    }
+
+    return '<pre><code class="hljs">' + md.utils.escapeHtml(str) + '</code></pre>';
   }
-]
+});
 
 export default function FAQ() {
   const [searchQuery, setSearchQuery] = useState("")
+  const [faqs, setFaqs] = useState<FAQ[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchFAQs = async () => {
+      try {
+        const response = await fetch('https://acode.app/api/faqs')
+        const data = await response.json()
+        setFaqs(data)
+      } catch (error) {
+        console.error('Failed to fetch FAQs:', error)
+        // Fallback data in case API fails
+        setFaqs([
+          {
+            q: "What is Acode?",
+            a: "Acode is a powerful, feature-rich code editor designed specifically for Android devices."
+          }
+        ])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchFAQs()
+  }, [])
 
   const filteredFAQs = faqs.filter(faq =>
-    faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+    faq.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    faq.a.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
@@ -97,18 +95,28 @@ export default function FAQ() {
         {/* FAQ Accordion */}
         <Card className="bg-card/50 backdrop-blur-sm border-border mb-8">
           <CardContent className="p-6">
-            <Accordion type="single" collapsible className="w-full">
-              {filteredFAQs.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left hover:text-primary transition-colors">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <p className="mt-4 text-muted-foreground">Loading FAQs...</p>
+              </div>
+            ) : (
+              <Accordion type="single" collapsible className="w-full">
+                {filteredFAQs.map((faq, index) => (
+                  <AccordionItem key={index} value={`item-${index}`}>
+                    <AccordionTrigger className="text-left hover:text-primary transition-colors">
+                      {faq.q}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground">
+                      <div 
+                        className="markdown-content"
+                        dangerouslySetInnerHTML={{ __html: md.render(faq.a) }} 
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            )}
           </CardContent>
         </Card>
 

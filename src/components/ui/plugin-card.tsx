@@ -15,6 +15,7 @@ interface Plugin {
   downloads: number
   votes_down: number
   author_verified: number
+  author_email?: string
 }
 
 interface PluginCardProps {
@@ -57,13 +58,7 @@ export function PluginCard({ plugin, index = 0 }: PluginCardProps) {
             </h3>
             <div className="flex items-center space-x-1">
               <p className="text-sm text-muted-foreground truncate">
-                by <Link 
-                  to={`/developer/${plugin.author.toLowerCase().replace(/\s+/g, '')}`}
-                  className="hover:text-primary transition-colors"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {plugin.author}
-                </Link>
+                by <span className="text-foreground">{plugin.author}</span>
               </p>
               {plugin.author_verified === 1 && (
                 <Verified className="w-3 h-3 text-primary" />
