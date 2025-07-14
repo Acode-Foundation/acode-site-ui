@@ -14,8 +14,6 @@ const filters = [
   { value: "default", label: "Default" },
   { value: "most-downloaded", label: "Most Downloaded" },
   { value: "newest", label: "Newest" },
-  { value: "most-voted", label: "Most Voted" },
-  { value: "most-commented", label: "Most Commented" },
   { value: "recently-updated", label: "Recently Updated" },
   { value: "free", label: "Free" },
   { value: "paid", label: "Paid" }
@@ -26,8 +24,8 @@ export default function Plugins() {
   const [selectedFilter, setSelectedFilter] = useState("default")
 
   // Determine API filter type
-  const apiFilter = ['default', 'most-downloaded', 'newest', 'most-voted', 'most-commented', 'recently-updated'].includes(selectedFilter) 
-    ? selectedFilter as 'default' | 'most-downloaded' | 'newest' | 'most-voted' | 'most-commented' | 'recently-updated'
+  const apiFilter = ['default', 'most-downloaded', 'newest', 'recently-updated'].includes(selectedFilter) 
+    ? selectedFilter as 'default' | 'most-downloaded' | 'newest' | 'recently-updated'
     : 'default'
 
   const { 

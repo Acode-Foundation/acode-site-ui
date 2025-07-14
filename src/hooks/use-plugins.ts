@@ -80,7 +80,7 @@ const fallbackPlugins: Plugin[] = [
   }
 ]
 
-const fetchPlugins = async (filter: 'default' | 'most-downloaded' | 'newest' | 'most-voted' | 'most-commented' | 'recently-updated' = 'default', page = 1): Promise<Plugin[]> => {
+const fetchPlugins = async (filter: 'default' | 'most-downloaded' | 'newest' | 'recently-updated' = 'default', page = 1): Promise<Plugin[]> => {
   try {
     let url = 'https://acode.app/api/plugins'
     const params = new URLSearchParams({ page: page.toString(), limit: '20' })
@@ -94,12 +94,6 @@ const fetchPlugins = async (filter: 'default' | 'most-downloaded' | 'newest' | '
         break
       case 'newest':
         params.append('orderBy', 'newest')
-        break
-      case 'most-voted':
-        params.append('orderBy', 'votes_up')
-        break
-      case 'most-commented':
-        params.append('orderBy', 'comment_count')
         break
       case 'recently-updated':
         params.append('orderBy', 'updated_at')
@@ -130,7 +124,7 @@ const fetchPlugins = async (filter: 'default' | 'most-downloaded' | 'newest' | '
   }
 }
 
-export const usePlugins = (filter: 'default' | 'most-downloaded' | 'newest' | 'most-voted' | 'most-commented' | 'recently-updated' = 'default') => {
+export const usePlugins = (filter: 'default' | 'most-downloaded' | 'newest' | 'recently-updated' = 'default') => {
   return useInfiniteQuery({
     queryKey: ['plugins', filter],
     queryFn: ({ pageParam = 1 }) => fetchPlugins(filter, pageParam),
