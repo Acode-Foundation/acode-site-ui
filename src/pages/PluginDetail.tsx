@@ -229,7 +229,7 @@ export default function PluginDetail() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             <Tabs defaultValue="overview" className="w-full">
@@ -411,126 +411,6 @@ export default function PluginDetail() {
                 </Card>
               </TabsContent>
             </Tabs>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Plugin Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Code className="w-5 h-5 mr-2" />
-                  Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Version</span>
-                  <Badge variant="outline">{plugin.version}</Badge>
-                </div>
-                <Separator />
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">License</span>
-                  <span className="font-medium">{plugin.license}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Likes</span>
-                  <div className="flex items-center gap-2">
-                    <ThumbsUp className="w-4 h-4 text-green-500" />
-                    <span className="text-green-500 font-medium">{plugin.votes_up}</span>
-                    <ThumbsDown className="w-4 h-4 text-red-500" />
-                    <span className="text-red-500 font-medium">{plugin.votes_down}</span>
-                  </div>
-                </div>
-                <Separator />
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">SKU</span>
-                  <code className="text-sm bg-muted px-2 py-1 rounded">{plugin.sku}</code>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Developer */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <User className="w-5 h-5 mr-2" />
-                  Developer
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Avatar className="w-12 h-12">
-                    <AvatarFallback className="bg-gradient-primary text-white font-bold">
-                      {plugin.author.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <Link 
-                      to={`/developer/${plugin.user_id}`}
-                      className="font-medium hover:text-primary transition-colors"
-                    >
-                      {plugin.author}
-                    </Link>
-                    <div className="flex items-center gap-1">
-                      <p className="text-sm text-muted-foreground">Plugin Developer</p>
-                      {plugin.author_verified === 1 && (
-                        <Shield className="w-3 h-3 text-green-500" />
-                      )}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex flex-wrap gap-2">
-                  {plugin.author_email && (
-                    <Button variant="outline" size="sm" asChild>
-                      <a href={`mailto:${plugin.author_email}`}>
-                        Contact
-                      </a>
-                    </Button>
-                  )}
-                  {plugin.author_github && (
-                    <Button variant="outline" size="sm" asChild>
-                      <a href={`https://github.com/${plugin.author_github}`} target="_blank" rel="noopener noreferrer">
-                        <Github className="w-4 h-4 mr-1" />
-                        GitHub
-                      </a>
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Security */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Shield className="w-5 h-5 mr-2" />
-                  Security
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <div className={`w-2 h-2 rounded-full ${plugin.author_verified === 1 ? 'bg-green-500' : 'bg-red-500'}`} />
-                    <span className="text-sm">
-                      {plugin.author_verified === 1 ? 'Verified Publisher' : 'Unverified Publisher'}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full" />
-                    <span className="text-sm">Scanned for Malware</span>
-                  </div>
-                  {plugin.repository && (
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full" />
-                      <span className="text-sm">Open Source</span>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
