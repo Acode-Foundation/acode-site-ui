@@ -13,7 +13,10 @@ import { usePluginFilters } from "@/hooks/use-plugin-filters"
 const filters = [
   { value: "default", label: "Default" },
   { value: "most-downloaded", label: "Most Downloaded" },
-  { value: "newest", label: "New" },
+  { value: "newest", label: "Newest" },
+  { value: "most-voted", label: "Most Voted" },
+  { value: "most-commented", label: "Most Commented" },
+  { value: "recently-updated", label: "Recently Updated" },
   { value: "free", label: "Free" },
   { value: "paid", label: "Paid" }
 ]
@@ -23,8 +26,8 @@ export default function Plugins() {
   const [selectedFilter, setSelectedFilter] = useState("default")
 
   // Determine API filter type
-  const apiFilter = ['default', 'most-downloaded', 'newest'].includes(selectedFilter) 
-    ? selectedFilter as 'default' | 'most-downloaded' | 'newest' 
+  const apiFilter = ['default', 'most-downloaded', 'newest', 'most-voted', 'most-commented', 'recently-updated'].includes(selectedFilter) 
+    ? selectedFilter as 'default' | 'most-downloaded' | 'newest' | 'most-voted' | 'most-commented' | 'recently-updated'
     : 'default'
 
   const { 
@@ -191,13 +194,6 @@ export default function Plugins() {
         {filteredPlugins.length === 0 && !isLoading && (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">No plugins found matching your criteria.</p>
-          </div>
-        )}
-
-        {/* End of Results */}
-        {!hasNextPage && !searchQuery && filteredPlugins.length > 0 && (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">You've reached the end of the plugins list</p>
           </div>
         )}
       </div>
