@@ -35,14 +35,14 @@ export function PluginCard({ plugin, index = 0 }: PluginCardProps) {
               <img 
                 src={plugin.icon} 
                 alt={plugin.name}
-                className="w-12 h-12 rounded-lg group-hover:scale-110 transition-transform bg-gradient-primary p-0.5"
+                className="w-12 h-12 rounded-lg group-hover:scale-110 transition-transform border border-border/20"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                   target.nextElementSibling?.classList.remove('hidden');
                 }}
               />
-              <div className="hidden w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform">
+              <div className="hidden w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform border border-border/20">
                 {plugin.name.charAt(0)}
               </div>
             </div>
