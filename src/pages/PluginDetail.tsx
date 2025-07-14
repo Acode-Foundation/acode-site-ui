@@ -171,13 +171,13 @@ export default function PluginDetail() {
                 <div className="flex items-center gap-3 mb-2">
                   <h1 className="text-4xl font-bold">{plugin.name}</h1>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="bg-muted/50 text-muted-foreground border">
+                    <Badge className="bg-primary/10 text-primary border-primary/20 text-sm px-3 py-1">
                       v{plugin.version}
                     </Badge>
-                    <Badge className={`${plugin.price === 0 ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-primary/10 text-primary border-primary/20'}`}>
+                    <Badge className={`${plugin.price === 0 ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-primary/10 text-primary border-primary/20'} text-sm px-3 py-1`}>
                       {plugin.price === 0 ? 'Free' : `$${plugin.price}`}
                     </Badge>
-                    <Badge variant="outline" className="bg-secondary/10 text-secondary border-secondary/20">
+                    <Badge className="bg-secondary/10 text-secondary border-secondary/20 text-sm px-3 py-1">
                       {plugin.license}
                     </Badge>
                   </div>

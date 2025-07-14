@@ -138,9 +138,6 @@ export default function DeveloperProfile() {
                       </Badge>
                     </div>
                   )}
-                  <Badge variant="outline" className="capitalize">
-                    {developer.role}
-                  </Badge>
                 </div>
                 
                 <p className="text-muted-foreground mb-4">{developer.email}</p>

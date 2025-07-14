@@ -10,8 +10,8 @@ const navItems = [
   { name: "FAQ", href: "/faq" },
   { name: "Plugins", href: "/plugins" },
   { name: "Docs", href: "https://docs.acode.app", external: true },
-  { name: "Registration", href: "/registration" },
-  { name: "Dashboard", href: "/dashboard" },
+  { name: "Login", href: "/login" },
+  { name: "Signup", href: "/signup" },
 ]
 
 export function FloatingNav() {
