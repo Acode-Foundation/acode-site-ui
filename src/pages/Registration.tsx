@@ -7,22 +7,20 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Checkbox } from "@/components/ui/checkbox"
-import { MainLayout } from "@/components/layout/main-layout"
 
 export default function Registration() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   return (
-    <MainLayout>
-      <div className="min-h-screen flex items-center justify-center p-4">
-        {/* Background Effects */}
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "2s" }} />
-        </div>
+    <div className="min-h-screen flex items-center justify-center p-4">
+      {/* Background Effects */}
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "2s" }} />
+      </div>
 
-        <div className="w-full max-w-md relative z-10">
+      <div className="w-full max-w-md relative z-10">
           <Card className="bg-card/50 backdrop-blur-lg border-border shadow-lg">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
@@ -181,6 +179,5 @@ export default function Registration() {
           </Card>
         </div>
       </div>
-    </MainLayout>
   )
 }

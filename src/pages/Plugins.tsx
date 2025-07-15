@@ -3,7 +3,6 @@ import { Search, Filter, ExternalLink, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MainLayout } from "@/components/layout/main-layout";
 import { PluginCard } from "@/components/ui/plugin-card";
 import { PluginCardSkeleton } from "@/components/ui/plugin-card-skeleton";
 import { usePlugins } from "@/hooks/use-plugins";
@@ -73,27 +72,27 @@ export default function Plugins() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
   if (isLoading) {
-    return <MainLayout>
-        <div className="min-h-screen py-8">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                Plugin
-                <span className="bg-gradient-primary bg-clip-text text-transparent"> Marketplace</span>
-              </h1>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {Array.from({
-              length: 12
-            }).map((_, i) => <PluginCardSkeleton key={i} />)}
-            </div>
-          </div>
-        </div>
-      </MainLayout>;
-  }
-  return <MainLayout>
+    return (
       <div className="min-h-screen py-8">
         <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Plugin
+              <span className="bg-gradient-primary bg-clip-text text-transparent"> Marketplace</span>
+            </h1>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({
+            length: 12
+          }).map((_, i) => <PluginCardSkeleton key={i} />)}
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="min-h-screen py-8">
+      <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -162,5 +161,5 @@ export default function Plugins() {
           </div>}
       </div>
     </div>
-    </MainLayout>;
+  );
 }

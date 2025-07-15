@@ -53,7 +53,7 @@ export function Footer() {
           {/* Copyright */}
           <div className="pt-4 border-t border-border/20 w-full max-w-md">
             <p className="text-muted-foreground text-xs">
-              © 2024 Acode. Made with <Heart className="w-3 h-3 mx-1 text-primary inline" /> for developers
+              © 2025 Acode. Made with <Heart className="w-3 h-3 mx-1 text-primary inline" /> for developers
             </p>
           </div>
         </div>

@@ -1,4 +1,3 @@
-import { MainLayout } from "@/components/layout/main-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import MarkdownIt from 'markdown-it'
 
@@ -59,17 +58,15 @@ Any disputes arising from these Terms of Service will be resolved through arbitr
 
 export default function Terms() {
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <Card className="bg-card/50 backdrop-blur-sm border-border/20">
-          <CardContent className="p-8">
-            <div 
-              className="markdown-content"
-              dangerouslySetInnerHTML={{ __html: md.render(termsContent) }}
-            />
-          </CardContent>
-        </Card>
-      </div>
-    </MainLayout>
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <Card className="bg-card/50 backdrop-blur-sm border-border/20">
+        <CardContent className="p-8">
+          <div 
+            className="markdown-content"
+            dangerouslySetInnerHTML={{ __html: md.render(termsContent) }}
+          />
+        </CardContent>
+      </Card>
+    </div>
   )
 }
