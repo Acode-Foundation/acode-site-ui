@@ -1,162 +1,61 @@
 import { MainLayout } from "@/components/layout/main-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import MarkdownIt from 'markdown-it'
-import hljs from 'highlight.js'
-import 'highlight.js/styles/github-dark.css'
 
 const md = new MarkdownIt({
   html: true,
-  linkify: true,
-  highlight: function (str, lang) {
-    if (lang && hljs.getLanguage(lang)) {
-      try {
-        return '<pre><code class="hljs">' +
-          hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
-          '</code></pre>';
-      } catch (__) { }
-    }
-
-    return '<pre><code class="hljs">' + md.utils.escapeHtml(str) + '</code></pre>';
-  }
+  linkify: true
 });
 
-const termsContent = `# Terms and Conditions
+const termsContent = `# Terms of Service
 
-*Last updated: ${new Date().toLocaleDateString()}*
+## Introduction
 
-## Acceptance of Terms
+These Terms of Service govern your use of our website and app. By using our services, you agree to these terms.
 
-By downloading, installing, or using Acode ("the App"), you agree to be bound by these Terms and Conditions ("Terms"). If you do not agree to these Terms, please do not use the App.
+## Account
 
-## Description of Service
+You must create a developer account to upload plugins to our website. You are responsible for maintaining the confidentiality of your account information and password.
 
-Acode is a mobile code editor application that provides:
+## Content
 
-- **Code Editing**: Advanced text editing capabilities for programming
-- **Plugin System**: Extensible functionality through plugins
-- **File Management**: Local and cloud file storage options
-- **Syntax Highlighting**: Support for multiple programming languages
-- **Development Tools**: Integrated development environment features
+You retain ownership of any plugins you upload to our website. However, by uploading a plugin, you grant us a non-exclusive, worldwide, perpetual license to use, copy, modify, and distribute the plugin in connection with our services. You represent and warrant that you have the right to grant this license and that your plugin does not infringe the intellectual property rights of any third party.
 
-## User Accounts
+## Payments
 
-### Account Creation
-- You must provide accurate and complete information when creating an account
-- You are responsible for maintaining the confidentiality of your account credentials
-- You must notify us immediately of any unauthorized access to your account
+We will pay you for your plugin sales and download count. Payments will be made to the bank account or PayPal email address you provide as your default payment method. If your earnings from the previous month(s) sum up to an amount equal to or greater than the threshold, your payment will be automatically transferred to your default payment method on the 16th of each month. If the 16th falls on a weekend, the transfer will occur on the next working day. Please note that it may take up to 5 working days for the amount to be credited to your account. You are responsible for any taxes or fees associated with receiving payments.
 
-### Account Responsibilities
-- You are solely responsible for all activities under your account
-- You must not share your account with others
-- You must be at least 13 years old to create an account
+Please let me know if you would like any further changes or updates to the Terms of Service.
 
-## Acceptable Use Policy
+## Payment Threshold
 
-### Permitted Uses
-You may use Acode for:
-- Personal and commercial software development
-- Educational and learning purposes
-- Creating and sharing plugins (subject to plugin guidelines)
-- Collaborative development projects
+The payment threshold is the minimum amount of earnings required for a payment to be processed and transferred to your designated payment method. Different minimum thresholds apply depending on the chosen payment method:
 
-### Prohibited Uses
-You must not:
-- **Illegal Activities**: Use the App for any unlawful purpose
-- **Malicious Code**: Develop, distribute, or execute malware or harmful code
-- **Intellectual Property Violation**: Infringe on copyrights, trademarks, or other rights
-- **System Abuse**: Attempt to hack, disrupt, or damage our services
-- **Spam or Harassment**: Send unsolicited content or harass other users
-- **Reverse Engineering**: Attempt to decompile or reverse engineer the App
+- For international payments: The minimum threshold is 5000 INR.
+- For payments via cryptocurrency: The minimum threshold is 4000 INR.
+- For all other payment methods: The minimum threshold is 1000 INR.
 
-## Plugin Ecosystem
+If you choose to change your payment threshold, it cannot be set lower than the respective minimum threshold specified above. However, regardless of the user-set threshold, if the selected payment method falls under one of the mentioned categories, the respective minimum threshold will be applied for processing payments.
 
-### Plugin Development
-- Plugins must comply with our Plugin Guidelines
-- You retain ownership of your original plugin code
-- You grant us a license to distribute your plugins through our platform
-- We reserve the right to remove plugins that violate these Terms
+Please note that all bank charges and taxes associated with receiving payments will be deducted from the payment amount.
 
-### Plugin Usage
-- Plugins are provided by third-party developers
-- We do not guarantee the functionality or security of third-party plugins
-- Use plugins at your own risk and discretion
-
-## Intellectual Property
-
-### Our Rights
-- Acode and its original features are protected by intellectual property laws
-- Our trademarks, logos, and branding remain our exclusive property
-- We reserve all rights not expressly granted to you
-
-### Your Rights
-- You retain ownership of the code and content you create using Acode
-- You grant us a limited license to process and store your content to provide our services
-- You represent that you have the right to use any content you upload or create
-
-## Privacy and Data
-
-Your privacy is important to us. Please review our [Privacy Policy](/privacy) to understand how we collect, use, and protect your information.
+You are responsible for any taxes or fees associated with receiving payments.
 
 ## Limitation of Liability
 
-### Disclaimer
-THE APP IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. WE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-
-### Limitation
-IN NO EVENT SHALL WE BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES ARISING FROM YOUR USE OF THE APP.
-
-## Indemnification
-
-You agree to indemnify and hold us harmless from any claims, damages, or expenses arising from:
-- Your use of the App
-- Your violation of these Terms
-- Your infringement of any intellectual property rights
+Our services are provided "as is" without any warranties of any kind. We will not be liable for any damages, whether direct, indirect, incidental, or consequential, arising from your use of our services.
 
 ## Termination
 
-### By You
-You may stop using the App at any time and delete your account through the app settings.
+We may terminate your account and use of our services at any time, for any reason, with or without notice.
 
-### By Us
-We may terminate or suspend your account if you:
-- Violate these Terms
-- Engage in illegal activities
-- Abuse our services or other users
-- Remain inactive for an extended period
+## Changes to these Terms
 
-## Updates and Changes
+We may update these Terms of Service from time to time. If we make changes, we will notify you by revising the date at the top of this policy. Your continued use of our services after any changes indicates your acceptance of the new terms.
 
-### App Updates
-- We may update the App to fix bugs, add features, or improve performance
-- Some updates may be required for continued use
-- We are not obligated to provide updates indefinitely
+## Disputes
 
-### Terms Changes
-- We may modify these Terms from time to time
-- We will notify you of significant changes through the App or email
-- Continued use after changes constitutes acceptance of new Terms
-
-## Governing Law
-
-These Terms are governed by the laws of [Your Jurisdiction]. Any disputes will be resolved in the courts of [Your Jurisdiction].
-
-## Contact Information
-
-For questions about these Terms, please contact us:
-
-- **Email**: legal@acode.app
-- **Support**: support@acode.app
-- **GitHub**: https://github.com/deadlyjack/Acode
-- **Discord**: https://discord.gg/acode
-
-## Severability
-
-If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.
-
-## Entire Agreement
-
-These Terms, together with our Privacy Policy, constitute the entire agreement between you and us regarding the use of Acode.
-`;
+Any disputes arising from these Terms of Service will be resolved through arbitration.`;
 
 export default function Terms() {
   return (
