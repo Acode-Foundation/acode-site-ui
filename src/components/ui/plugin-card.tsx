@@ -47,7 +47,7 @@ export function PluginCard({ plugin, index = 0 }: PluginCardProps) {
                 {plugin.name.charAt(0)}
               </div>
             </div>
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="secondary" className="text-xs hover:bg-primary/20 hover:text-primary transition-colors">
               v{plugin.version}
             </Badge>
           </div>
@@ -69,10 +69,15 @@ export function PluginCard({ plugin, index = 0 }: PluginCardProps) {
         
         <CardContent className="pt-0">
           <div className="flex items-center justify-between text-sm mb-4">
-            <span className={`font-medium ${plugin.price === 0 ? 'text-green-400' : 'text-primary'}`}>
+            <Badge 
+              variant="secondary" 
+              className={`font-medium hover:bg-primary/20 hover:text-primary transition-colors ${
+                plugin.price === 0 ? 'text-green-500 hover:text-green-600 hover:bg-green-500/20' : 'text-primary'
+              }`}
+            >
               {plugin.price === 0 ? 'Free' : `₹${plugin.price}`}
-            </span>
-            <Badge variant="outline" className="text-xs px-1">
+            </Badge>
+            <Badge variant="secondary" className="text-xs px-1 hover:bg-primary/20 hover:text-primary transition-colors">
               {plugin.license}
             </Badge>
           </div>
