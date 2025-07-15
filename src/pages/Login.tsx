@@ -168,19 +168,6 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Demo Credentials */}
-        <Card className="mt-4 bg-muted/20 border-muted">
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground text-center mb-2">
-              Demo credentials for testing:
-            </p>
-            <div className="text-xs text-muted-foreground space-y-1">
-              <div><strong>Email:</strong> demo@acode.app</div>
-              <div><strong>Password:</strong> demo123</div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   )
