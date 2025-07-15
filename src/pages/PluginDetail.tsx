@@ -171,13 +171,20 @@ export default function PluginDetail() {
                 <div className="flex items-center gap-3 mb-2">
                   <h1 className="text-4xl font-bold">{plugin.name}</h1>
                   <div className="flex flex-wrap gap-2">
-                    <Badge className="bg-primary/10 text-primary border-primary/20 text-sm px-3 py-1">
+                    <Badge variant="outline" className="text-sm px-3 py-1 bg-muted/30 hover:bg-muted/50 hover:text-foreground transition-colors">
                       v{plugin.version}
                     </Badge>
-                    <Badge className={`${plugin.price === 0 ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-primary/10 text-primary border-primary/20'} text-sm px-3 py-1`}>
+                    <Badge 
+                      variant="outline" 
+                      className={`text-sm px-3 py-1 transition-colors ${
+                        plugin.price === 0 
+                          ? 'bg-green-500/10 text-green-500 border-green-500/30 hover:bg-green-500/20 hover:border-green-500/40' 
+                          : 'bg-blue-500/10 text-blue-500 border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500/40'
+                      }`}
+                    >
                       {plugin.price === 0 ? 'Free' : `₹${plugin.price}`}
                     </Badge>
-                    <Badge className="bg-muted/50 text-muted-foreground border-muted text-sm px-3 py-1">
+                    <Badge variant="outline" className="text-sm px-3 py-1 bg-muted/30 hover:bg-muted/50 hover:text-foreground transition-colors">
                       {plugin.license}
                     </Badge>
                   </div>
