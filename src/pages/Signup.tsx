@@ -14,46 +14,46 @@ export default function Signup() {
 
   return (
     <div className="flex items-center justify-center py-8 px-4">
-      {/* Background Effects */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-acode-purple/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-acode-blue/20 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
-      </div>
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <User className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold mb-2">
+            Create Account
+          </h1>
+          <p className="text-muted-foreground">
+            Join the Acode community and start building amazing things
+          </p>
+        </div>
 
-      <div className="w-full max-w-md relative z-10">
-        <Card className="bg-card/50 backdrop-blur-lg border-border shadow-elegant">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              Create Account
-            </CardTitle>
-            <CardDescription>
-              Join the Acode community and start building amazing things
-            </CardDescription>
-          </CardHeader>
+        <Card className="bg-card/50 backdrop-blur-sm border-border">
+          <CardHeader className="space-y-1 pb-4">
           
-          <CardContent className="space-y-6">
-            {/* Social Login */}
-            <div className="space-y-3">
-              <Button variant="outline" className="w-full" size="lg">
-                <Github className="w-5 h-5 mr-2" />
+            <div className="space-y-2">
+              <Button variant="outline" className="w-full">
+                <Github className="w-4 h-4 mr-2" />
                 Continue with GitHub
               </Button>
-              <Button variant="outline" className="w-full" size="lg">
-                <Mail className="w-5 h-5 mr-2" />
+              <Button variant="outline" className="w-full">
+                <Mail className="w-4 h-4 mr-2" />
                 Continue with Google
               </Button>
             </div>
-
+            
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <Separator />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">Or continue with email</span>
+                <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
               </div>
             </div>
+          </CardHeader>
 
-            {/* Signup Form */}
+          <CardContent>
+
             <form className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -157,23 +157,20 @@ export default function Signup() {
                 </Label>
               </div>
               
-              <Button 
-                type="submit" 
-                className="w-full bg-gradient-primary hover:shadow-glow-primary transition-all duration-300 group" 
-                size="lg"
-              >
-                Create Account
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-primary hover:shadow-glow-primary transition-all duration-300 group"
+                  >
+                    Create Account
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
             </form>
 
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">
-                Already have an account?{" "}
-                <Link to="/login" className="text-primary hover:underline font-medium">
-                  Sign in
-                </Link>
-              </p>
+            <div className="mt-6 text-center text-sm">
+              <span className="text-muted-foreground">Already have an account? </span>
+              <Link to="/login" className="text-primary hover:underline">
+                Sign in
+              </Link>
             </div>
           </CardContent>
         </Card>
