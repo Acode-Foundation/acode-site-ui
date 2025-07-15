@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { MainLayout } from "@/components/layout/main-layout"
 
 export default function ForgotPassword() {
   const [emailSent, setEmailSent] = useState(false)
@@ -18,45 +17,33 @@ export default function ForgotPassword() {
   }
 
   return (
-    <MainLayout>
-      <div className="min-h-screen flex items-center justify-center p-4">
-      {/* Background Effects */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-acode-purple/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-acode-blue/20 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
-      </div>
+    <div className="flex items-center justify-center py-8 px-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Mail className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold mb-2">
+            {!emailSent ? "Forgot Password?" : "Check Your Email"}
+          </h1>
+          <p className="text-muted-foreground">
+            {!emailSent ? "No worries! Enter your email and we'll send you a reset link" : `We've sent a password reset link to ${email}`}
+          </p>
+        </div>
 
-      <div className="w-full max-w-md relative z-10">
-        <Card className="bg-card/50 backdrop-blur-lg border-border shadow-elegant">
-          <CardHeader className="text-center">
-            {!emailSent ? (
-              <>
-                <CardTitle className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  Forgot Password?
-                </CardTitle>
-                <CardDescription>
-                  No worries! Enter your email and we'll send you a reset link
-                </CardDescription>
-              </>
-            ) : (
-              <>
-                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-8 h-8 text-green-500" />
-                </div>
-                <CardTitle className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  Check Your Email
-                </CardTitle>
-                <CardDescription>
-                  We've sent a password reset link to {email}
-                </CardDescription>
-              </>
+        <Card className="bg-card/50 backdrop-blur-sm border-border">
+          <CardHeader className="space-y-1 pb-4">
+            {emailSent && (
+              <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-green-500" />
+              </div>
             )}
           </CardHeader>
           
-          <CardContent className="space-y-6">
+          <CardContent>
             {!emailSent ? (
-              <>
-                <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
                     <div className="relative">
@@ -73,60 +60,44 @@ export default function ForgotPassword() {
                     </div>
                   </div>
                   
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-primary hover:shadow-glow-primary transition-all duration-300 group" 
-                    size="lg"
-                  >
-                    Send Reset Link
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </form>
-
-                <div className="text-center">
-                  <Link 
-                    to="/login" 
-                    className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-1" />
-                    Back to Login
-                  </Link>
-                </div>
-              </>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-primary hover:shadow-glow-primary transition-all duration-300 group"
+                >
+                  Send Reset Link
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </form>
             ) : (
-              <>
-                <div className="space-y-4">
-                  <div className="text-center space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      Didn't receive the email? Check your spam folder or try again.
-                    </p>
-                  </div>
-
-                  <Button 
-                    onClick={() => setEmailSent(false)}
-                    variant="outline" 
-                    className="w-full" 
-                    size="lg"
-                  >
-                    Resend Email
-                  </Button>
-
-                  <div className="text-center">
-                    <Link 
-                      to="/login" 
-                      className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <ArrowLeft className="w-4 h-4 mr-1" />
-                      Back to Login
-                    </Link>
-                  </div>
+              <div className="space-y-4">
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Didn't receive the email? Check your spam folder or try again.
+                  </p>
                 </div>
-              </>
+
+                <Button 
+                  onClick={() => setEmailSent(false)}
+                  variant="outline" 
+                  className="w-full"
+                >
+                  Resend Email
+                </Button>
+              </div>
             )}
+
+            <div className="mt-6 text-center">
+              <Link 
+                to="/login" 
+                className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4 mr-1" />
+                Back to Login
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>
     </div>
-    </MainLayout>
   )
 }

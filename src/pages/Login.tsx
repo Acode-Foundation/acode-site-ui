@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { MainLayout } from "@/components/layout/main-layout"
 import { Link } from "react-router-dom"
 import { useToast } from "@/hooks/use-toast"
 
@@ -42,8 +41,7 @@ export default function Login() {
   }
 
   return (
-    <MainLayout>
-      <div className="min-h-screen flex items-center justify-center py-12 px-4">
+    <div className="flex items-center justify-center py-8 px-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -170,21 +168,7 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Demo Credentials */}
-        <Card className="mt-4 bg-muted/20 border-muted">
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground text-center mb-2">
-              Demo credentials for testing:
-            </p>
-            <div className="text-xs text-muted-foreground space-y-1">
-              <div><strong>Email:</strong> demo@acode.app</div>
-              <div><strong>Password:</strong> demo123</div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
-    </MainLayout>
   )
 }
