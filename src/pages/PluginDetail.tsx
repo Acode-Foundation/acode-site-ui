@@ -299,6 +299,12 @@ export default function PluginDetail() {
                           <div key={review.id} className="border-b border-border/50 pb-4 last:border-b-0">
                             <div className="flex items-start gap-3">
                               <Avatar className="w-8 h-8">
+                                {review.github ? (
+                                  <AvatarImage 
+                                    src={`https://avatars.githubusercontent.com/${review.github}`} 
+                                    alt={review.name || 'User'} 
+                                  />
+                                ) : null}
                                 <AvatarFallback className="bg-gradient-primary text-white text-sm">
                                   {review.name?.charAt(0) || 'U'}
                                 </AvatarFallback>
