@@ -14,19 +14,19 @@ const footerLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/20 bg-background/95 backdrop-blur-sm">
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col items-center text-center space-y-8">
+    <footer className="mt-16 border-t border-border/20 bg-card/30 backdrop-blur-md">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col items-center text-center space-y-6">
           {/* Brand */}
           <div className="flex items-center space-x-3">
-            <img src={acodeLogoSvg} alt="Acode" className="h-8 w-8" />
-            <span className="font-bold text-xl bg-gradient-primary bg-clip-text text-transparent">
+            <img src={acodeLogoSvg} alt="Acode" className="h-7 w-7" />
+            <span className="font-bold text-lg bg-gradient-primary bg-clip-text text-transparent">
               Acode
             </span>
           </div>
 
           {/* Links */}
-          <div className="flex flex-wrap justify-center items-center gap-8 text-sm">
+          <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-sm">
             {footerLinks.map((link) => (
               <div key={link.name}>
                 {link.external ? (
@@ -34,14 +34,14 @@ export function Footer() {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200 hover:underline"
                   >
                     {link.name}
                   </a>
                 ) : (
                   <Link
                     to={link.href}
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200 hover:underline"
                   >
                     {link.name}
                   </Link>
@@ -51,9 +51,9 @@ export function Footer() {
           </div>
 
           {/* Copyright */}
-          <div className="pt-6 border-t border-border/20 w-full">
-            <p className="text-muted-foreground text-sm">
-              © 2024 Acode. Made with <Heart className="w-4 h-4 mx-1 text-primary inline" /> for developers
+          <div className="pt-4 border-t border-border/20 w-full max-w-md">
+            <p className="text-muted-foreground text-xs">
+              © 2024 Acode. Made with <Heart className="w-3 h-3 mx-1 text-primary inline" /> for developers
             </p>
           </div>
         </div>
