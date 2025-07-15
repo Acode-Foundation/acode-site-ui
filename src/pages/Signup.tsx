@@ -15,7 +15,7 @@ export default function Signup() {
 
   return (
     <MainLayout>
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="flex items-center justify-center py-8 px-4">
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-acode-purple/20 rounded-full blur-3xl animate-float" />

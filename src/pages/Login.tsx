@@ -43,7 +43,7 @@ export default function Login() {
 
   return (
     <MainLayout>
-      <div className="min-h-screen flex items-center justify-center py-12 px-4">
+      <div className="flex items-center justify-center py-8 px-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
