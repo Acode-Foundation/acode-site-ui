@@ -70,7 +70,7 @@ export function PluginCard({ plugin, index = 0 }: PluginCardProps) {
         <CardContent className="pt-0">
           <div className="flex items-center justify-between text-sm mb-4">
             <span className={`font-medium ${plugin.price === 0 ? 'text-green-400' : 'text-primary'}`}>
-              {plugin.price === 0 ? 'Free' : `$${plugin.price}`}
+              {plugin.price === 0 ? 'Free' : `₹${plugin.price}`}
             </span>
             <Badge variant="outline" className="text-xs px-1">
               {plugin.license}

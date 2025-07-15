@@ -108,12 +108,12 @@ export default function Plugins() {
             {/* Search */}
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input placeholder="Search plugins, authors, keywords..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-12 h-12 bg-background/80 border-border/50 rounded-lg text-base focus:border-primary focus:ring-primary" />
+              <Input placeholder="Search plugins, authors, keywords..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-12 h-12 bg-background/80 border-border/50 rounded-lg text-base" />
             </div>
 
             {/* Filter */}
             <Select value={selectedFilter} onValueChange={setSelectedFilter}>
-              <SelectTrigger className="w-full lg:w-48 h-12 bg-background/80 border-border/50 rounded-lg focus:border-primary focus:ring-primary">
+              <SelectTrigger className="w-full lg:w-48 h-12 bg-background/80 border-border/50 rounded-lg">
                 <Filter className="w-4 h-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>

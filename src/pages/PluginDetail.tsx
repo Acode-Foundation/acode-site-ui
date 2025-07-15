@@ -175,7 +175,7 @@ export default function PluginDetail() {
                       v{plugin.version}
                     </Badge>
                     <Badge className={`${plugin.price === 0 ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-primary/10 text-primary border-primary/20'} text-sm px-3 py-1`}>
-                      {plugin.price === 0 ? 'Free' : `$${plugin.price}`}
+                      {plugin.price === 0 ? 'Free' : `₹${plugin.price}`}
                     </Badge>
                     <Badge className="bg-muted/50 text-muted-foreground border-muted text-sm px-3 py-1">
                       {plugin.license}

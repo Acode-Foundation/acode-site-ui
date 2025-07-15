@@ -55,7 +55,7 @@ export default function ForgotPassword() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required 
-                        className="pl-10 bg-background/50 border-border focus:border-primary"
+                        className="pl-10 bg-background/50"
                       />
                     </div>
                   </div>
