@@ -64,7 +64,7 @@ export default function Signup() {
                     id="firstName" 
                     placeholder="John" 
                     required 
-                    className="bg-background/50 border-border focus:border-primary"
+                    className="bg-background/50"
                   />
                 </div>
                 <div className="space-y-2">
@@ -73,7 +73,7 @@ export default function Signup() {
                     id="lastName" 
                     placeholder="Doe" 
                     required 
-                    className="bg-background/50 border-border focus:border-primary"
+                    className="bg-background/50"
                   />
                 </div>
               </div>
@@ -86,7 +86,7 @@ export default function Signup() {
                     id="username" 
                     placeholder="johndoe" 
                     required 
-                    className="pl-10 bg-background/50 border-border focus:border-primary"
+                    className="pl-10 bg-background/50"
                   />
                 </div>
               </div>
@@ -100,7 +100,7 @@ export default function Signup() {
                     type="email" 
                     placeholder="john@example.com" 
                     required 
-                    className="pl-10 bg-background/50 border-border focus:border-primary"
+                    className="pl-10 bg-background/50"
                   />
                 </div>
               </div>
@@ -113,7 +113,7 @@ export default function Signup() {
                     type={showPassword ? "text" : "password"} 
                     placeholder="Create a strong password"
                     required 
-                    className="pr-10 bg-background/50 border-border focus:border-primary"
+                    className="pr-10 bg-background/50"
                   />
                   <button
                     type="button"
@@ -133,7 +133,7 @@ export default function Signup() {
                     type={showConfirmPassword ? "text" : "password"} 
                     placeholder="Confirm your password"
                     required 
-                    className="pr-10 bg-background/50 border-border focus:border-primary"
+                    className="pr-10 bg-background/50"
                   />
                   <button
                     type="button"
