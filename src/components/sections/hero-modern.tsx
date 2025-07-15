@@ -1,23 +1,11 @@
-import { useState, useEffect } from "react"
 import { ArrowRight, Star, GitFork, Download, Play, Code, Smartphone, Monitor } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useGitHubStats } from "@/hooks/use-github-stats"
 import acodeLogoSvg from "@/assets/acode-logo.svg"
 
-interface GitHubStats {
-  stars: number
-  forks: number
-}
-
 export function HeroModern() {
-  const [githubStats, setGithubStats] = useState<GitHubStats>({ stars: 2400, forks: 450 })
-
-  useEffect(() => {
-    // This would be replaced with actual GitHub API call
-    // fetch('https://api.github.com/repos/deadlyjack/Acode')
-    //   .then(res => res.json())
-    //   .then(data => setGithubStats({ stars: data.stargazers_count, forks: data.forks_count }))
-  }, [])
+  const { data: githubStats, isLoading } = useGitHubStats()
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
@@ -59,7 +47,7 @@ export function HeroModern() {
             />
             <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 mb-4">
               <Star className="w-3 h-3 mr-1" />
-              {githubStats.stars.toLocaleString()} stars on GitHub
+              {githubStats?.stars.toLocaleString() || '3,000'} stars on GitHub
             </Badge>
           </div>
 
@@ -96,12 +84,12 @@ export function HeroModern() {
           <div className="flex justify-center space-x-8 animate-slide-up" style={{ animationDelay: "0.8s" }}>
             <div className="flex items-center space-x-2">
               <Star className="w-5 h-5 text-yellow-500" />
-              <span className="font-semibold text-lg">{githubStats.stars.toLocaleString()}</span>
+              <span className="font-semibold text-lg">{githubStats?.stars.toLocaleString() || '3,000'}</span>
               <span className="text-muted-foreground">stars</span>
             </div>
             <div className="flex items-center space-x-2">
               <GitFork className="w-5 h-5 text-primary" />
-              <span className="font-semibold text-lg">{githubStats.forks.toLocaleString()}</span>
+              <span className="font-semibold text-lg">{githubStats?.forks.toLocaleString() || '500'}</span>
               <span className="text-muted-foreground">forks</span>
             </div>
           </div>
@@ -109,7 +97,7 @@ export function HeroModern() {
           {/* Version Info */}
           <div className="mt-16 mb-4 animate-fade-in" style={{ animationDelay: "1s" }}>
             <p className="text-sm text-muted-foreground">
-              Latest version: 1.8.5 • Compatible with Android 5.0+ • Trusted by 2M+ developers
+              Latest version: {githubStats?.latestVersion || '1.11.0'} • Compatible with Android 5.0+ • Trusted by 2M+ developers
             </p>
           </div>
         </div>

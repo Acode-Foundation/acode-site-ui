@@ -39,28 +39,6 @@ export function PluginsSection() {
             ))}
           </div>
         )}
-
-        {/* Plugin Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-          <div className="text-center">
-            <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-              500+
-            </div>
-            <p className="text-muted-foreground">Available Plugins</p>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-              2.1M+
-            </div>
-            <p className="text-muted-foreground">Total Downloads</p>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-              150+
-            </div>
-            <p className="text-muted-foreground">Active Developers</p>
-          </div>
-        </div>
       </div>
     </section>
   )
