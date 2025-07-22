@@ -93,13 +93,13 @@ export default function PluginDetail() {
   
   const { data: plugin, isLoading, error } = useQuery({
     queryKey: ['plugin', id],
-    queryFn: () => fetchPlugin(id!),
+    queryFn: async () => await fetchPlugin(id!),
     enabled: !!id,
   })
 
   const { data: reviews = [] } = useQuery({
     queryKey: ['reviews', id],
-    queryFn: () => fetchReviews(id!),
+    queryFn: async () => fetchReviews(id!),
     enabled: !!id,
   })
 
