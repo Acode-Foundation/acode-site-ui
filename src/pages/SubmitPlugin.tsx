@@ -1,6 +1,6 @@
-import { Upload, FileArchive, AlertCircle, CheckCircle, Loader2, Package, User, Tag, Shield, Hash, DollarSign, Github, UserCheck, GitBranch } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Upload, FileArchive, AlertCircle, CheckCircle, Loader2, Package, User, Tag, Shield, Hash, DollarSign, Github, UserCheck, GitBranch, Edit } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import JSZip from "jszip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,12 +12,68 @@ import { PluginMetadata } from "@/types/submit-plugin";
 export default function SubmitPlugin() {
 	const navigate = useNavigate();
 	const { toast } = useToast();
+	const [searchParams] = useSearchParams();
 	const { data: user, isLoading: userLoading } = useLoggedInUser();
 	const [file, setFile] = useState<File | null>(null);
 	const [pluginMetadata, setPluginMetadata] = useState<PluginMetadata | null>(null);
 	const [isUploading, setIsUploading] = useState(false);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [isAnalyzing, setIsAnalyzing] = useState(false);
+	const [isLoadingExisting, setIsLoadingExisting] = useState(false);
+	
+	const pluginId = searchParams.get("id");
+	const isUpdateMode = !!pluginId;
+
+	// Load existing plugin data if in update mode
+	useEffect(() => {
+		const loadExistingPlugin = async () => {
+			if (!isUpdateMode || !pluginId || !user) return;
+
+			setIsLoadingExisting(true);
+			try {
+				const response = await fetch(
+					`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin/${pluginId}`,
+					{
+						credentials: "include",
+					}
+				);
+
+				if (!response.ok) {
+					throw new Error("Failed to load plugin data");
+				}
+
+				const pluginData = await response.json();
+				
+				// Set existing metadata for display
+				const existingMetadata: PluginMetadata = {
+					id: pluginData.id,
+					name: pluginData.name,
+					version: pluginData.version,
+					author: user.name,
+					license: pluginData.license,
+					keywords: pluginData.keywords ? JSON.parse(pluginData.keywords) : [],
+					contributors: pluginData.contributors ? JSON.parse(pluginData.contributors) : [],
+					minVersionCode: pluginData.minVersionCode,
+					price: pluginData.price,
+					repository: pluginData.repository,
+				};
+
+				setPluginMetadata(existingMetadata);
+			} catch (error) {
+				console.error("Error loading plugin:", error);
+				toast({
+					title: "Failed to load plugin",
+					description: "Could not load existing plugin data.",
+					variant: "destructive",
+				});
+				navigate("/plugins");
+			} finally {
+				setIsLoadingExisting(false);
+			}
+		};
+
+		loadExistingPlugin();
+	}, [isUpdateMode, pluginId, user, navigate, toast]);
 
 	const analyzePluginZip = async (zipFile: File) => {
 		setIsAnalyzing(true);
@@ -100,7 +156,7 @@ export default function SubmitPlugin() {
 	};
 
 	const handleSubmit = async () => {
-		if (!file) {
+		if (!file && !isUpdateMode) {
 			toast({
 				title: "No file selected",
 				description: "Please select a plugin ZIP file to upload.",
@@ -112,7 +168,7 @@ export default function SubmitPlugin() {
 		if (!user) {
 			toast({
 				title: "Authentication required",
-				description: "Please log in to submit a plugin.",
+				description: `Please log in to ${isUpdateMode ? 'update' : 'submit'} a plugin.`,
 				variant: "destructive",
 			});
 			navigate("/login");
@@ -123,40 +179,47 @@ export default function SubmitPlugin() {
 
 		try {
 			const formData = new FormData();
-			formData.append("plugin", file);
+			if (file) {
+				formData.append("plugin", file);
+			}
 
-			const response = await fetch(
-				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin`,
-				{
-					method: "POST",
-					body: formData,
-					credentials: "include",
-				}
-			);
+			const url = isUpdateMode 
+				? `${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin`
+				: `${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin`;
+
+			const response = await fetch(url, {
+				method: isUpdateMode ? "PUT" : "POST",
+				body: formData,
+				credentials: "include",
+			});
 
 			if (!response.ok) {
 				const errorData = await response.json();
-				throw new Error(errorData.error || "Failed to upload plugin");
+				throw new Error(errorData.error || `Failed to ${isUpdateMode ? 'update' : 'upload'} plugin`);
 			}
 
 			const result = await response.json();
 			
 			toast({
-				title: "Plugin submitted successfully!",
-				description: "Your plugin has been submitted and is awaiting approval.",
+				title: isUpdateMode ? "Plugin updated successfully!" : "Plugin submitted successfully!",
+				description: isUpdateMode 
+					? "Your plugin has been updated."
+					: "Your plugin has been submitted and is awaiting approval.",
 			});
 
 			// Reset form
 			setFile(null);
-			setPluginMetadata(null);
+			if (!isUpdateMode) {
+				setPluginMetadata(null);
+			}
 			
 			// Navigate to plugins page or dashboard
 			navigate("/plugins");
 		} catch (error) {
-			console.error("Upload error:", error);
+			console.error(`${isUpdateMode ? 'Update' : 'Upload'} error:`, error);
 			toast({
-				title: "Upload failed",
-				description: error instanceof Error ? error.message : "An error occurred while uploading your plugin.",
+				title: `${isUpdateMode ? 'Update' : 'Upload'} failed`,
+				description: error instanceof Error ? error.message : `An error occurred while ${isUpdateMode ? 'updating' : 'uploading'} your plugin.`,
 				variant: "destructive",
 			});
 		} finally {
@@ -164,7 +227,7 @@ export default function SubmitPlugin() {
 		}
 	};
 
-	if (userLoading) {
+	if (userLoading || isLoadingExisting) {
 		return (
 			<div className="min-h-screen py-8">
 				<div className="container mx-auto px-4">
@@ -214,14 +277,17 @@ export default function SubmitPlugin() {
 				{/* Header */}
 				<div className="text-center mb-12">
 					<h1 className="text-4xl md:text-5xl font-bold mb-4">
-						Submit Your
+						{isUpdateMode ? "Update Your" : "Submit Your"}
 						<span className="bg-gradient-primary bg-clip-text text-transparent">
 							{" "}
 							Plugin
 						</span>
 					</h1>
-					<p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-						Share your plugin with the Acode community. Upload your ZIP file and help extend Acode's functionality.
+					<p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+						{isUpdateMode 
+							? "Update your plugin with a new version. Upload an updated ZIP file to make changes to your plugin."
+							: "Share your creativity with the Acode community. Upload your plugin ZIP file and help extend Acode's functionality for millions of developers."
+						}
 					</p>
 				</div>
 
@@ -229,11 +295,14 @@ export default function SubmitPlugin() {
 				<Card className="border-border/50 shadow-lg">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
-							<FileArchive className="w-5 h-5" />
-							Upload Plugin
+							{isUpdateMode ? <Edit className="w-5 h-5" /> : <FileArchive className="w-5 h-5" />}
+							{isUpdateMode ? "Update Plugin" : "Upload Plugin"}
 						</CardTitle>
 						<CardDescription>
-							Upload your plugin ZIP file. Make sure it includes plugin.json, icon, and other required files.
+							{isUpdateMode 
+								? "Upload a new version of your plugin ZIP file to update it. The file should include updated plugin.json and other required files."
+								: "Upload your plugin ZIP file. Make sure it includes plugin.json, icon, and other required files."
+							}
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-6">
@@ -389,22 +458,12 @@ export default function SubmitPlugin() {
 												<div className="flex items-center gap-2">
 													<DollarSign className="w-4 h-4 text-muted-foreground" />
 													<span className="text-sm font-medium">Price:</span>
-													<div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+													<div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
 														pluginMetadata.price === 0 
 															? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400" 
 															: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
 													}`}>
-														{pluginMetadata.price === 0 ? (
-															<>
-																<span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-																Free
-															</>
-														) : (
-															<>
-																<span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-																₹{pluginMetadata.price}
-															</>
-														)}
+														{pluginMetadata.price === 0 ? "Free" : `₹${pluginMetadata.price}`}
 													</div>
 												</div>
 											)}
@@ -499,12 +558,12 @@ export default function SubmitPlugin() {
 								{isUploading ? (
 									<>
 										<Loader2 className="w-4 h-4 mr-2 animate-spin" />
-										Uploading...
+										{isUpdateMode ? "Updating..." : "Uploading..."}
 									</>
 								) : (
 									<>
-										<Upload className="w-4 h-4 mr-2" />
-										Submit Plugin
+										{isUpdateMode ? <Edit className="w-4 h-4 mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
+										{isUpdateMode ? "Update Plugin" : "Submit Plugin"}
 									</>
 								)}
 							</Button>
