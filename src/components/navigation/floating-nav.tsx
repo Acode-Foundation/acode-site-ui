@@ -4,7 +4,7 @@ import { Moon, Sun, Menu, X, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/ui/theme-provider"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useLoggedInUser } from "@/hooks/useLoggedInUser"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
@@ -136,6 +136,12 @@ export function FloatingNav() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center space-x-2 h-9 px-3 hover:bg-primary/10 transition-colors duration-200 rounded-lg">
                   <Avatar className="h-6 w-6">
+                    {user?.github && (
+                      <AvatarImage 
+                        src={`https://github.com/${user.github}.png`} 
+                        alt={`${user.name}'s avatar`}
+                      />
+                    )}
                     <AvatarFallback className="text-xs bg-primary/10 text-primary">
                       {user?.name?.[0]?.toUpperCase() || 'U'}
                     </AvatarFallback>
@@ -227,6 +233,12 @@ export function FloatingNav() {
                 <>
                   <div className="flex items-center space-x-2 py-2">
                     <Avatar className="h-6 w-6">
+                      {user?.github && (
+                        <AvatarImage 
+                          src={`https://github.com/${user.github}.png`} 
+                          alt={`${user.name}'s avatar`}
+                        />
+                      )}
                       <AvatarFallback className="text-xs bg-primary/10 text-primary">
                         {user?.name?.[0]?.toUpperCase() || 'U'}
                       </AvatarFallback>

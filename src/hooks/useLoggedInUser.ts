@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import {User} from "@/types";
+import { User } from "@/types";
 
 export const fetchLoggedInUser = async (): Promise<User> => {
     const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/login`, {
