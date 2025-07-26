@@ -350,7 +350,9 @@ export default function SubmitPlugin() {
 												<div className="flex items-center gap-2">
 													<Tag className="w-4 h-4 text-muted-foreground" />
 													<span className="text-sm font-medium">Version:</span>
-													<Badge variant="secondary">{pluginMetadata.version}</Badge>
+													<span className="text-xs font-mono bg-primary/10 text-primary px-2 py-1 rounded-md border border-primary/20">
+														v{pluginMetadata.version}
+													</span>
 												</div>
 												<div className="flex items-center gap-2">
 													<User className="w-4 h-4 text-muted-foreground" />
@@ -387,9 +389,23 @@ export default function SubmitPlugin() {
 												<div className="flex items-center gap-2">
 													<DollarSign className="w-4 h-4 text-muted-foreground" />
 													<span className="text-sm font-medium">Price:</span>
-													<Badge variant={pluginMetadata.price === 0 ? "secondary" : "default"}>
-														{pluginMetadata.price === 0 ? "Free" : `₹${pluginMetadata.price}`}
-													</Badge>
+													<div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+														pluginMetadata.price === 0 
+															? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400" 
+															: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
+													}`}>
+														{pluginMetadata.price === 0 ? (
+															<>
+																<span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+																Free
+															</>
+														) : (
+															<>
+																<span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+																₹{pluginMetadata.price}
+															</>
+														)}
+													</div>
 												</div>
 											)}
 											{pluginMetadata.minVersionCode !== undefined && (
@@ -412,25 +428,27 @@ export default function SubmitPlugin() {
 											)}
 											{pluginMetadata.contributors && pluginMetadata.contributors.length > 0 && (
 												<div>
-													<span className="text-sm font-medium mb-2 block">Contributors:</span>
-													<div className="space-y-2">
+													<span className="text-sm font-medium mb-3 block">Contributors:</span>
+													<div className="space-y-3">
 														{pluginMetadata.contributors.map((contributor, index) => (
-															<div key={index} className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
-																<UserCheck className="w-4 h-4 text-muted-foreground" />
-																<div className="flex-1">
-																	<div className="text-sm font-medium">
+															<div key={index} className="flex items-center gap-3 p-3 bg-gradient-to-r from-muted/40 to-muted/20 rounded-lg border border-border/50 hover:border-border transition-colors">
+																<div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+																	<UserCheck className="w-4 h-4 text-primary" />
+																</div>
+																<div className="flex-1 min-w-0">
+																	<div className="text-sm font-medium text-foreground">
 																		{typeof contributor === 'string' ? contributor : contributor.name}
 																	</div>
 																	{typeof contributor === 'object' && contributor.role && (
-																		<div className="text-xs text-muted-foreground">
+																		<div className="text-xs text-muted-foreground mt-0.5">
 																			{contributor.role}
 																		</div>
 																	)}
 																</div>
 																{typeof contributor === 'object' && contributor.github && (
-																	<div className="flex items-center gap-1 text-xs text-muted-foreground">
-																		<Github className="w-3 h-3" />
-																		<span>@{contributor.github}</span>
+																	<div className="flex items-center gap-1.5 px-2 py-1 bg-background/50 rounded-md border border-border/50">
+																		<Github className="w-3 h-3 text-muted-foreground" />
+																		<span className="text-xs font-mono text-muted-foreground">@{contributor.github}</span>
 																	</div>
 																)}
 															</div>
@@ -454,7 +472,7 @@ export default function SubmitPlugin() {
 								</li>
 								<li className="flex items-start gap-2">
 									<span className="text-primary mt-1">•</span>
-									<span>Provide an icon file (recommended: 128x128px PNG)</span>
+									<span>Provide an icon file (max 50KB size)</span>
 								</li>
 								<li className="flex items-start gap-2">
 									<span className="text-primary mt-1">•</span>
@@ -466,7 +484,7 @@ export default function SubmitPlugin() {
 								</li>
 								<li className="flex items-start gap-2">
 									<span className="text-primary mt-1">•</span>
-									<span>File size should not exceed 10MB</span>
+									<span>Price must be between ₹10-₹10,000 for paid plugins</span>
 								</li>
 							</ul>
 						</div>
