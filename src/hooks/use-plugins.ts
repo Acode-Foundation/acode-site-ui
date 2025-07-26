@@ -1,24 +1,5 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-
-export interface Plugin {
-	id: string;
-	sku: string;
-	icon: string;
-	name: string;
-	price: number;
-	author: string;
-	user_id: number;
-	version: string;
-	keywords: string;
-	license: string;
-	votes_up: number;
-	downloads: number;
-	repository: string | null;
-	votes_down: number;
-	comment_count: number;
-	author_verified: number;
-	min_version_code: number;
-}
+import type { Plugin, PluginFilterType } from "@/types";
 
 const fallbackPlugins: Plugin[] = [
 	{
@@ -81,15 +62,11 @@ const fallbackPlugins: Plugin[] = [
 ];
 
 const fetchPlugins = async (
-	filter:
-		| "default"
-		| "most-downloaded"
-		| "newest"
-		| "recently-updated" = "default",
+	filter: PluginFilterType = "default",
 	page = 1,
 ): Promise<Plugin[]> => {
 	try {
-		let url = "https://acode.app/api/plugins";
+		let url = `${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugins`;
 		const params = new URLSearchParams({ page: page.toString(), limit: "20" });
 
 		switch (filter) {
@@ -131,13 +108,7 @@ const fetchPlugins = async (
 	}
 };
 
-export const usePlugins = (
-	filter:
-		| "default"
-		| "most-downloaded"
-		| "newest"
-		| "recently-updated" = "default",
-) => {
+export const usePlugins = (filter: PluginFilterType = "default") => {
 	return useInfiniteQuery({
 		queryKey: ["plugins", filter],
 		queryFn: ({ pageParam = 1 }) => fetchPlugins(filter, pageParam),

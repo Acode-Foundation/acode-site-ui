@@ -51,11 +51,7 @@ export default function Plugins() {
 		"newest",
 		"recently-updated",
 	].includes(selectedFilter)
-		? (selectedFilter as
-				| "default"
-				| "most-downloaded"
-				| "newest"
-				| "recently-updated")
+		? (selectedFilter as import("@/types").PluginFilterType)
 		: "default";
 	const {
 		data,

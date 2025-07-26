@@ -13,10 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import "highlight.js/styles/github-dark.css";
 
-interface FAQ {
-	q: string;
-	a: string;
-}
+import type { FAQ } from "@/types";
 
 const md = new MarkdownIt({
 	html: true,
@@ -48,7 +45,7 @@ export default function FAQ() {
 	useEffect(() => {
 		const fetchFAQs = async () => {
 			try {
-				const response = await fetch("https://acode.app/api/faqs");
+				const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/faqs`);
 				const data = await response.json();
 				setFaqs(data);
 			} catch (error) {

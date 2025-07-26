@@ -1,9 +1,5 @@
 import { useMemo } from "react";
-import type { Plugin } from "./use-plugins";
-
-interface FilterOptions {
-	searchQuery: string;
-}
+import type { Plugin, FilterOptions } from "@/types";
 
 export const usePluginFilters = (plugins: Plugin[], filters: FilterOptions) => {
 	return useMemo(() => {
