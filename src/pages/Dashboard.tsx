@@ -154,7 +154,6 @@ const handleLogOut = async (
 			response.headers.get("content-type") === "application/json"
 				? await response.json()
 				: null;
-		console.log(response);
 		if (responseData?.error || !response.ok) {
 			toast({
 				title: "Unable to Log Out!",

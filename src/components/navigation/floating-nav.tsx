@@ -48,9 +48,9 @@ export function FloatingNav() {
 	const handleLogout = async () => {
 		try {
 			const response = await fetch(
-				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/logout`,
+				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/login`,
 				{
-					method: "POST",
+					method: "DELETE",
 					credentials: "include",
 				},
 			);
