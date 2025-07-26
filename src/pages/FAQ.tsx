@@ -45,9 +45,20 @@ export default function FAQ() {
 	useEffect(() => {
 		const fetchFAQs = async () => {
 			try {
-				const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/faqs`);
+				const response = await fetch(
+					`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/faqs`,
+				);
 				const data = await response.json();
-				setFaqs(data);
+				if (Array.isArray(data)) {
+					setFaqs(data);
+				} else {
+					setFaqs([
+						{
+							q: "What is Acode?",
+							a: "Acode is a powerful, feature-rich code editor designed specifically for Android devices.",
+						},
+					]);
+				}
 			} catch (error) {
 				console.error("Failed to fetch FAQs:", error);
 				// Fallback data in case API fails
@@ -65,7 +76,7 @@ export default function FAQ() {
 		fetchFAQs();
 	}, []);
 
-	const filteredFAQs = faqs.filter(
+	const filteredFAQs = faqs?.filter(
 		(faq) =>
 			faq.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			faq.a.toLowerCase().includes(searchQuery.toLowerCase()),
