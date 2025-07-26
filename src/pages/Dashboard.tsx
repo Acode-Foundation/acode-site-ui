@@ -143,7 +143,7 @@ const handleLogOut = async (
 	// invalidate the Access Token received while Login.
 	try {
 		const response = await fetch(
-			`${import.meta.env.DEV ? import.meta.env.serverURL : ""}/api/login`,
+			`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/login`,
 			{
 				method: "DELETE",
 				credentials: "include",
@@ -199,7 +199,7 @@ const handleUpdateProfile = async (
 	if (emailOtp) formData.append("otp", emailOtp.toString());
 
 	const response = await fetch(
-		`${import.meta.env.DEV ? import.meta.env.serverURL : ""}api/user`,
+		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}api/user`,
 		{
 			method: "PUT",
 			body: formData,
