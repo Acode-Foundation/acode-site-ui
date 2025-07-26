@@ -1,4 +1,4 @@
-import { Upload, FileArchive, AlertCircle, CheckCircle, Loader2, Package, User, Tag, Shield, Hash, DollarSign } from "lucide-react";
+import { Upload, FileArchive, AlertCircle, CheckCircle, Loader2, Package, User, Tag, Shield, Hash, DollarSign, Github, UserCheck } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import JSZip from "jszip";
@@ -7,19 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
-
-interface PluginMetadata {
-	id: string;
-	name: string;
-	version: string;
-	author?: string;
-	license?: string;
-	keywords?: string[];
-	contributors?: string[];
-	minVersionCode?: number;
-	price?: number;
-	icon?: string;
-}
+import { PluginMetadata } from "@/types/submit-plugin";
 
 export default function SubmitPlugin() {
 	const navigate = useNavigate();
@@ -55,13 +43,13 @@ export default function SubmitPlugin() {
 			}
 
 			const metadata: PluginMetadata = {
-				id: pluginData.id,
-				name: pluginData.name,
-				version: pluginData.version,
+				id: pluginData.id || "",
+				name: pluginData.name || "",
+				version: pluginData.version || "",
 				author: pluginData.author,
 				license: pluginData.license,
-				keywords: pluginData.keywords,
-				contributors: pluginData.contributors,
+				keywords: Array.isArray(pluginData.keywords) ? pluginData.keywords : [],
+				contributors: Array.isArray(pluginData.contributors) ? pluginData.contributors : [],
 				minVersionCode: pluginData.minVersionCode,
 				price: pluginData.price,
 				icon: iconDataUrl,
@@ -412,10 +400,26 @@ export default function SubmitPlugin() {
 											{pluginMetadata.contributors && pluginMetadata.contributors.length > 0 && (
 												<div>
 													<span className="text-sm font-medium mb-2 block">Contributors:</span>
-													<div className="space-y-1">
+													<div className="space-y-2">
 														{pluginMetadata.contributors.map((contributor, index) => (
-															<div key={index} className="text-sm text-muted-foreground">
-																{contributor}
+															<div key={index} className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
+																<UserCheck className="w-4 h-4 text-muted-foreground" />
+																<div className="flex-1">
+																	<div className="text-sm font-medium">
+																		{typeof contributor === 'string' ? contributor : contributor.name}
+																	</div>
+																	{typeof contributor === 'object' && contributor.role && (
+																		<div className="text-xs text-muted-foreground">
+																			{contributor.role}
+																		</div>
+																	)}
+																</div>
+																{typeof contributor === 'object' && contributor.github && (
+																	<div className="flex items-center gap-1 text-xs text-muted-foreground">
+																		<Github className="w-3 h-3" />
+																		<span>@{contributor.github}</span>
+																	</div>
+																)}
 															</div>
 														))}
 													</div>
