@@ -1,4 +1,4 @@
-import { Upload, FileArchive, AlertCircle, CheckCircle, Loader2, Package, User, Tag, Shield, Hash, DollarSign, Github, UserCheck } from "lucide-react";
+import { Upload, FileArchive, AlertCircle, CheckCircle, Loader2, Package, User, Tag, Shield, Hash, DollarSign, Github, UserCheck, GitBranch } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import JSZip from "jszip";
@@ -46,13 +46,14 @@ export default function SubmitPlugin() {
 				id: pluginData.id || "",
 				name: pluginData.name || "",
 				version: pluginData.version || "",
-				author: pluginData.author,
+				author: user?.name || "Unknown",
 				license: pluginData.license,
 				keywords: Array.isArray(pluginData.keywords) ? pluginData.keywords : [],
 				contributors: Array.isArray(pluginData.contributors) ? pluginData.contributors : [],
 				minVersionCode: pluginData.minVersionCode,
 				price: pluginData.price,
 				icon: iconDataUrl,
+				repository: pluginData.repository,
 			};
 
 			setPluginMetadata(metadata);
@@ -351,11 +352,23 @@ export default function SubmitPlugin() {
 													<span className="text-sm font-medium">Version:</span>
 													<Badge variant="secondary">{pluginMetadata.version}</Badge>
 												</div>
-												{pluginMetadata.author && (
+												<div className="flex items-center gap-2">
+													<User className="w-4 h-4 text-muted-foreground" />
+													<span className="text-sm font-medium">Author:</span>
+													<span className="text-sm">{pluginMetadata.author}</span>
+												</div>
+												{pluginMetadata.repository && (
 													<div className="flex items-center gap-2">
-														<User className="w-4 h-4 text-muted-foreground" />
-														<span className="text-sm font-medium">Author:</span>
-														<span className="text-sm">{pluginMetadata.author}</span>
+														<GitBranch className="w-4 h-4 text-muted-foreground" />
+														<span className="text-sm font-medium">Repository:</span>
+														<a 
+															href={pluginMetadata.repository} 
+															target="_blank" 
+															rel="noopener noreferrer"
+															className="text-sm text-primary hover:underline"
+														>
+															{pluginMetadata.repository}
+														</a>
 													</div>
 												)}
 											</div>

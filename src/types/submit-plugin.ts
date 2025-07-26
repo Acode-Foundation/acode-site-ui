@@ -15,4 +15,5 @@ export interface PluginMetadata {
 	minVersionCode?: number;
 	price?: number;
 	icon?: string;
+	repository?: string;
 }
