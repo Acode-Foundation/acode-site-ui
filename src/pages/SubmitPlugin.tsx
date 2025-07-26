@@ -92,7 +92,7 @@ export default function SubmitPlugin() {
 
 			// Look for icon
 			let iconDataUrl: string | undefined;
-			const iconFile = zipContent.file("icon.png") || zipContent.file("icon.jpg") || zipContent.file("icon.jpeg");
+			const iconFile = zipContent.file(pluginData.icon || "icon.png");
 			if (iconFile) {
 				const iconBlob = await iconFile.async("blob");
 				iconDataUrl = URL.createObjectURL(iconBlob);
