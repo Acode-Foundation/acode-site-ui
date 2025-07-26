@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Link } from "react-router-dom"
+import {Link, useParams, redirect} from "react-router-dom"
 import { useToast } from "@/hooks/use-toast"
 
 export default function Login() {
@@ -14,24 +14,62 @@ export default function Login() {
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+  const params = useParams()
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    
-    // Demo login logic - redirect to dashboard with hardcoded credentials
-    setTimeout(() => {
-      setIsLoading(false)
-      if (email === "demo@acode.app" && password === "demo123") {
-        window.location.href = "/dashboard"
-      } else {
-        toast({
-          title: "Login failed",
-          description: "Please use the demo credentials provided below.",
+      e.preventDefault()
+      setIsLoading(true)
+
+      try {
+        const formData = new FormData(e.target as HTMLFormElement);
+        console.log(formData.get("email"), formData.get("password"), formData.get("password"));
+        console.log(import.meta.env)
+        const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/login`, {
+          method: "POST",
+          body: formData,
+          credentials: "include",
         })
+
+        const responseData = response.headers.get("content-type").includes("application/json") ? await response.json() : null;
+        console.log(responseData)
+        if(responseData?.error || !response.ok) {
+          setIsLoading(false)
+          return toast({
+            title: "Login Failed",
+            description: responseData?.error || `Something went wrong, server responded empty (request status code: ${response.status}). Please try again.`,
+            // destructive = bg Red (shown as error)
+            variant: "destructive"
+          })
+        }
+
+        toast({
+          title: "Login Success",
+          description: "Successfully logged in, redirecting...",
+        })
+
+        setTimeout(() => {
+          let redirectUrl = params?.redirect as string
+          setIsLoading(false)
+          if(params.redirect === "app") {
+            redirectUrl = `acode://user/login/${responseData.token}`
+          }
+
+          window.location.href = redirectUrl || "/dashboard"
+
+        }, 1000)
+
+      } catch (error) {
+        console.error(`Login attempt Failed: `,error)
+        setIsLoading(false);
+        toast({
+          title: "Login Failed",
+          description: `Something went wrong, server responded empty/request/network error (as ${error.message || error}), Please try again.`,
+          // destructive = bg Red (shown as error)
+          variant: "destructive"
+        })
+        return;
       }
-    }, 1000)
-  }
+    }
 
   const handleSocialLogin = (provider: string) => {
     toast({
@@ -96,6 +134,7 @@ export default function Login() {
                 <Input
                   id="email"
                   type="email"
+                  name="email"
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -110,6 +149,7 @@ export default function Login() {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                    name="password"
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
