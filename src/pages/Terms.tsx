@@ -1,9 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card"
-import MarkdownIt from 'markdown-it'
+import MarkdownIt from "markdown-it";
+import { Card, CardContent } from "@/components/ui/card";
 
 const md = new MarkdownIt({
-  html: true,
-  linkify: true
+	html: true,
+	linkify: true,
 });
 
 const termsContent = `# Terms of Service
@@ -57,16 +57,16 @@ We may update these Terms of Service from time to time. If we make changes, we w
 Any disputes arising from these Terms of Service will be resolved through arbitration.`;
 
 export default function Terms() {
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Card className="bg-card/50 backdrop-blur-sm border-border/20">
-        <CardContent className="p-8">
-          <div 
-            className="markdown-content"
-            dangerouslySetInnerHTML={{ __html: md.render(termsContent) }}
-          />
-        </CardContent>
-      </Card>
-    </div>
-  )
+	return (
+		<div className="container mx-auto px-4 py-8 max-w-4xl">
+			<Card className="bg-card/50 backdrop-blur-sm border-border/20">
+				<CardContent className="p-8">
+					<div
+						className="markdown-content"
+						dangerouslySetInnerHTML={{ __html: md.render(termsContent) }}
+					/>
+				</CardContent>
+			</Card>
+		</div>
+	);
 }
