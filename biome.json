@@ -542,7 +542,7 @@
 						"useExhaustiveDependencies": "warn",
 						"useHookAtTopLevel": "error"
 					},
-					"style": { "useComponentExportOnlyModules": "warn" }
+					"style": { "useComponentExportOnlyModules": "off" }
 				}
 			}
 		}
