@@ -1,17 +1,24 @@
 import { useState, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
-import { Moon, Sun, Menu, X } from "lucide-react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Moon, Sun, Menu, X, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/ui/theme-provider"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useLoggedInUser } from "@/hooks/useLoggedInUser"
+import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import acodeLogoSvg from "@/assets/acode-logo.svg"
 
-const navItems = [
-  { name: "FAQ", href: "/faq" },
-  { name: "Plugins", href: "/plugins" },
+const baseNavItems = [
+  { name: "FAQ", href: "/faq", external: false },
+  { name: "Plugins", href: "/plugins", external: false },
   { name: "Docs", href: "https://docs.acode.app", external: true },
-  { name: "Login", href: "/login" },
-  { name: "Signup", href: "/signup" },
+]
+
+const authNavItems = [
+  { name: "Login", href: "/login", external: false },
+  { name: "Signup", href: "/signup", external: false },
 ]
 
 export function FloatingNav() {
@@ -19,6 +26,11 @@ export function FloatingNav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, setTheme } = useTheme()
   const location = useLocation()
+  const navigate = useNavigate()
+  const { toast } = useToast()
+  const { data: user, isLoading, error } = useLoggedInUser()
+  
+  const isLoggedIn = !isLoading && !error && user
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,6 +39,34 @@ export function FloatingNav() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      })
+      
+      if (response.ok) {
+        toast({
+          title: "Logged out successfully",
+          description: "You have been logged out.",
+        })
+        navigate('/')
+        window.location.reload() // Refresh to clear user data
+      } else {
+        throw new Error('Logout failed')
+      }
+    } catch (error) {
+      toast({
+        title: "Logout failed",
+        description: "Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const navItems = isLoggedIn ? baseNavItems : [...baseNavItems, ...authNavItems]
 
   return (
     <nav
@@ -90,6 +130,36 @@ export function FloatingNav() {
             ))}
           </div>
           
+          {/* User Menu or Theme Toggle */}
+          {isLoggedIn ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center space-x-2 h-9 px-3 hover:bg-primary/10 transition-colors duration-200 rounded-lg">
+                  <Avatar className="h-6 w-6">
+                    <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                      {user?.name?.[0]?.toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium">
+                    {user?.name || 'User'}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard" className="flex items-center cursor-pointer">
+                    <User className="h-4 w-4 mr-2" />
+                    Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout} className="flex items-center cursor-pointer">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null}
+          
           {/* Theme Toggle */}
           <Button
             variant="ghost"
@@ -150,7 +220,41 @@ export function FloatingNav() {
                 )}
               </div>
             ))}
-            <div className="pt-4 border-t border-border">
+            
+            {/* Mobile user menu or theme toggle */}
+            <div className="pt-4 border-t border-border space-y-2">
+              {isLoggedIn ? (
+                <>
+                  <div className="flex items-center space-x-2 py-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                        {user?.name?.[0]?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium">
+                      {user?.name || 'User'}
+                    </span>
+                  </div>
+                  <Link
+                    to="/dashboard"
+                    className="flex items-center text-base font-medium transition-colors duration-200 hover:text-primary py-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout()
+                      setIsMobileMenuOpen(false)
+                    }}
+                    className="flex items-center text-base font-medium transition-colors duration-200 hover:text-primary py-2 w-full text-left"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </button>
+                </>
+              ) : null}
               <Button
                 variant="ghost"
                 size="sm"
