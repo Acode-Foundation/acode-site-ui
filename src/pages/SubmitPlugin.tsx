@@ -1,20 +1,87 @@
-import { Upload, FileArchive, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { Upload, FileArchive, AlertCircle, CheckCircle, Loader2, Package, User, Tag, Shield, Hash, DollarSign } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import JSZip from "jszip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
+
+interface PluginMetadata {
+	id: string;
+	name: string;
+	version: string;
+	author?: string;
+	license?: string;
+	keywords?: string[];
+	contributors?: string[];
+	minVersionCode?: number;
+	price?: number;
+	icon?: string;
+}
 
 export default function SubmitPlugin() {
 	const navigate = useNavigate();
 	const { toast } = useToast();
 	const { data: user, isLoading: userLoading } = useLoggedInUser();
 	const [file, setFile] = useState<File | null>(null);
+	const [pluginMetadata, setPluginMetadata] = useState<PluginMetadata | null>(null);
 	const [isUploading, setIsUploading] = useState(false);
 	const [isDragOver, setIsDragOver] = useState(false);
+	const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-	const handleFileSelect = (selectedFile: File) => {
+	const analyzePluginZip = async (zipFile: File) => {
+		setIsAnalyzing(true);
+		try {
+			const zip = new JSZip();
+			const zipContent = await zip.loadAsync(zipFile);
+			
+			// Look for plugin.json
+			const pluginJsonFile = zipContent.file("plugin.json");
+			if (!pluginJsonFile) {
+				throw new Error("plugin.json not found in ZIP file");
+			}
+
+			const pluginJsonContent = await pluginJsonFile.async("string");
+			const pluginData = JSON.parse(pluginJsonContent);
+
+			// Look for icon
+			let iconDataUrl: string | undefined;
+			const iconFile = zipContent.file("icon.png") || zipContent.file("icon.jpg") || zipContent.file("icon.jpeg");
+			if (iconFile) {
+				const iconBlob = await iconFile.async("blob");
+				iconDataUrl = URL.createObjectURL(iconBlob);
+			}
+
+			const metadata: PluginMetadata = {
+				id: pluginData.id,
+				name: pluginData.name,
+				version: pluginData.version,
+				author: pluginData.author,
+				license: pluginData.license,
+				keywords: pluginData.keywords,
+				contributors: pluginData.contributors,
+				minVersionCode: pluginData.minVersionCode,
+				price: pluginData.price,
+				icon: iconDataUrl,
+			};
+
+			setPluginMetadata(metadata);
+		} catch (error) {
+			console.error("Error analyzing ZIP:", error);
+			toast({
+				title: "Invalid plugin ZIP",
+				description: error instanceof Error ? error.message : "Could not read plugin metadata from ZIP file.",
+				variant: "destructive",
+			});
+			setPluginMetadata(null);
+		} finally {
+			setIsAnalyzing(false);
+		}
+	};
+
+	const handleFileSelect = async (selectedFile: File) => {
 		if (selectedFile.type !== "application/zip" && !selectedFile.name.endsWith(".zip")) {
 			toast({
 				title: "Invalid file type",
@@ -24,6 +91,7 @@ export default function SubmitPlugin() {
 			return;
 		}
 		setFile(selectedFile);
+		await analyzePluginZip(selectedFile);
 	};
 
 	const handleDrop = (e: React.DragEvent) => {
@@ -91,6 +159,7 @@ export default function SubmitPlugin() {
 
 			// Reset form
 			setFile(null);
+			setPluginMetadata(null);
 			
 			// Navigate to plugins page or dashboard
 			navigate("/plugins");
@@ -195,7 +264,19 @@ export default function SubmitPlugin() {
 							}}
 							onDragLeave={() => setIsDragOver(false)}
 						>
-							{file ? (
+							{isAnalyzing ? (
+								<div className="space-y-4">
+									<Loader2 className="w-12 h-12 mx-auto animate-spin text-primary" />
+									<div>
+										<p className="font-medium text-primary">
+											Analyzing Plugin...
+										</p>
+										<p className="text-sm text-muted-foreground mt-1">
+											Reading plugin metadata from ZIP file
+										</p>
+									</div>
+								</div>
+							) : file ? (
 								<div className="space-y-4">
 									<CheckCircle className="w-12 h-12 mx-auto text-green-500" />
 									<div>
@@ -209,7 +290,10 @@ export default function SubmitPlugin() {
 									<Button
 										variant="outline"
 										size="sm"
-										onClick={() => setFile(null)}
+										onClick={() => {
+											setFile(null);
+											setPluginMetadata(null);
+										}}
 									>
 										Remove File
 									</Button>
@@ -237,6 +321,111 @@ export default function SubmitPlugin() {
 								</div>
 							)}
 						</div>
+
+						{/* Plugin Metadata Display */}
+						{pluginMetadata && (
+							<Card className="border-border/50">
+								<CardHeader>
+									<CardTitle className="flex items-center gap-2">
+										<Package className="w-5 h-5" />
+										Plugin Information
+									</CardTitle>
+									<CardDescription>
+										Metadata extracted from your plugin.json file
+									</CardDescription>
+								</CardHeader>
+								<CardContent>
+									<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+										{/* Icon and Basic Info */}
+										<div className="space-y-4">
+											{pluginMetadata.icon && (
+												<div className="flex justify-center">
+													<img 
+														src={pluginMetadata.icon} 
+														alt="Plugin Icon" 
+														className="w-16 h-16 rounded-lg border border-border"
+													/>
+												</div>
+											)}
+											<div className="space-y-2">
+												<div className="flex items-center gap-2">
+													<Hash className="w-4 h-4 text-muted-foreground" />
+													<span className="text-sm font-medium">ID:</span>
+													<code className="text-sm bg-muted px-2 py-1 rounded">{pluginMetadata.id}</code>
+												</div>
+												<div className="flex items-center gap-2">
+													<Package className="w-4 h-4 text-muted-foreground" />
+													<span className="text-sm font-medium">Name:</span>
+													<span className="text-sm">{pluginMetadata.name}</span>
+												</div>
+												<div className="flex items-center gap-2">
+													<Tag className="w-4 h-4 text-muted-foreground" />
+													<span className="text-sm font-medium">Version:</span>
+													<Badge variant="secondary">{pluginMetadata.version}</Badge>
+												</div>
+												{pluginMetadata.author && (
+													<div className="flex items-center gap-2">
+														<User className="w-4 h-4 text-muted-foreground" />
+														<span className="text-sm font-medium">Author:</span>
+														<span className="text-sm">{pluginMetadata.author}</span>
+													</div>
+												)}
+											</div>
+										</div>
+
+										{/* Additional Info */}
+										<div className="space-y-4">
+											{pluginMetadata.license && (
+												<div className="flex items-center gap-2">
+													<Shield className="w-4 h-4 text-muted-foreground" />
+													<span className="text-sm font-medium">License:</span>
+													<Badge variant="outline">{pluginMetadata.license}</Badge>
+												</div>
+											)}
+											{pluginMetadata.price !== undefined && (
+												<div className="flex items-center gap-2">
+													<DollarSign className="w-4 h-4 text-muted-foreground" />
+													<span className="text-sm font-medium">Price:</span>
+													<Badge variant={pluginMetadata.price === 0 ? "secondary" : "default"}>
+														{pluginMetadata.price === 0 ? "Free" : `₹${pluginMetadata.price}`}
+													</Badge>
+												</div>
+											)}
+											{pluginMetadata.minVersionCode !== undefined && (
+												<div className="flex items-center gap-2">
+													<span className="text-sm font-medium">Min Version Code:</span>
+													<span className="text-sm">{pluginMetadata.minVersionCode}</span>
+												</div>
+											)}
+											{pluginMetadata.keywords && pluginMetadata.keywords.length > 0 && (
+												<div>
+													<span className="text-sm font-medium mb-2 block">Keywords:</span>
+													<div className="flex flex-wrap gap-1">
+														{pluginMetadata.keywords.map((keyword, index) => (
+															<Badge key={index} variant="outline" className="text-xs">
+																{keyword}
+															</Badge>
+														))}
+													</div>
+												</div>
+											)}
+											{pluginMetadata.contributors && pluginMetadata.contributors.length > 0 && (
+												<div>
+													<span className="text-sm font-medium mb-2 block">Contributors:</span>
+													<div className="space-y-1">
+														{pluginMetadata.contributors.map((contributor, index) => (
+															<div key={index} className="text-sm text-muted-foreground">
+																{contributor}
+															</div>
+														))}
+													</div>
+												</div>
+											)}
+										</div>
+									</div>
+								</CardContent>
+							</Card>
+						)}
 
 						{/* Requirements */}
 						<div className="bg-muted/30 rounded-lg p-6">
