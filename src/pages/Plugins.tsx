@@ -173,7 +173,11 @@ export default function Plugins() {
 						Showing {filteredPlugins.length} of {categoryFilteredPlugins.length}{" "}
 						plugins
 					</p>
-					<Button variant="outline" size="sm">
+					<Button 
+						variant="outline" 
+						size="sm"
+						onClick={() => window.location.href = '/submit-plugin'}
+					>
 						<ExternalLink className="w-4 h-4 mr-2" />
 						Submit Plugin
 					</Button>

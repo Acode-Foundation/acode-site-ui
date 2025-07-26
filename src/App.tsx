@@ -18,6 +18,7 @@ import PluginDetail from "./pages/PluginDetail";
 import Plugins from "./pages/Plugins";
 import Privacy from "./pages/Privacy";
 import Signup from "./pages/Signup";
+import SubmitPlugin from "./pages/SubmitPlugin";
 import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient({
@@ -46,6 +47,7 @@ const App = () => (
 								<Route path="/" element={<Index />} />
 								<Route path="/plugins" element={<Plugins />} />
 								<Route path="/plugins/:id" element={<PluginDetail />} />
+								<Route path="/submit-plugin" element={<SubmitPlugin />} />
 								<Route path="/faq" element={<FAQ />} />
 								<Route path="/privacy" element={<Privacy />} />
 								<Route path="/terms" element={<Terms />} />
