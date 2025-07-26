@@ -16,6 +16,7 @@ export default function SubmitPlugin() {
 	const { data: user, isLoading: userLoading } = useLoggedInUser();
 	const [file, setFile] = useState<File | null>(null);
 	const [pluginMetadata, setPluginMetadata] = useState<PluginMetadata | null>(null);
+	const [changelogs, setChangelogs] = useState<string | null>(null);
 	const [isUploading, setIsUploading] = useState(false);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -97,6 +98,18 @@ export default function SubmitPlugin() {
 				const iconBlob = await iconFile.async("blob");
 				iconDataUrl = URL.createObjectURL(iconBlob);
 			}
+
+			// Look for changelogs
+			let changelogsContent: string | null = null;
+			const changelogsFile = zipContent.file("changelogs.md") || 
+									zipContent.file("CHANGELOGS.md") || 
+									zipContent.file("changelog.md") || 
+									zipContent.file("CHANGELOG.md");
+			if (changelogsFile) {
+				changelogsContent = await changelogsFile.async("text");
+			}
+
+			setChangelogs(changelogsContent);
 
 			const metadata: PluginMetadata = {
 				id: pluginData.id || "",
@@ -181,6 +194,10 @@ export default function SubmitPlugin() {
 			const formData = new FormData();
 			if (file) {
 				formData.append("plugin", file);
+			}
+			
+			if (changelogs) {
+				formData.append("changelogs", changelogs);
 			}
 
 			const url = isUpdateMode 
