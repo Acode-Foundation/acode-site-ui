@@ -38,7 +38,7 @@ export function EarningsOverview() {
 				<div className="space-y-4">
 					<div>
 						<div className="text-2xl font-bold text-primary">
-							${earnings?.earnings?.toFixed(2) || "0.00"}
+							₹{earnings?.earnings?.toFixed(2) || "0.00"}
 						</div>
 						<div className="text-sm text-muted-foreground">
 							{earnings?.month} {earnings?.year}
