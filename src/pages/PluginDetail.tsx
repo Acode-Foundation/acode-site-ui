@@ -12,74 +12,41 @@ import {
 	ThumbsDown,
 	ThumbsUp,
 	Users,
+	Flag,
+	Reply,
+	Send,
 } from "lucide-react";
 import MarkdownIt from "markdown-it";
 import { Link, useParams } from "react-router-dom";
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import "highlight.js/styles/github-dark.css";
 import MarkdownItGitHubAlerts from "markdown-it-github-alerts";
+import { useLoggedInUser } from "@/hooks/useLoggedInUser";
+import { useReviews, useSubmitReview, useReplyToReview, useFlagComment } from "@/hooks/use-reviews";
+import { PluginData, Contributor, VOTE_UP, VOTE_DOWN, VOTE_NULL } from "@/types/plugin-detail";
+import { toast } from "sonner";
 
-interface PluginData {
-	id: string;
-	sku: string;
-	icon: string;
-	name: string;
-	price: number;
-	author: string;
-	user_id: number;
-	version: string;
-	keywords: string;
-	license: string;
-	votes_up: number;
-	downloads: number;
-	repository: string | null;
-	votes_down: number;
-	comment_count: number;
-	author_verified: number;
-	min_version_code: number;
-	changelogs: string;
-	contributors: string;
-	description: string;
-	author_email: string;
-	author_github: string;
-}
-
-interface Contributor {
-	name: string;
-	github: string;
-	role: string;
-}
-
-interface Review {
-	id: number;
-	plugin_id: string;
-	user_id: number;
-	comment: string;
-	vote: number;
-	created_at: string;
-	updated_at: string;
-	author_reply: string;
-	name: string;
-	github: string;
-}
+// Types are now imported from @/types/plugin-detail
 
 const fetchPlugin = async (pluginId: string): Promise<PluginData> => {
 	const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin/${pluginId}`);
 	if (!response.ok) {
 		throw new Error("Plugin not found");
-	}
-	return response.json();
-};
-
-const fetchReviews = async (pluginId: string): Promise<Review[]> => {
-	const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/comment/${pluginId}`);
-	if (!response.ok) {
-		return [];
 	}
 	return response.json();
 };
@@ -108,6 +75,13 @@ const md = new MarkdownIt({
 
 export default function PluginDetail() {
 	const { id } = useParams();
+	const { data: loggedInUser } = useLoggedInUser();
+	
+	// Review form state
+	const [reviewComment, setReviewComment] = useState("");
+	const [reviewVote, setReviewVote] = useState<string>("");
+	const [replyText, setReplyText] = useState<{ [key: number]: string }>({});
+	const [showReplyForm, setShowReplyForm] = useState<{ [key: number]: boolean }>({});
 
 	const {
 		data: plugin,
@@ -119,11 +93,10 @@ export default function PluginDetail() {
 		enabled: !!id,
 	});
 
-	const { data: reviews = [] } = useQuery({
-		queryKey: ["reviews", id],
-		queryFn: async () => fetchReviews(id!),
-		enabled: !!id,
-	});
+	const { data: reviews = [] } = useReviews(id!);
+	const submitReviewMutation = useSubmitReview(id!);
+	const replyMutation = useReplyToReview(id!);
+	const flagMutation = useFlagComment(id!);
 
 	if (isLoading) {
 		return (
@@ -162,10 +135,66 @@ export default function PluginDetail() {
 	};
 
 	const getVoteIcon = (vote: number) => {
-		if (vote === 1) return <ThumbsUp className="w-4 h-4 text-green-500" />;
-		if (vote === -1) return <ThumbsDown className="w-4 h-4 text-red-500" />;
+		if (vote === VOTE_UP) return <ThumbsUp className="w-4 h-4 text-green-500" />;
+		if (vote === VOTE_DOWN) return <ThumbsDown className="w-4 h-4 text-red-500" />;
 		return null;
 	};
+
+	const handleSubmitReview = async () => {
+		if (!loggedInUser) {
+			toast.error("Please log in to write a review");
+			return;
+		}
+
+		if (!reviewComment.trim() && !reviewVote) {
+			toast.error("Please provide a comment or vote");
+			return;
+		}
+
+		try {
+			await submitReviewMutation.mutateAsync({
+				comment: reviewComment.trim(),
+				vote: reviewVote ? parseInt(reviewVote) : VOTE_NULL,
+			});
+			setReviewComment("");
+			setReviewVote("");
+			toast.success("Review submitted successfully");
+		} catch (error: any) {
+			toast.error(error.message || "Failed to submit review");
+		}
+	};
+
+	const handleReply = async (commentId: number) => {
+		const reply = replyText[commentId]?.trim();
+		if (!reply) {
+			toast.error("Please enter a reply");
+			return;
+		}
+
+		try {
+			await replyMutation.mutateAsync({
+				commentId,
+				data: { reply },
+			});
+			setReplyText(prev => ({ ...prev, [commentId]: "" }));
+			setShowReplyForm(prev => ({ ...prev, [commentId]: false }));
+			toast.success("Reply sent successfully");
+		} catch (error: any) {
+			toast.error(error.message || "Failed to send reply");
+		}
+	};
+
+	const handleFlag = async (commentId: number) => {
+		try {
+			const result = await flagMutation.mutateAsync(commentId);
+			toast.success(result.flagged ? "Comment flagged" : "Comment unflagged");
+		} catch (error: any) {
+			toast.error(error.message || "Failed to flag comment");
+		}
+	};
+
+	const isPluginDeveloper = loggedInUser?.id === plugin?.user_id;
+	const userReview = reviews.find(review => review.user_id === loggedInUser?.id);
 
 	return (
 		<div className="min-h-screen bg-gradient-dark">
@@ -337,7 +366,69 @@ export default function PluginDetail() {
 								</Card>
 							</TabsContent>
 
-							<TabsContent value="reviews">
+							<TabsContent value="reviews" className="space-y-6">
+								{/* Write Review Section */}
+								{loggedInUser && !userReview && (
+									<Card>
+										<CardHeader>
+											<CardTitle>Write a Review</CardTitle>
+										</CardHeader>
+										<CardContent className="space-y-4">
+											<div className="space-y-2">
+												<Label htmlFor="vote">Your Rating</Label>
+												<Select value={reviewVote} onValueChange={setReviewVote}>
+													<SelectTrigger>
+														<SelectValue placeholder="Select your rating" />
+													</SelectTrigger>
+													<SelectContent>
+														<SelectItem value={VOTE_UP.toString()}>
+															<div className="flex items-center gap-2">
+																<ThumbsUp className="w-4 h-4 text-green-500" />
+																Thumbs Up
+															</div>
+														</SelectItem>
+														<SelectItem value={VOTE_DOWN.toString()}>
+															<div className="flex items-center gap-2">
+																<ThumbsDown className="w-4 h-4 text-red-500" />
+																Thumbs Down
+															</div>
+														</SelectItem>
+														<SelectItem value={VOTE_NULL.toString()}>
+															<div className="flex items-center gap-2">
+																<MessageSquare className="w-4 h-4" />
+																Comment Only
+															</div>
+														</SelectItem>
+													</SelectContent>
+												</Select>
+											</div>
+											<div className="space-y-2">
+												<Label htmlFor="comment">Comment (optional)</Label>
+												<Textarea
+													id="comment"
+													placeholder="Share your thoughts about this plugin..."
+													value={reviewComment}
+													onChange={(e) => setReviewComment(e.target.value)}
+													rows={3}
+													maxLength={250}
+												/>
+												<div className="text-xs text-muted-foreground text-right">
+													{reviewComment.length}/250 characters
+												</div>
+											</div>
+											<Button 
+												onClick={handleSubmitReview}
+												disabled={submitReviewMutation.isPending}
+												className="w-full"
+											>
+												<Send className="w-4 h-4 mr-2" />
+												{submitReviewMutation.isPending ? "Submitting..." : "Submit Review"}
+											</Button>
+										</CardContent>
+									</Card>
+								)}
+
+								{/* Reviews List */}
 								<Card>
 									<CardHeader>
 										<CardTitle className="flex items-center gap-2">
@@ -393,6 +484,22 @@ export default function PluginDetail() {
 																	<span className="text-sm text-muted-foreground">
 																		{formatDate(review.created_at)}
 																	</span>
+																	{/* Flag button for plugin developer */}
+																	{isPluginDeveloper && (
+																		<Button
+																			size="sm"
+																			variant="ghost"
+																			onClick={() => handleFlag(review.id)}
+																			disabled={flagMutation.isPending}
+																			className={`h-6 w-6 p-0 ${
+																				review.flagged_by_author 
+																					? "text-red-500 hover:text-red-600" 
+																					: "text-muted-foreground hover:text-foreground"
+																			}`}
+																		>
+																			<Flag className="w-3 h-3" />
+																		</Button>
+																	)}
 																</div>
 																{review.comment ? (
 																	<p className="text-sm text-muted-foreground mb-2">
@@ -400,11 +507,13 @@ export default function PluginDetail() {
 																	</p>
 																) : (
 																	<p className="text-sm text-muted-foreground/60 italic mb-2">
-																		{review.vote === 1
+																		{review.vote === VOTE_UP
 																			? "Gave a thumbs up"
 																			: "Gave a thumbs down"}
 																	</p>
 																)}
+																
+																{/* Developer Reply */}
 																{review.author_reply && (
 																	<div className="mt-2 p-3 bg-muted/50 rounded-lg border">
 																		<div className="flex items-center gap-2 mb-1">
@@ -419,6 +528,58 @@ export default function PluginDetail() {
 																		<p className="text-sm">
 																			{review.author_reply}
 																		</p>
+																	</div>
+																)}
+
+																{/* Reply Form for Plugin Developer */}
+																{isPluginDeveloper && !review.author_reply && (
+																	<div className="mt-2">
+																		{!showReplyForm[review.id] ? (
+																			<Button
+																				size="sm"
+																				variant="outline"
+																				onClick={() => setShowReplyForm(prev => ({ ...prev, [review.id]: true }))}
+																				className="h-7 px-3 text-xs"
+																			>
+																				<Reply className="w-3 h-3 mr-1" />
+																				Reply
+																			</Button>
+																		) : (
+																			<div className="space-y-2">
+																				<Textarea
+																					placeholder="Write your reply..."
+																					value={replyText[review.id] || ""}
+																					onChange={(e) => setReplyText(prev => ({ 
+																						...prev, 
+																						[review.id]: e.target.value 
+																					}))}
+																					rows={2}
+																					className="text-sm"
+																				/>
+																				<div className="flex gap-2">
+																					<Button
+																						size="sm"
+																						onClick={() => handleReply(review.id)}
+																						disabled={replyMutation.isPending}
+																						className="h-7 px-3 text-xs"
+																					>
+																						<Send className="w-3 h-3 mr-1" />
+																						Send Reply
+																					</Button>
+																					<Button
+																						size="sm"
+																						variant="outline"
+																						onClick={() => {
+																							setShowReplyForm(prev => ({ ...prev, [review.id]: false }));
+																							setReplyText(prev => ({ ...prev, [review.id]: "" }));
+																						}}
+																						className="h-7 px-3 text-xs"
+																					>
+																						Cancel
+																					</Button>
+																				</div>
+																			</div>
+																		)}
 																	</div>
 																)}
 															</div>

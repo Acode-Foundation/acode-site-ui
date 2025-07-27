@@ -23,38 +23,12 @@ import { PluginCard } from "@/components/ui/plugin-card";
 import { useToast } from "@/hooks/use-toast";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import { useDeletePlugin } from "@/hooks/use-user-plugins";
+import { Plugin } from "@/types/plugin";
+import { DeveloperProfile as DeveloperType } from "@/types/developer";
 
-interface Developer {
-	id: number;
-	name: string;
+interface Developer extends DeveloperType {
 	role: string;
-	email: string;
-	github: string;
-	website: string;
-	verified: number;
 	threshold: number;
-	created_at: string;
-	updated_at: string;
-}
-
-interface Plugin {
-	id: string;
-	sku: string;
-	icon: string;
-	name: string;
-	price: number;
-	author: string;
-	user_id: number;
-	version: string;
-	keywords: string | null;
-	license: string;
-	votes_up: number;
-	downloads: number;
-	repository: string | null;
-	votes_down: number;
-	comment_count: number;
-	author_verified: number;
-	min_version_code: number;
 }
 
 const fetchDeveloper = async (email: string): Promise<Developer> => {

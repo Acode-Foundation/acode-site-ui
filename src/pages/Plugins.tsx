@@ -1,4 +1,4 @@
-import { ExternalLink, Filter, Loader2, Search } from "lucide-react";
+import { ExternalLink, Filter, Loader2, Search, Edit, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,8 +11,23 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { usePluginFilters } from "@/hooks/use-plugin-filters";
 import { usePlugins } from "@/hooks/use-plugins";
+import { useDeletePlugin } from "@/hooks/use-user-plugins";
+import { useLoggedInUser } from "@/hooks/useLoggedInUser";
+import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 const filters = [
 	{
@@ -43,6 +58,9 @@ const filters = [
 export default function Plugins() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedFilter, setSelectedFilter] = useState("default");
+	
+	const { data: loggedInUser } = useLoggedInUser();
+	const deletePluginMutation = useDeletePlugin();
 
 	// Determine API filter type
 	const apiFilter = [
@@ -79,6 +97,15 @@ export default function Plugins() {
 	const filteredPlugins = usePluginFilters(categoryFilteredPlugins, {
 		searchQuery,
 	});
+
+	const handleDeletePlugin = async (pluginId: string) => {
+		try {
+			await deletePluginMutation.mutateAsync(pluginId);
+			toast.success("Plugin deleted successfully");
+		} catch (error) {
+			toast.error("Failed to delete plugin");
+		}
+	};
 
 	// Infinite scroll implementation
 	const handleScroll = useCallback(() => {
@@ -186,7 +213,51 @@ export default function Plugins() {
 				{/* Plugins Grid */}
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 					{filteredPlugins.map((plugin, index) => (
-						<PluginCard key={plugin.id} plugin={plugin} index={index} />
+						<div key={plugin.id} className="relative group">
+							<PluginCard plugin={plugin} index={index} />
+							{loggedInUser?.id === plugin.user_id && (
+								<div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+									<Button
+										size="sm"
+										variant="secondary"
+										className="h-8 w-8 p-0 bg-card/90 backdrop-blur-sm border border-border/50 hover:bg-muted hover:text-foreground"
+										asChild
+									>
+										<Link to={`/submit-plugin?id=${plugin.id}`}>
+											<Edit className="h-3 w-3" />
+										</Link>
+									</Button>
+									<AlertDialog>
+										<AlertDialogTrigger asChild>
+											<Button
+												size="sm"
+												variant="secondary"
+												className="h-8 w-8 p-0 bg-card/90 backdrop-blur-sm border border-border/50 hover:bg-destructive hover:text-destructive-foreground"
+											>
+												<Trash2 className="h-3 w-3" />
+											</Button>
+										</AlertDialogTrigger>
+										<AlertDialogContent>
+											<AlertDialogHeader>
+												<AlertDialogTitle>Delete Plugin</AlertDialogTitle>
+												<AlertDialogDescription>
+													Are you sure you want to delete "{plugin.name}"? This action cannot be undone.
+												</AlertDialogDescription>
+											</AlertDialogHeader>
+											<AlertDialogFooter>
+												<AlertDialogCancel>Cancel</AlertDialogCancel>
+												<AlertDialogAction
+													onClick={() => handleDeletePlugin(plugin.id)}
+													className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+												>
+													Delete
+												</AlertDialogAction>
+											</AlertDialogFooter>
+										</AlertDialogContent>
+									</AlertDialog>
+								</div>
+							)}
+						</div>
 					))}
 				</div>
 
