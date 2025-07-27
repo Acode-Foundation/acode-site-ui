@@ -47,6 +47,7 @@ import { useLoggedInUser } from "@/hooks/useLoggedInUser.ts";
 import { User } from "@/types";
 import { UserPluginsOverview } from "@/components/dashboard/user-plugins-overview";
 import { EarningsOverview } from "@/components/dashboard/earnings-overview";
+import { PaymentMethods } from "@/components/dashboard/payment-methods";
 
 // Mock user data
 const currentMockUser = {
@@ -860,59 +861,8 @@ export default function Dashboard() {
 				</CardContent>
 			</Card>
 
-			{/* Bank Details */}
-			<Card>
-				<CardHeader>
-					<CardTitle className="flex items-center gap-2">
-						<Building2 className="w-5 h-5" />
-						Bank Details
-					</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-4">
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<div className="space-y-2">
-							<Label htmlFor="accountHolder">Account Holder</Label>
-							<Input
-								id="accountHolder"
-								defaultValue={
-									currentUser.bankAccount.accountHolder ||
-									"No Bank Account Holder"
-								}
-							/>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor="bankName">Bank Name</Label>
-							<Input
-								id="bankName"
-								defaultValue={
-									currentUser.bankAccount.bankName || "No Bank Name"
-								}
-							/>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor="accountNumber">Account Number</Label>
-							<Input
-								id="accountNumber"
-								defaultValue={
-									currentUser.bankAccount.accountNumber ||
-									"No Bank Account Number"
-								}
-							/>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor="routingNumber">Routing Number</Label>
-							<Input
-								id="routingNumber"
-								defaultValue={
-									currentUser?.bankAccount.routingNumber ||
-									"No Bank Routing Number"
-								}
-							/>
-						</div>
-					</div>
-					<Button variant="outline">Update Bank Details</Button>
-				</CardContent>
-			</Card>
+			{/* Payment Methods */}
+			<PaymentMethods />
 
 		</div>
 	);
