@@ -31,6 +31,9 @@ import { useUnpaidEarnings } from "@/hooks/use-unpaid-earnings";
 import { usePayments } from "@/hooks/use-payments";
 import { useEarnings } from "@/hooks/use-earnings";
 import { usePaymentReceipt } from "@/hooks/use-payment-receipt";
+import { useUpdateThreshold } from "@/hooks/use-update-threshold";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Earnings() {
 	const currentYear = new Date().getFullYear();
@@ -39,20 +42,92 @@ export default function Earnings() {
 	const [selectedMonth, setSelectedMonth] = useState(currentMonth);
 	const [selectedPaymentYear, setSelectedPaymentYear] = useState<number | undefined>(undefined);
 	const [selectedReceiptId, setSelectedReceiptId] = useState<string | null>(null);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [newThreshold, setNewThreshold] = useState<string>("");
+	const [showThresholdDialog, setShowThresholdDialog] = useState(false);
+	
+	const itemsPerPage = 10;
 
 	const { data: user } = useLoggedInUser();
 	const userId = user?.id?.toString() || "";
+	const { toast } = useToast();
 
 	const { data: unpaidEarnings } = useUnpaidEarnings(userId);
 	const { data: monthlyEarnings } = useEarnings(selectedYear, selectedMonth, userId);
 	const { data: payments } = usePayments(userId, selectedPaymentYear);
 	const { data: receipt } = usePaymentReceipt(selectedReceiptId);
+	const updateThresholdMutation = useUpdateThreshold();
 
 	const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
 	const months = [
 		"January", "February", "March", "April", "May", "June",
 		"July", "August", "September", "October", "November", "December"
 	];
+
+	// Pagination for payments
+	const paginatedPayments = payments ? payments.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) : [];
+	const totalPages = payments ? Math.ceil(payments.length / itemsPerPage) : 0;
+
+	const formatDate = (dateString: string) => {
+		return new Date(dateString).toLocaleDateString('en-US', {
+			year: 'numeric',
+			month: 'short',
+			day: 'numeric'
+		});
+	};
+
+	const formatCurrency = (amount: number) => {
+		return amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+	};
+
+	const getNextPaymentDate = () => {
+		const now = new Date();
+		const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 16);
+		return nextMonth.toLocaleDateString('en-US', { 
+			month: 'short', 
+			day: 'numeric' 
+		});
+	};
+
+	const getPaymentStatus = () => {
+		const earnings = unpaidEarnings?.earnings || 0;
+		const threshold = unpaidEarnings?.threshold || 0;
+		
+		if (earnings >= threshold) {
+			return `Will be paid on ${getNextPaymentDate()}`;
+		} else {
+			const remaining = threshold - earnings;
+			return `₹${formatCurrency(remaining)} more needed to reach threshold`;
+		}
+	};
+
+	const handleUpdateThreshold = async () => {
+		const thresholdValue = parseInt(newThreshold);
+		if (thresholdValue < 1000) {
+			toast({
+				title: "Error",
+				description: "Threshold must be at least ₹1,000",
+				variant: "destructive",
+			});
+			return;
+		}
+
+		try {
+			await updateThresholdMutation.mutateAsync(thresholdValue);
+			toast({
+				title: "Success",
+				description: "Payment threshold updated successfully",
+			});
+			setShowThresholdDialog(false);
+			setNewThreshold("");
+		} catch (error) {
+			toast({
+				title: "Error",
+				description: error.message,
+				variant: "destructive",
+			});
+		}
+	};
 
 	return (
 		<div className="container mx-auto px-4 py-8">
@@ -75,16 +150,16 @@ export default function Earnings() {
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold text-primary">
-							₹{unpaidEarnings?.earnings?.toFixed(2) || "0.00"}
+							₹{formatCurrency(unpaidEarnings?.earnings || 0)}
 						</div>
 						<p className="text-xs text-muted-foreground">
 							Period: {unpaidEarnings?.from && unpaidEarnings?.to 
-								? `${new Date(unpaidEarnings.from).toLocaleDateString()} - ${new Date(unpaidEarnings.to).toLocaleDateString()}`
+								? `${formatDate(unpaidEarnings.from)} - ${formatDate(unpaidEarnings.to)}`
 								: "N/A"}
 						</p>
 						<div className="mt-2">
 							<div className="text-xs text-muted-foreground mb-1">
-								Payment threshold: ₹{unpaidEarnings?.threshold || 0}
+								{getPaymentStatus()}
 							</div>
 							<div className="w-full bg-secondary rounded-full h-2">
 								<div
@@ -107,7 +182,7 @@ export default function Earnings() {
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">
-							₹{monthlyEarnings?.earnings?.toFixed(2) || "0.00"}
+							₹{formatCurrency(monthlyEarnings?.earnings || 0)}
 						</div>
 						<p className="text-xs text-muted-foreground">
 							{monthlyEarnings?.month} {monthlyEarnings?.year}
@@ -123,10 +198,24 @@ export default function Earnings() {
 						<TrendingUp className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
-						<div className="text-2xl font-bold">
-							₹{user?.threshold || 0}
+						<div className="flex items-center justify-between">
+							<div>
+								<div className="text-2xl font-bold">
+									₹{formatCurrency(user?.threshold || 0)}
+								</div>
+								<p className="text-xs text-muted-foreground">Minimum payout amount</p>
+							</div>
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={() => {
+									setNewThreshold(user?.threshold?.toString() || "");
+									setShowThresholdDialog(true);
+								}}
+							>
+								Update
+							</Button>
 						</div>
-						<p className="text-xs text-muted-foreground">Minimum payout amount</p>
 					</CardContent>
 				</Card>
 			</div>
@@ -166,7 +255,7 @@ export default function Earnings() {
 				<CardContent>
 					<div className="text-center p-8">
 						<div className="text-3xl font-bold text-primary mb-2">
-							₹{monthlyEarnings?.earnings?.toFixed(2) || "0.00"}
+							₹{formatCurrency(monthlyEarnings?.earnings || 0)}
 						</div>
 						<p className="text-muted-foreground">
 							{months[selectedMonth]} {selectedYear} earnings
@@ -209,13 +298,13 @@ export default function Earnings() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{payments?.map((payment) => (
+								{paginatedPayments?.map((payment) => (
 									<TableRow key={payment.id}>
 										<TableCell>
-											{new Date(payment.created_at).toLocaleDateString()}
+											{formatDate(payment.created_at)}
 										</TableCell>
 										<TableCell className="font-medium">
-											₹{payment.amount.toFixed(2)}
+											₹{formatCurrency(payment.amount)}
 										</TableCell>
 										<TableCell>
 											<Badge
@@ -255,6 +344,36 @@ export default function Earnings() {
 								</p>
 							</div>
 						)}
+
+						{/* Pagination */}
+						{totalPages > 1 && (
+							<div className="flex items-center justify-between pt-4">
+								<div className="text-sm text-muted-foreground">
+									Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, payments?.length || 0)} of {payments?.length || 0} payments
+								</div>
+								<div className="flex gap-2">
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => setCurrentPage(currentPage - 1)}
+										disabled={currentPage === 1}
+									>
+										Previous
+									</Button>
+									<span className="px-3 py-2 text-sm">
+										Page {currentPage} of {totalPages}
+									</span>
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => setCurrentPage(currentPage + 1)}
+										disabled={currentPage === totalPages}
+									>
+										Next
+									</Button>
+								</div>
+							</div>
+						)}
 					</div>
 				</CardContent>
 			</Card>
@@ -274,11 +393,11 @@ export default function Earnings() {
 								</div>
 								<div>
 									<p className="text-sm font-medium">Amount</p>
-									<p className="text-sm text-muted-foreground">₹{receipt.amount.toFixed(2)}</p>
+									<p className="text-sm text-muted-foreground">₹{formatCurrency(receipt.amount)}</p>
 								</div>
 								<div>
 									<p className="text-sm font-medium">Date</p>
-									<p className="text-sm text-muted-foreground">{new Date(receipt.created_at).toLocaleDateString()}</p>
+									<p className="text-sm text-muted-foreground">{formatDate(receipt.created_at)}</p>
 								</div>
 								<div>
 									<p className="text-sm font-medium">Status</p>
@@ -307,6 +426,45 @@ export default function Earnings() {
 							</div>
 						</div>
 					)}
+				</DialogContent>
+			</Dialog>
+
+			{/* Threshold Update Dialog */}
+			<Dialog open={showThresholdDialog} onOpenChange={setShowThresholdDialog}>
+				<DialogContent className="max-w-md">
+					<DialogHeader>
+						<DialogTitle>Update Payment Threshold</DialogTitle>
+					</DialogHeader>
+					<div className="space-y-4">
+						<div>
+							<label className="text-sm font-medium">New Threshold Amount (₹)</label>
+							<Input
+								type="number"
+								value={newThreshold}
+								onChange={(e) => setNewThreshold(e.target.value)}
+								placeholder="Enter minimum amount (min: 1000)"
+								min="1000"
+							/>
+							<p className="text-xs text-muted-foreground mt-1">
+								Minimum threshold is ₹1,000
+							</p>
+						</div>
+						
+						<div className="flex gap-2 pt-4">
+							<Button 
+								onClick={handleUpdateThreshold}
+								disabled={updateThresholdMutation.isPending || !newThreshold}
+							>
+								{updateThresholdMutation.isPending ? "Updating..." : "Update Threshold"}
+							</Button>
+							<Button 
+								variant="outline" 
+								onClick={() => setShowThresholdDialog(false)}
+							>
+								Cancel
+							</Button>
+						</div>
+					</div>
 				</DialogContent>
 			</Dialog>
 		</div>

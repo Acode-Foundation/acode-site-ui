@@ -283,12 +283,12 @@ export function PaymentMethods() {
             <div key={method.id} className="flex items-center justify-between p-4 border rounded-lg">
               <div className="flex items-center gap-4">
                 {getPaymentMethodDisplay(method)}
-                {method.is_default === 1 && (
-                  <Badge variant="secondary">
-                    <Check className="w-3 h-3 mr-1" />
-                    Default
-                  </Badge>
-                )}
+				{method.is_default === 1 && (
+					<Badge variant="default" className="bg-gradient-primary text-white border-0">
+						<Check className="w-3 h-3 mr-1" />
+						Default
+					</Badge>
+				)}
               </div>
               
               <div className="flex gap-2">

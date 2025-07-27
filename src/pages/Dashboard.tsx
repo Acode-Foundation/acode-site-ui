@@ -704,22 +704,34 @@ export default function Dashboard() {
 					</div>
 				</CardHeader>
 				<CardContent className="space-y-6">
-					<div className="flex items-center space-x-6">
-						<Avatar className="w-20 h-20">
+					<div className="flex flex-col sm:flex-row items-center gap-6 p-6 bg-gradient-subtle rounded-lg border border-border/50">
+						<Avatar className="w-24 h-24 ring-2 ring-primary/20">
 							{currentUser.github ? (
 								<AvatarImage
 									src={`https://avatars.githubusercontent.com/${currentUser.github}`}
 									alt={currentUser.name}
 								/>
 							) : null}
-							<AvatarFallback className="text-2xl">
+							<AvatarFallback className="text-2xl bg-gradient-primary text-white">
 								{currentUser.name
 									.split(" ")
 									.map((n) => n[0])
 									.join("")}
 							</AvatarFallback>
 						</Avatar>
-						<Button variant="outline">Change Avatar</Button>
+						<div className="flex-1 text-center sm:text-left">
+							<h3 className="text-xl font-semibold">{currentUser.name}</h3>
+							<p className="text-muted-foreground">{currentUser.email}</p>
+							<div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
+								<Badge variant="outline">{currentUser.role}</Badge>
+								{currentUser.verified && (
+									<Badge variant="default" className="bg-green-500">Verified</Badge>
+								)}
+							</div>
+						</div>
+						<Button variant="outline" size="sm">
+							Change Avatar
+						</Button>
 					</div>
 					<form onSubmit={(e) => handleSubmit(e)} className="space-y-4">
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -750,15 +762,6 @@ export default function Dashboard() {
 								<Label htmlFor="github">GitHub</Label>
 								<Input id="github" defaultValue={currentUser.github} />
 							</div>
-							<div className="space-y-2">
-								<Label htmlFor="location">Location</Label>
-								<Input id="location" defaultValue={"No Location"} />
-							</div>
-						</div>
-
-						<div className="space-y-2">
-							<Label htmlFor="bio">Bio</Label>
-							<Textarea id="bio" defaultValue={"No Bio"} rows={3} />
 						</div>
 
 						<Button
@@ -773,90 +776,62 @@ export default function Dashboard() {
 					{/* Radix-UI Dialog for OTP Verification */}
 
 					<Dialog open={showOTPDialog} onOpenChange={setShowOTPDialog}>
-						<DialogPortal>
-							<DialogOverlay className="fixed inset-0 bg-black bg-opacity-50 z-40" />
-							<DialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-50 max-w-md w-full mx-4">
-								{/* Close button */}
-								<DialogClose asChild>
-									<button
-										className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-										aria-label="Close"
-									>
-										<X size={20} />
-									</button>
-								</DialogClose>
+						<DialogContent className="sm:max-w-md">
+							<DialogTitle>Verify Your New Email</DialogTitle>
+							<DialogDescription>
+								We've sent a 6-digit verification code to <strong>{currentEmail}</strong>. 
+								Please enter the code below to confirm your email change.
+							</DialogDescription>
 
-								<DialogTitle className="text-lg font-semibold text-gray-900 mb-2">
-									Verify Your New Email
-								</DialogTitle>
-
-								<DialogDescription className="text-gray-600 mb-6">
-									We've sent a 6-digit verification code to{" "}
-									<strong className="text-gray-900">{currentEmail}</strong>.{" "}
-									Please enter the code below to confirm your email change.
-								</DialogDescription>
-
-								<div className="space-y-4">
-									{/* OTP Input */}
-									<div>
-										<label
-											htmlFor="otp"
-											className="block text-sm font-medium text-gray-700 mb-1"
-										>
-											Verification Code
-										</label>
-										<input
-											type="text"
-											id="otp"
-											value={otpValue}
-											onChange={(e) => {
-												// Only allow digits and limit to 6 characters
-												const value = e.target.value
-													.replace(/\D/g, "")
-													.slice(0, 6);
-												setOtpValue(value);
-												setOtpError(""); // Clear error when user types
-											}}
-											placeholder="Enter 6-digit code"
-											className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-lg tracking-widest"
-											maxLength={6}
-										/>
-										{otpError && (
-											<p className="text-sm text-red-600 mt-1">{otpError}</p>
-										)}
-									</div>
-
-									{/* Resend OTP link */}
-									<div className="text-center">
-										<button
-											onClick={handleResendOTP}
-											disabled={isSendingOTP}
-											className="text-sm text-blue-600 hover:text-blue-700 disabled:text-gray-400"
-										>
-											{isSendingOTP ? "Sending..." : "Resend Code"}
-										</button>
-									</div>
-
-									{/* Action buttons */}
-									<div className="flex justify-end space-x-3 pt-4">
-										<button
-											onClick={handleCancel}
-											className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
-										>
-											Cancel
-										</button>
-
-										<button
-											onClick={handleOTPVerification}
-											disabled={isVerifyingOTP || !otpValue.trim()}
-											className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:bg-gray-400"
-										>
-											{isVerifyingOTP ? "Verifying..." : "Verify & Update"}
-										</button>
-									</div>
+							<div className="space-y-4">
+								<div>
+									<Label htmlFor="otp">Verification Code</Label>
+									<Input
+										id="otp"
+										type="text"
+										value={otpValue}
+										onChange={(e) => {
+											const value = e.target.value.replace(/\D/g, "").slice(0, 6);
+											setOtpValue(value);
+											setOtpError("");
+										}}
+										placeholder="Enter 6-digit code"
+										maxLength={6}
+										className="text-center text-lg tracking-widest"
+									/>
+									{otpError && (
+										<p className="text-sm text-destructive mt-1">{otpError}</p>
+									)}
 								</div>
-							</DialogContent>
-						</DialogPortal>
+
+								<div className="text-center">
+									<Button
+										variant="link"
+										onClick={handleResendOTP}
+										disabled={isSendingOTP}
+									>
+										{isSendingOTP ? "Sending..." : "Resend Code"}
+									</Button>
+								</div>
+
+								<div className="flex gap-2 pt-4">
+									<Button
+										onClick={handleOTPVerification}
+										disabled={isVerifyingOTP || !otpValue.trim()}
+										className="flex-1"
+									>
+										{isVerifyingOTP ? "Verifying..." : "Verify & Update"}
+									</Button>
+									<Button
+										variant="outline"
+										onClick={handleCancel}
+										className="flex-1"
+									>
+										Cancel
+									</Button>
+								</div>
+							</div>
+						</DialogContent>
 					</Dialog>
 				</CardContent>
 			</Card>
