@@ -176,15 +176,6 @@ export function FloatingNav() {
 								</DropdownMenuItem>
 								<DropdownMenuItem asChild>
 									<Link
-										to="/earnings"
-										className="flex items-center cursor-pointer"
-									>
-										<DollarSign className="h-4 w-4 mr-2" />
-										Earnings
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem asChild>
-									<Link
 										to={`/developer/${user?.email}`}
 										className="flex items-center cursor-pointer"
 									>
@@ -291,14 +282,6 @@ export function FloatingNav() {
 									>
 										<User className="h-4 w-4 mr-2" />
 										Dashboard
-									</Link>
-									<Link
-										to="/earnings"
-										className="flex items-center text-base font-medium transition-colors duration-200 hover:text-primary py-2"
-										onClick={() => setIsMobileMenuOpen(false)}
-									>
-										<DollarSign className="h-4 w-4 mr-2" />
-										Earnings
 									</Link>
 									<Link
 										to={`/developer/${user?.email}`}

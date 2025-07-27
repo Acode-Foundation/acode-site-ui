@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
 	Calendar,
@@ -8,13 +9,20 @@ import {
 	Mail,
 	Package,
 	Star,
+	Edit,
+	Trash2,
+	Settings,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { PluginCard } from "@/components/ui/plugin-card";
+import { useToast } from "@/hooks/use-toast";
+import { useLoggedInUser } from "@/hooks/useLoggedInUser";
+import { useDeletePlugin } from "@/hooks/use-user-plugins";
 
 interface Developer {
 	id: number;
@@ -67,6 +75,11 @@ const fetchDeveloperPlugins = async (userId: string): Promise<Plugin[]> => {
 
 export default function DeveloperProfile() {
 	const { email } = useParams<{ email: string }>();
+	const { toast } = useToast();
+	const { data: loggedInUser } = useLoggedInUser();
+	const deleteMutation = useDeletePlugin();
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+	const [pluginToDelete, setPluginToDelete] = useState<string | null>(null);
 
 	const {
 		data: developer,
@@ -83,6 +96,33 @@ export default function DeveloperProfile() {
 		queryFn: () => fetchDeveloperPlugins(developer!.id.toString()),
 		enabled: !!developer?.id,
 	});
+
+	const isOwnProfile = loggedInUser?.email === email;
+
+	const handleDeletePlugin = (pluginId: string) => {
+		setPluginToDelete(pluginId);
+		setDeleteDialogOpen(true);
+	};
+
+	const confirmDelete = async () => {
+		if (!pluginToDelete) return;
+
+		try {
+			await deleteMutation.mutateAsync(pluginToDelete);
+			toast({
+				title: "Success",
+				description: "Plugin deleted successfully",
+			});
+			setDeleteDialogOpen(false);
+			setPluginToDelete(null);
+		} catch (error) {
+			toast({
+				title: "Error",
+				description: "Failed to delete plugin",
+				variant: "destructive",
+			});
+		}
+	};
 
 	if (isDeveloperLoading) {
 		return (
@@ -167,6 +207,14 @@ export default function DeveloperProfile() {
 								</div>
 
 								<div className="flex flex-wrap gap-3">
+									{isOwnProfile && (
+										<Button size="sm" asChild className="bg-gradient-primary hover:shadow-glow-primary">
+											<Link to="/dashboard?tab=profile">
+												<Settings className="w-4 h-4 mr-2" />
+												Edit Profile
+											</Link>
+										</Button>
+									)}
 									{developer.website && (
 										<Button variant="outline" size="sm" asChild>
 											<a
@@ -251,7 +299,31 @@ export default function DeveloperProfile() {
 						) : plugins.length > 0 ? (
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 								{plugins.map((plugin, index) => (
-									<PluginCard key={plugin.id} plugin={plugin} index={index} />
+									<div key={plugin.id} className="relative group">
+										<PluginCard plugin={plugin} index={index} />
+										{isOwnProfile && (
+											<div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1">
+												<Button
+													size="sm"
+													variant="secondary"
+													className="h-8 w-8 p-0 bg-background/80 backdrop-blur-sm border"
+													asChild
+												>
+													<Link to={`/plugin/${plugin.sku}`}>
+														<Edit className="h-3 w-3" />
+													</Link>
+												</Button>
+												<Button
+													size="sm"
+													variant="secondary"
+													className="h-8 w-8 p-0 bg-background/80 backdrop-blur-sm border hover:bg-destructive hover:text-destructive-foreground"
+													onClick={() => handleDeletePlugin(plugin.id)}
+												>
+													<Trash2 className="h-3 w-3" />
+												</Button>
+											</div>
+										)}
+									</div>
 								))}
 							</div>
 						) : (
@@ -264,6 +336,24 @@ export default function DeveloperProfile() {
 						)}
 					</CardContent>
 				</Card>
+
+				{/* Delete Confirmation Dialog */}
+				<AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Delete Plugin</AlertDialogTitle>
+							<AlertDialogDescription>
+								Are you sure you want to delete this plugin? This action cannot be undone.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel onClick={() => setPluginToDelete(null)}>Cancel</AlertDialogCancel>
+							<AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">
+								Delete
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
 			</div>
 		</div>
 	);

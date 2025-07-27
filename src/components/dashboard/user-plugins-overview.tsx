@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import {
 	Table,
 	TableBody,
@@ -29,6 +30,8 @@ export function UserPluginsOverview() {
 	const { data: plugins = [], isLoading } = useUserPlugins(user?.id?.toString() || "");
 	const deletePluginMutation = useDeletePlugin();
 	const [currentPage, setCurrentPage] = useState(1);
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+	const [pluginToDelete, setPluginToDelete] = useState<{ id: string; name: string } | null>(null);
 	const pluginsPerPage = 5;
 
 	// Pagination logic
@@ -36,17 +39,22 @@ export function UserPluginsOverview() {
 	const startIndex = (currentPage - 1) * pluginsPerPage;
 	const paginatedPlugins = plugins.slice(startIndex, startIndex + pluginsPerPage);
 
-	const handleDelete = async (pluginId: string, pluginName: string) => {
-		if (!confirm(`Are you sure you want to delete "${pluginName}"?`)) {
-			return;
-		}
+	const handleDelete = (pluginId: string, pluginName: string) => {
+		setPluginToDelete({ id: pluginId, name: pluginName });
+		setDeleteDialogOpen(true);
+	};
+
+	const confirmDelete = async () => {
+		if (!pluginToDelete) return;
 
 		try {
-			await deletePluginMutation.mutateAsync(pluginId);
+			await deletePluginMutation.mutateAsync(pluginToDelete.id);
 			toast({
 				title: "Plugin deleted",
-				description: `${pluginName} has been deleted successfully.`,
+				description: `${pluginToDelete.name} has been deleted successfully.`,
 			});
+			setDeleteDialogOpen(false);
+			setPluginToDelete(null);
 		} catch (error) {
 			toast({
 				title: "Error",
@@ -317,6 +325,24 @@ export function UserPluginsOverview() {
 						)}
 					</>
 				)}
+
+				{/* Delete Confirmation Dialog */}
+				<AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Delete Plugin</AlertDialogTitle>
+							<AlertDialogDescription>
+								Are you sure you want to delete "{pluginToDelete?.name}"? This action cannot be undone.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel onClick={() => setPluginToDelete(null)}>Cancel</AlertDialogCancel>
+							<AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">
+								Delete
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
 			</CardContent>
 		</Card>
 	);

@@ -3,6 +3,7 @@ import { CreditCard, Plus, Trash2, Check, Building2, Wallet } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,6 +23,10 @@ export function PaymentMethods() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [methodType, setMethodType] = useState<"paypal" | "bank" | "crypto">("paypal");
   const [formData, setFormData] = useState<CreatePaymentMethodData>({});
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [methodToDelete, setMethodToDelete] = useState<string | null>(null);
+  const [defaultDialogOpen, setDefaultDialogOpen] = useState(false);
+  const [methodToSetDefault, setMethodToSetDefault] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,14 +49,21 @@ export function PaymentMethods() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this payment method?")) return;
+    setMethodToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!methodToDelete) return;
     
     try {
-      await deleteMutation.mutateAsync(id);
+      await deleteMutation.mutateAsync(methodToDelete);
       toast({
         title: "Success",
         description: "Payment method deleted successfully",
       });
+      setDeleteDialogOpen(false);
+      setMethodToDelete(null);
     } catch (error) {
       toast({
         title: "Error",
@@ -62,12 +74,21 @@ export function PaymentMethods() {
   };
 
   const handleSetDefault = async (id: string) => {
+    setMethodToSetDefault(id);
+    setDefaultDialogOpen(true);
+  };
+
+  const confirmSetDefault = async () => {
+    if (!methodToSetDefault) return;
+    
     try {
-      await setDefaultMutation.mutateAsync(id);
+      await setDefaultMutation.mutateAsync(methodToSetDefault);
       toast({
         title: "Success",
         description: "Default payment method updated",
       });
+      setDefaultDialogOpen(false);
+      setMethodToSetDefault(null);
     } catch (error) {
       toast({
         title: "Error",
@@ -320,6 +341,42 @@ export function PaymentMethods() {
             </div>
           )}
         </div>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Payment Method</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this payment method? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setMethodToDelete(null)}>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Set Default Confirmation Dialog */}
+        <AlertDialog open={defaultDialogOpen} onOpenChange={setDefaultDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Set Default Payment Method</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to set this as your default payment method?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setMethodToSetDefault(null)}>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmSetDefault}>
+                Set Default
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );
