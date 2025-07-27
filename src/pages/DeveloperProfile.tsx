@@ -66,7 +66,7 @@ const fetchDeveloper = async (email: string): Promise<Developer> => {
 };
 
 const fetchDeveloperPlugins = async (userId: string): Promise<Plugin[]> => {
-	const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugins?user_id=${userId}`);
+	const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugins?user=${userId}`);
 	if (!response.ok) {
 		return [];
 	}
@@ -309,7 +309,7 @@ export default function DeveloperProfile() {
 													className="h-8 w-8 p-0 bg-card/90 backdrop-blur-sm border border-border/50 hover:bg-muted hover:text-foreground"
 													asChild
 												>
-													<Link to={`/plugin/${plugin.sku}`}>
+													<Link to={`/submit-plugin?id=${plugin.id}`}>
 														<Edit className="h-3 w-3" />
 													</Link>
 												</Button>

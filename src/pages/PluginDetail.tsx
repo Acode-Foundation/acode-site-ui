@@ -69,7 +69,7 @@ interface Review {
 }
 
 const fetchPlugin = async (pluginId: string): Promise<PluginData> => {
-	const response = await fetch(`https://acode.app/api/plugin/${pluginId}`);
+	const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin/${pluginId}`);
 	if (!response.ok) {
 		throw new Error("Plugin not found");
 	}
@@ -77,7 +77,7 @@ const fetchPlugin = async (pluginId: string): Promise<PluginData> => {
 };
 
 const fetchReviews = async (pluginId: string): Promise<Review[]> => {
-	const response = await fetch(`https://acode.app/api/comment/${pluginId}`);
+	const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/comment/${pluginId}`);
 	if (!response.ok) {
 		return [];
 	}

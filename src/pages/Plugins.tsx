@@ -176,7 +176,7 @@ export default function Plugins() {
 					<Button 
 						variant="outline" 
 						size="sm"
-						onClick={() => window.location.href = '/submit-plugin'}
+						onClick={() => { window.location.href = '/submit-plugin'; }}
 					>
 						<ExternalLink className="w-4 h-4 mr-2" />
 						Submit Plugin
