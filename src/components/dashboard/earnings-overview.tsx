@@ -1,9 +1,11 @@
 import { DollarSign, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCurrentMonthEarnings } from "@/hooks/use-earnings";
+import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 
 export function EarningsOverview() {
-	const { data: earnings, isLoading } = useCurrentMonthEarnings();
+	const { data: user } = useLoggedInUser();
+	const { data: earnings, isLoading } = useCurrentMonthEarnings(user?.id?.toString() || "");
 
 	if (isLoading) {
 		return (

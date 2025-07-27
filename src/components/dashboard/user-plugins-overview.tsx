@@ -12,10 +12,12 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { useUserPlugins, useDeletePlugin } from "@/hooks/use-user-plugins";
+import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import { toast } from "@/hooks/use-toast";
 
 export function UserPluginsOverview() {
-	const { data: plugins = [], isLoading } = useUserPlugins();
+	const { data: user } = useLoggedInUser();
+	const { data: plugins = [], isLoading } = useUserPlugins(user?.id?.toString() || "");
 	const deletePluginMutation = useDeletePlugin();
 
 	const handleDelete = async (pluginId: string, pluginName: string) => {

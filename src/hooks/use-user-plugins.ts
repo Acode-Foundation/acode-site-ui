@@ -6,9 +6,9 @@ interface UserPlugin extends Plugin {
 	revenue?: number;
 }
 
-const fetchUserPlugins = async (): Promise<UserPlugin[]> => {
+const fetchUserPlugins = async (userId: string): Promise<UserPlugin[]> => {
 	const response = await fetch(
-		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugins/my`,
+		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugins?user=${userId}`,
 		{
 			method: "GET",
 			headers: {
@@ -42,10 +42,10 @@ const deletePlugin = async (pluginId: string): Promise<void> => {
 	}
 };
 
-export const useUserPlugins = () => {
+export const useUserPlugins = (userId: string) => {
 	return useQuery({
-		queryKey: ["userPlugins"],
-		queryFn: fetchUserPlugins,
+		queryKey: ["userPlugins", userId],
+		queryFn: () => fetchUserPlugins(userId),
 		staleTime: 5 * 60 * 1000, // 5 minutes
 		gcTime: 10 * 60 * 1000, // 10 minutes
 		refetchOnWindowFocus: false,
