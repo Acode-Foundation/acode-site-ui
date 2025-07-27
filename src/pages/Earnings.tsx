@@ -41,7 +41,7 @@ export default function Earnings() {
 	const [selectedYear, setSelectedYear] = useState(currentYear);
 	const [selectedMonth, setSelectedMonth] = useState(currentMonth);
 	const [selectedPaymentYear, setSelectedPaymentYear] = useState<number | undefined>(undefined);
-	const [selectedReceiptId, setSelectedReceiptId] = useState<string | null>(null);
+	const [selectedReceiptId, setSelectedReceiptId] = useState<number | null>(null);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [newThreshold, setNewThreshold] = useState<string>("");
 	const [showThresholdDialog, setShowThresholdDialog] = useState(false);
@@ -58,7 +58,7 @@ export default function Earnings() {
 	const { data: receipt } = usePaymentReceipt(selectedReceiptId);
 	const updateThresholdMutation = useUpdateThreshold();
 
-	const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
+	const years = Array.from({ length: currentYear - 2023 + 1 }, (_, i) => currentYear - i);
 	const months = [
 		"January", "February", "March", "April", "May", "June",
 		"July", "August", "September", "October", "November", "December"
@@ -320,7 +320,9 @@ export default function Earnings() {
 											</Badge>
 										</TableCell>
 										<TableCell className="hidden sm:table-cell">
-											Payment Method
+											{payment.paypal_email ? `PayPal: ${payment.paypal_email}` : 
+											 payment.bank_name ? `${payment.bank_name} (${payment.bank_account_number})` : 
+											 'Payment Method'}
 										</TableCell>
 										<TableCell>
 											<Button
@@ -412,9 +414,9 @@ export default function Earnings() {
 								)}
 								{receipt.paymentMethod.bank_account_number && (
 									<div className="text-sm text-muted-foreground">
-										<p>Bank: {receipt.paymentMethod.bank_name}</p>
+										<p>Bank: {receipt.bank_name}</p>
 										<p>Account: ****{receipt.paymentMethod.bank_account_number.slice(-4)}</p>
-										<p>Holder: {receipt.paymentMethod.bank_account_holder}</p>
+										<p>Holder: {receipt.user_name}</p>
 									</div>
 								)}
 								{receipt.paymentMethod.wallet_address && (

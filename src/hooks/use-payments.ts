@@ -1,12 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 
 interface Payment {
-  id: string;
+  id: number;
+  user_id: number;
   amount: number;
-  status: string;
+  bank_name?: string;
+  bank_account_number?: string;
+  paypal_email?: string;
   created_at: string;
-  payment_method_id: string;
-  user_id: string;
+  status: string;
+  date_from: string;
+  date_to: string;
 }
 
 const fetchPayments = async (userId: string, year?: number): Promise<Payment[]> => {

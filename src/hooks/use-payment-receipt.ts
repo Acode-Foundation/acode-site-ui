@@ -1,26 +1,37 @@
 import { useQuery } from "@tanstack/react-query";
 
 interface PaymentReceipt {
-  id: string;
-  amount: number;
-  status: string;
+  id: number;
   created_at: string;
-  user_id: string;
+  updated_at: string;
+  user_id: number;
+  amount: number;
+  receipt?: string;
+  date_from: string;
+  date_to: string;
+  status: string;
+  payment_method_id: number;
+  user_name: string;
+  user_email: string;
+  bank_name?: string;
+  paypal_email?: string;
+  bank_account_number?: string;
   paymentMethod: {
-    id: string;
+    id: number;
+    user_id: number;
+    created_at: string;
     paypal_email?: string;
-    bank_name?: string;
     bank_account_number?: string;
-    bank_ifsc_code?: string;
-    bank_swift_code?: string;
-    bank_account_holder?: string;
     bank_account_type?: string;
     wallet_address?: string;
     wallet_type?: string;
+    is_default: number;
+    user_name: string;
+    user_email: string;
   };
 }
 
-const fetchPaymentReceipt = async (paymentId: string): Promise<PaymentReceipt> => {
+const fetchPaymentReceipt = async (paymentId: number): Promise<PaymentReceipt> => {
   const response = await fetch(
     `${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/user/receipt/${paymentId}`,
     {
@@ -39,7 +50,7 @@ const fetchPaymentReceipt = async (paymentId: string): Promise<PaymentReceipt> =
   return response.json();
 };
 
-export const usePaymentReceipt = (paymentId: string | null) => {
+export const usePaymentReceipt = (paymentId: number | null) => {
   return useQuery({
     queryKey: ["paymentReceipt", paymentId],
     queryFn: () => fetchPaymentReceipt(paymentId!),
