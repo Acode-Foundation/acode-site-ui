@@ -1,12 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
+import type { EarningsData } from "@/types";
 
-interface EarningsData {
-	earnings: number;
-	month: string;
-	year: number;
-}
-
-const fetchEarnings = async (year: number, month: number, userId: string): Promise<EarningsData> => {
+const fetchEarnings = async (
+	year: number,
+	month: number,
+	userId: string,
+): Promise<EarningsData> => {
 	const response = await fetch(
 		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/user/earnings/${year}/${month}?user=${userId}`,
 		{
@@ -15,7 +14,7 @@ const fetchEarnings = async (year: number, month: number, userId: string): Promi
 				Accept: "application/json",
 			},
 			credentials: "include",
-		}
+		},
 	);
 
 	if (!response.ok) {
@@ -39,6 +38,6 @@ export const useCurrentMonthEarnings = (userId: string) => {
 	const now = new Date();
 	const year = now.getFullYear();
 	const month = now.getMonth(); // 0-indexed
-	
+
 	return useEarnings(year, month, userId);
 };

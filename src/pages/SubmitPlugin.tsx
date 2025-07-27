@@ -1,10 +1,32 @@
-import { Upload, FileArchive, AlertCircle, CheckCircle, Loader2, Package, User, Tag, Shield, Hash, DollarSign, Github, UserCheck, GitBranch, Edit } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import JSZip from "jszip";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	AlertCircle,
+	CheckCircle,
+	DollarSign,
+	Edit,
+	FileArchive,
+	GitBranch,
+	Github,
+	Hash,
+	Loader2,
+	Package,
+	Shield,
+	Tag,
+	Upload,
+	User,
+	UserCheck,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import { PluginMetadata } from "@/types/submit-plugin";
@@ -15,13 +37,15 @@ export default function SubmitPlugin() {
 	const [searchParams] = useSearchParams();
 	const { data: user, isLoading: userLoading } = useLoggedInUser();
 	const [file, setFile] = useState<File | null>(null);
-	const [pluginMetadata, setPluginMetadata] = useState<PluginMetadata | null>(null);
+	const [pluginMetadata, setPluginMetadata] = useState<PluginMetadata | null>(
+		null,
+	);
 	const [changelogs, setChangelogs] = useState<string | null>(null);
 	const [isUploading, setIsUploading] = useState(false);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [isAnalyzing, setIsAnalyzing] = useState(false);
 	const [isLoadingExisting, setIsLoadingExisting] = useState(false);
-	
+
 	const pluginId = searchParams.get("id");
 	const isUpdateMode = !!pluginId;
 
@@ -36,7 +60,7 @@ export default function SubmitPlugin() {
 					`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin/${pluginId}`,
 					{
 						credentials: "include",
-					}
+					},
 				);
 
 				if (!response.ok) {
@@ -44,7 +68,7 @@ export default function SubmitPlugin() {
 				}
 
 				const pluginData = await response.json();
-				
+
 				// Set existing metadata for display
 				const existingMetadata: PluginMetadata = {
 					id: pluginData.id,
@@ -53,7 +77,9 @@ export default function SubmitPlugin() {
 					author: user.name,
 					license: pluginData.license,
 					keywords: pluginData.keywords ? JSON.parse(pluginData.keywords) : [],
-					contributors: pluginData.contributors ? JSON.parse(pluginData.contributors) : [],
+					contributors: pluginData.contributors
+						? JSON.parse(pluginData.contributors)
+						: [],
 					minVersionCode: pluginData.minVersionCode,
 					price: pluginData.price,
 					repository: pluginData.repository,
@@ -81,7 +107,7 @@ export default function SubmitPlugin() {
 		try {
 			const zip = new JSZip();
 			const zipContent = await zip.loadAsync(zipFile);
-			
+
 			// Look for plugin.json
 			const pluginJsonFile = zipContent.file("plugin.json");
 			if (!pluginJsonFile) {
@@ -101,10 +127,11 @@ export default function SubmitPlugin() {
 
 			// Look for changelogs
 			let changelogsContent: string | null = null;
-			const changelogsFile = zipContent.file("changelogs.md") || 
-									zipContent.file("CHANGELOGS.md") || 
-									zipContent.file("changelog.md") || 
-									zipContent.file("CHANGELOG.md");
+			const changelogsFile =
+				zipContent.file("changelogs.md") ||
+				zipContent.file("CHANGELOGS.md") ||
+				zipContent.file("changelog.md") ||
+				zipContent.file("CHANGELOG.md");
 			if (changelogsFile) {
 				changelogsContent = await changelogsFile.async("text");
 			}
@@ -118,7 +145,9 @@ export default function SubmitPlugin() {
 				author: user?.name || "Unknown",
 				license: pluginData.license,
 				keywords: Array.isArray(pluginData.keywords) ? pluginData.keywords : [],
-				contributors: Array.isArray(pluginData.contributors) ? pluginData.contributors : [],
+				contributors: Array.isArray(pluginData.contributors)
+					? pluginData.contributors
+					: [],
 				minVersionCode: pluginData.minVersionCode,
 				price: pluginData.price,
 				icon: iconDataUrl,
@@ -130,7 +159,10 @@ export default function SubmitPlugin() {
 			console.error("Error analyzing ZIP:", error);
 			toast({
 				title: "Invalid plugin ZIP",
-				description: error instanceof Error ? error.message : "Could not read plugin metadata from ZIP file.",
+				description:
+					error instanceof Error
+						? error.message
+						: "Could not read plugin metadata from ZIP file.",
 				variant: "destructive",
 			});
 			setPluginMetadata(null);
@@ -140,7 +172,10 @@ export default function SubmitPlugin() {
 	};
 
 	const handleFileSelect = async (selectedFile: File) => {
-		if (selectedFile.type !== "application/zip" && !selectedFile.name.endsWith(".zip")) {
+		if (
+			selectedFile.type !== "application/zip" &&
+			!selectedFile.name.endsWith(".zip")
+		) {
 			toast({
 				title: "Invalid file type",
 				description: "Please upload a ZIP file containing your plugin.",
@@ -181,7 +216,7 @@ export default function SubmitPlugin() {
 		if (!user) {
 			toast({
 				title: "Authentication required",
-				description: `Please log in to ${isUpdateMode ? 'update' : 'submit'} a plugin.`,
+				description: `Please log in to ${isUpdateMode ? "update" : "submit"} a plugin.`,
 				variant: "destructive",
 			});
 			navigate("/login");
@@ -195,12 +230,12 @@ export default function SubmitPlugin() {
 			if (file) {
 				formData.append("plugin", file);
 			}
-			
+
 			if (changelogs) {
 				formData.append("changelogs", changelogs);
 			}
 
-			const url = isUpdateMode 
+			const url = isUpdateMode
 				? `${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin`
 				: `${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin`;
 
@@ -212,14 +247,19 @@ export default function SubmitPlugin() {
 
 			if (!response.ok) {
 				const errorData = await response.json();
-				throw new Error(errorData.error || `Failed to ${isUpdateMode ? 'update' : 'upload'} plugin`);
+				throw new Error(
+					errorData.error ||
+						`Failed to ${isUpdateMode ? "update" : "upload"} plugin`,
+				);
 			}
 
 			const result = await response.json();
-			
+
 			toast({
-				title: isUpdateMode ? "Plugin updated successfully!" : "Plugin submitted successfully!",
-				description: isUpdateMode 
+				title: isUpdateMode
+					? "Plugin updated successfully!"
+					: "Plugin submitted successfully!",
+				description: isUpdateMode
 					? "Your plugin has been updated."
 					: "Your plugin has been submitted and is awaiting approval.",
 			});
@@ -229,14 +269,17 @@ export default function SubmitPlugin() {
 			if (!isUpdateMode) {
 				setPluginMetadata(null);
 			}
-			
+
 			// Navigate to plugins page or dashboard
 			navigate("/plugins");
 		} catch (error) {
-			console.error(`${isUpdateMode ? 'Update' : 'Upload'} error:`, error);
+			console.error(`${isUpdateMode ? "Update" : "Upload"} error:`, error);
 			toast({
-				title: `${isUpdateMode ? 'Update' : 'Upload'} failed`,
-				description: error instanceof Error ? error.message : `An error occurred while ${isUpdateMode ? 'updating' : 'uploading'} your plugin.`,
+				title: `${isUpdateMode ? "Update" : "Upload"} failed`,
+				description:
+					error instanceof Error
+						? error.message
+						: `An error occurred while ${isUpdateMode ? "updating" : "uploading"} your plugin.`,
 				variant: "destructive",
 			});
 		} finally {
@@ -273,9 +316,9 @@ export default function SubmitPlugin() {
 								<Button onClick={() => navigate("/login")} className="w-full">
 									Log In
 								</Button>
-								<Button 
-									variant="outline" 
-									onClick={() => navigate("/signup")} 
+								<Button
+									variant="outline"
+									onClick={() => navigate("/signup")}
 									className="w-full"
 								>
 									Create Account
@@ -301,10 +344,9 @@ export default function SubmitPlugin() {
 						</span>
 					</h1>
 					<p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-						{isUpdateMode 
+						{isUpdateMode
 							? "Update your plugin with a new version. Upload an updated ZIP file to make changes to your plugin."
-							: "Share your creativity with the Acode community. Upload your plugin ZIP file and help extend Acode's functionality for millions of developers."
-						}
+							: "Share your creativity with the Acode community. Upload your plugin ZIP file and help extend Acode's functionality for millions of developers."}
 					</p>
 				</div>
 
@@ -312,14 +354,17 @@ export default function SubmitPlugin() {
 				<Card className="border-border/50 shadow-lg">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
-							{isUpdateMode ? <Edit className="w-5 h-5" /> : <FileArchive className="w-5 h-5" />}
+							{isUpdateMode ? (
+								<Edit className="w-5 h-5" />
+							) : (
+								<FileArchive className="w-5 h-5" />
+							)}
 							{isUpdateMode ? "Update Plugin" : "Upload Plugin"}
 						</CardTitle>
 						<CardDescription>
-							{isUpdateMode 
+							{isUpdateMode
 								? "Upload a new version of your plugin ZIP file to update it. The file should include updated plugin.json and other required files."
-								: "Upload your plugin ZIP file. Make sure it includes plugin.json, icon, and other required files."
-							}
+								: "Upload your plugin ZIP file. Make sure it includes plugin.json, icon, and other required files."}
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-6">
@@ -329,8 +374,8 @@ export default function SubmitPlugin() {
 								isDragOver
 									? "border-primary bg-primary/5"
 									: file
-									? "border-green-500 bg-green-500/5"
-									: "border-border hover:border-primary/50"
+										? "border-green-500 bg-green-500/5"
+										: "border-border hover:border-primary/50"
 							}`}
 							onDrop={handleDrop}
 							onDragOver={(e) => {
@@ -415,9 +460,9 @@ export default function SubmitPlugin() {
 										<div className="space-y-4">
 											{pluginMetadata.icon && (
 												<div className="flex justify-center">
-													<img 
-														src={pluginMetadata.icon} 
-														alt="Plugin Icon" 
+													<img
+														src={pluginMetadata.icon}
+														alt="Plugin Icon"
 														className="w-16 h-16 rounded-lg border border-border"
 													/>
 												</div>
@@ -426,7 +471,9 @@ export default function SubmitPlugin() {
 												<div className="flex items-center gap-2">
 													<Hash className="w-4 h-4 text-muted-foreground" />
 													<span className="text-sm font-medium">ID:</span>
-													<code className="text-sm bg-muted px-2 py-1 rounded">{pluginMetadata.id}</code>
+													<code className="text-sm bg-muted px-2 py-1 rounded">
+														{pluginMetadata.id}
+													</code>
 												</div>
 												<div className="flex items-center gap-2">
 													<Package className="w-4 h-4 text-muted-foreground" />
@@ -443,15 +490,19 @@ export default function SubmitPlugin() {
 												<div className="flex items-center gap-2">
 													<User className="w-4 h-4 text-muted-foreground" />
 													<span className="text-sm font-medium">Author:</span>
-													<span className="text-sm">{pluginMetadata.author}</span>
+													<span className="text-sm">
+														{pluginMetadata.author}
+													</span>
 												</div>
 												{pluginMetadata.repository && (
 													<div className="flex items-center gap-2">
 														<GitBranch className="w-4 h-4 text-muted-foreground" />
-														<span className="text-sm font-medium">Repository:</span>
-														<a 
-															href={pluginMetadata.repository} 
-															target="_blank" 
+														<span className="text-sm font-medium">
+															Repository:
+														</span>
+														<a
+															href={pluginMetadata.repository}
+															target="_blank"
 															rel="noopener noreferrer"
 															className="text-sm text-primary hover:underline"
 														>
@@ -468,70 +519,101 @@ export default function SubmitPlugin() {
 												<div className="flex items-center gap-2">
 													<Shield className="w-4 h-4 text-muted-foreground" />
 													<span className="text-sm font-medium">License:</span>
-													<Badge variant="outline">{pluginMetadata.license}</Badge>
+													<Badge variant="outline">
+														{pluginMetadata.license}
+													</Badge>
 												</div>
 											)}
 											{pluginMetadata.price !== undefined && (
 												<div className="flex items-center gap-2">
 													<DollarSign className="w-4 h-4 text-muted-foreground" />
 													<span className="text-sm font-medium">Price:</span>
-													<div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-														pluginMetadata.price === 0 
-															? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400" 
-															: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
-													}`}>
-														{pluginMetadata.price === 0 ? "Free" : `₹${pluginMetadata.price}`}
+													<div
+														className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+															pluginMetadata.price === 0
+																? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+																: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
+														}`}
+													>
+														{pluginMetadata.price === 0
+															? "Free"
+															: `₹${pluginMetadata.price}`}
 													</div>
 												</div>
 											)}
 											{pluginMetadata.minVersionCode !== undefined && (
 												<div className="flex items-center gap-2">
-													<span className="text-sm font-medium">Min Version Code:</span>
-													<span className="text-sm">{pluginMetadata.minVersionCode}</span>
+													<span className="text-sm font-medium">
+														Min Version Code:
+													</span>
+													<span className="text-sm">
+														{pluginMetadata.minVersionCode}
+													</span>
 												</div>
 											)}
-											{pluginMetadata.keywords && pluginMetadata.keywords.length > 0 && (
-												<div>
-													<span className="text-sm font-medium mb-2 block">Keywords:</span>
-													<div className="flex flex-wrap gap-1">
-														{pluginMetadata.keywords.map((keyword, index) => (
-															<Badge key={index} variant="outline" className="text-xs">
-																{keyword}
-															</Badge>
-														))}
+											{pluginMetadata.keywords &&
+												pluginMetadata.keywords.length > 0 && (
+													<div>
+														<span className="text-sm font-medium mb-2 block">
+															Keywords:
+														</span>
+														<div className="flex flex-wrap gap-1">
+															{pluginMetadata.keywords.map((keyword, index) => (
+																<Badge
+																	key={index}
+																	variant="outline"
+																	className="text-xs"
+																>
+																	{keyword}
+																</Badge>
+															))}
+														</div>
 													</div>
-												</div>
-											)}
-											{pluginMetadata.contributors && pluginMetadata.contributors.length > 0 && (
-												<div>
-													<span className="text-sm font-medium mb-3 block">Contributors:</span>
-													<div className="space-y-3">
-														{pluginMetadata.contributors.map((contributor, index) => (
-															<div key={index} className="flex items-center gap-3 p-3 bg-gradient-to-r from-muted/40 to-muted/20 rounded-lg border border-border/50 hover:border-border transition-colors">
-																<div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-																	<UserCheck className="w-4 h-4 text-primary" />
-																</div>
-																<div className="flex-1 min-w-0">
-																	<div className="text-sm font-medium text-foreground">
-																		{typeof contributor === 'string' ? contributor : contributor.name}
-																	</div>
-																	{typeof contributor === 'object' && contributor.role && (
-																		<div className="text-xs text-muted-foreground mt-0.5">
-																			{contributor.role}
+												)}
+											{pluginMetadata.contributors &&
+												pluginMetadata.contributors.length > 0 && (
+													<div>
+														<span className="text-sm font-medium mb-3 block">
+															Contributors:
+														</span>
+														<div className="space-y-3">
+															{pluginMetadata.contributors.map(
+																(contributor, index) => (
+																	<div
+																		key={index}
+																		className="flex items-center gap-3 p-3 bg-gradient-to-r from-muted/40 to-muted/20 rounded-lg border border-border/50 hover:border-border transition-colors"
+																	>
+																		<div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+																			<UserCheck className="w-4 h-4 text-primary" />
 																		</div>
-																	)}
-																</div>
-																{typeof contributor === 'object' && contributor.github && (
-																	<div className="flex items-center gap-1.5 px-2 py-1 bg-background/50 rounded-md border border-border/50">
-																		<Github className="w-3 h-3 text-muted-foreground" />
-																		<span className="text-xs font-mono text-muted-foreground">@{contributor.github}</span>
+																		<div className="flex-1 min-w-0">
+																			<div className="text-sm font-medium text-foreground">
+																				{typeof contributor === "string"
+																					? contributor
+																					: contributor.name}
+																			</div>
+																			{typeof contributor === "object" &&
+																				contributor.role && (
+																					<div className="text-xs text-muted-foreground mt-0.5">
+																						{contributor.role}
+																					</div>
+																				)}
+																		</div>
+																		{typeof contributor === "object" &&
+																			contributor.github && (
+																				<div className="flex items-center gap-1.5 px-2 py-1 bg-background/50 rounded-md border border-border/50">
+																					<Github className="w-3 h-3 text-muted-foreground" />
+																					<span className="text-xs font-mono text-muted-foreground">
+																						@{contributor.github}
+																					</span>
+																				</div>
+																			)}
 																	</div>
-																)}
-															</div>
-														))}
+																),
+															)}
+														</div>
 													</div>
-												</div>
-											)}
+												)}
 										</div>
 									</div>
 								</CardContent>
@@ -544,7 +626,11 @@ export default function SubmitPlugin() {
 							<ul className="space-y-2 text-sm text-muted-foreground">
 								<li className="flex items-start gap-2">
 									<span className="text-primary mt-1">•</span>
-									<span>Include a valid <code className="bg-muted px-1 rounded">plugin.json</code> file with plugin metadata</span>
+									<span>
+										Include a valid{" "}
+										<code className="bg-muted px-1 rounded">plugin.json</code>{" "}
+										file with plugin metadata
+									</span>
 								</li>
 								<li className="flex items-start gap-2">
 									<span className="text-primary mt-1">•</span>
@@ -552,7 +638,10 @@ export default function SubmitPlugin() {
 								</li>
 								<li className="flex items-start gap-2">
 									<span className="text-primary mt-1">•</span>
-									<span>Include a README file with plugin description and usage instructions</span>
+									<span>
+										Include a README file with plugin description and usage
+										instructions
+									</span>
 								</li>
 								<li className="flex items-start gap-2">
 									<span className="text-primary mt-1">•</span>
@@ -560,7 +649,9 @@ export default function SubmitPlugin() {
 								</li>
 								<li className="flex items-start gap-2">
 									<span className="text-primary mt-1">•</span>
-									<span>Price must be between ₹10-₹10,000 for paid plugins</span>
+									<span>
+										Price must be between ₹10-₹10,000 for paid plugins
+									</span>
 								</li>
 							</ul>
 						</div>
@@ -579,15 +670,16 @@ export default function SubmitPlugin() {
 									</>
 								) : (
 									<>
-										{isUpdateMode ? <Edit className="w-4 h-4 mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
+										{isUpdateMode ? (
+											<Edit className="w-4 h-4 mr-2" />
+										) : (
+											<Upload className="w-4 h-4 mr-2" />
+										)}
 										{isUpdateMode ? "Update Plugin" : "Submit Plugin"}
 									</>
 								)}
 							</Button>
-							<Button
-								variant="outline"
-								onClick={() => navigate("/plugins")}
-							>
+							<Button variant="outline" onClick={() => navigate("/plugins")}>
 								Cancel
 							</Button>
 						</div>

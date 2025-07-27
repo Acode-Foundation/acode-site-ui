@@ -11,6 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
 	Select,
 	SelectContent,
 	SelectItem,
@@ -25,27 +32,29 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useLoggedInUser } from "@/hooks/useLoggedInUser";
-import { useUnpaidEarnings } from "@/hooks/use-unpaid-earnings";
-import { usePayments } from "@/hooks/use-payments";
 import { useEarnings } from "@/hooks/use-earnings";
 import { usePaymentReceipt } from "@/hooks/use-payment-receipt";
-import { useUpdateThreshold } from "@/hooks/use-update-threshold";
-import { Input } from "@/components/ui/input";
+import { usePayments } from "@/hooks/use-payments";
 import { useToast } from "@/hooks/use-toast";
+import { useUnpaidEarnings } from "@/hooks/use-unpaid-earnings";
+import { useUpdateThreshold } from "@/hooks/use-update-threshold";
+import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 
 export default function Earnings() {
 	const currentYear = new Date().getFullYear();
 	const currentMonth = new Date().getMonth();
 	const [selectedYear, setSelectedYear] = useState(currentYear);
 	const [selectedMonth, setSelectedMonth] = useState(currentMonth);
-	const [selectedPaymentYear, setSelectedPaymentYear] = useState<number | undefined>(undefined);
-	const [selectedReceiptId, setSelectedReceiptId] = useState<number | null>(null);
+	const [selectedPaymentYear, setSelectedPaymentYear] = useState<
+		number | undefined
+	>(undefined);
+	const [selectedReceiptId, setSelectedReceiptId] = useState<number | null>(
+		null,
+	);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [newThreshold, setNewThreshold] = useState<string>("");
 	const [showThresholdDialog, setShowThresholdDialog] = useState(false);
-	
+
 	const itemsPerPage = 10;
 
 	const { data: user } = useLoggedInUser();
@@ -53,46 +62,71 @@ export default function Earnings() {
 	const { toast } = useToast();
 
 	const { data: unpaidEarnings } = useUnpaidEarnings(userId);
-	const { data: monthlyEarnings } = useEarnings(selectedYear, selectedMonth, userId);
+	const { data: monthlyEarnings } = useEarnings(
+		selectedYear,
+		selectedMonth,
+		userId,
+	);
 	const { data: payments } = usePayments(userId, selectedPaymentYear);
 	const { data: receipt } = usePaymentReceipt(selectedReceiptId);
 	const updateThresholdMutation = useUpdateThreshold();
 
-	const years = Array.from({ length: currentYear - 2023 + 1 }, (_, i) => currentYear - i);
+	const years = Array.from(
+		{ length: currentYear - 2023 + 1 },
+		(_, i) => currentYear - i,
+	);
 	const months = [
-		"January", "February", "March", "April", "May", "June",
-		"July", "August", "September", "October", "November", "December"
+		"January",
+		"February",
+		"March",
+		"April",
+		"May",
+		"June",
+		"July",
+		"August",
+		"September",
+		"October",
+		"November",
+		"December",
 	];
 
 	// Pagination for payments
-	const paginatedPayments = payments ? payments.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) : [];
+	const paginatedPayments = payments
+		? payments.slice(
+				(currentPage - 1) * itemsPerPage,
+				currentPage * itemsPerPage,
+			)
+		: [];
 	const totalPages = payments ? Math.ceil(payments.length / itemsPerPage) : 0;
 
 	const formatDate = (dateString: string) => {
-		return new Date(dateString).toLocaleDateString('en-US', {
-			year: 'numeric',
-			month: 'short',
-			day: 'numeric'
+		return new Date(dateString).toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "short",
+			day: "numeric",
 		});
 	};
 
 	const formatCurrency = (amount: number) => {
-		return amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+		return amount.toLocaleString("en-IN", {
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		});
 	};
 
 	const getNextPaymentDate = () => {
 		const now = new Date();
 		const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 16);
-		return nextMonth.toLocaleDateString('en-US', { 
-			month: 'short', 
-			day: 'numeric' 
+		return nextMonth.toLocaleDateString("en-US", {
+			month: "short",
+			day: "numeric",
 		});
 	};
 
 	const getPaymentStatus = () => {
 		const earnings = unpaidEarnings?.earnings || 0;
 		const threshold = unpaidEarnings?.threshold || 0;
-		
+
 		if (earnings >= threshold) {
 			return `Will be paid on ${getNextPaymentDate()}`;
 		} else {
@@ -153,7 +187,8 @@ export default function Earnings() {
 							₹{formatCurrency(unpaidEarnings?.earnings || 0)}
 						</div>
 						<p className="text-xs text-muted-foreground">
-							Period: {unpaidEarnings?.from && unpaidEarnings?.to 
+							Period:{" "}
+							{unpaidEarnings?.from && unpaidEarnings?.to
 								? `${formatDate(unpaidEarnings.from)} - ${formatDate(unpaidEarnings.to)}`
 								: "N/A"}
 						</p>
@@ -203,7 +238,9 @@ export default function Earnings() {
 								<div className="text-2xl font-bold">
 									₹{formatCurrency(user?.threshold || 0)}
 								</div>
-								<p className="text-xs text-muted-foreground">Minimum payout amount</p>
+								<p className="text-xs text-muted-foreground">
+									Minimum payout amount
+								</p>
 							</div>
 							<Button
 								variant="outline"
@@ -229,23 +266,33 @@ export default function Earnings() {
 							Monthly Earnings
 						</CardTitle>
 						<div className="flex gap-2">
-							<Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(Number(value))}>
+							<Select
+								value={selectedYear.toString()}
+								onValueChange={(value) => setSelectedYear(Number(value))}
+							>
 								<SelectTrigger className="w-32">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
-									{years.map(year => (
-										<SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+									{years.map((year) => (
+										<SelectItem key={year} value={year.toString()}>
+											{year}
+										</SelectItem>
 									))}
 								</SelectContent>
 							</Select>
-							<Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(Number(value))}>
+							<Select
+								value={selectedMonth.toString()}
+								onValueChange={(value) => setSelectedMonth(Number(value))}
+							>
 								<SelectTrigger className="w-32">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
 									{months.map((month, index) => (
-										<SelectItem key={index} value={index.toString()}>{month}</SelectItem>
+										<SelectItem key={index} value={index.toString()}>
+											{month}
+										</SelectItem>
 									))}
 								</SelectContent>
 							</Select>
@@ -272,14 +319,23 @@ export default function Earnings() {
 							<CreditCard className="w-5 h-5" />
 							Payment History
 						</CardTitle>
-						<Select value={selectedPaymentYear?.toString() || "all"} onValueChange={(value) => setSelectedPaymentYear(value === "all" ? undefined : Number(value))}>
+						<Select
+							value={selectedPaymentYear?.toString() || "all"}
+							onValueChange={(value) =>
+								setSelectedPaymentYear(
+									value === "all" ? undefined : Number(value),
+								)
+							}
+						>
 							<SelectTrigger className="w-40">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="all">All Time</SelectItem>
-								{years.map(year => (
-									<SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+								{years.map((year) => (
+									<SelectItem key={year} value={year.toString()}>
+										{year}
+									</SelectItem>
 								))}
 							</SelectContent>
 						</Select>
@@ -293,16 +349,16 @@ export default function Earnings() {
 									<TableHead>Date</TableHead>
 									<TableHead>Amount</TableHead>
 									<TableHead>Status</TableHead>
-									<TableHead className="hidden sm:table-cell">Payment Method</TableHead>
+									<TableHead className="hidden sm:table-cell">
+										Payment Method
+									</TableHead>
 									<TableHead>Actions</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
 								{paginatedPayments?.map((payment) => (
 									<TableRow key={payment.id}>
-										<TableCell>
-											{formatDate(payment.created_at)}
-										</TableCell>
+										<TableCell>{formatDate(payment.created_at)}</TableCell>
 										<TableCell className="font-medium">
 											₹{formatCurrency(payment.amount)}
 										</TableCell>
@@ -320,9 +376,11 @@ export default function Earnings() {
 											</Badge>
 										</TableCell>
 										<TableCell className="hidden sm:table-cell">
-											{payment.paypal_email ? `PayPal: ${payment.paypal_email}` : 
-											 payment.bank_name ? `${payment.bank_name} (${payment.bank_account_number})` : 
-											 'Payment Method'}
+											{payment.paypal_email
+												? `PayPal: ${payment.paypal_email}`
+												: payment.bank_name
+													? `${payment.bank_name} (${payment.bank_account_number})`
+													: "Payment Method"}
 										</TableCell>
 										<TableCell>
 											<Button
@@ -351,7 +409,9 @@ export default function Earnings() {
 						{totalPages > 1 && (
 							<div className="flex items-center justify-between pt-4">
 								<div className="text-sm text-muted-foreground">
-									Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, payments?.length || 0)} of {payments?.length || 0} payments
+									Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+									{Math.min(currentPage * itemsPerPage, payments?.length || 0)}{" "}
+									of {payments?.length || 0} payments
 								</div>
 								<div className="flex gap-2">
 									<Button
@@ -381,7 +441,10 @@ export default function Earnings() {
 			</Card>
 
 			{/* Receipt Dialog */}
-			<Dialog open={!!selectedReceiptId} onOpenChange={() => setSelectedReceiptId(null)}>
+			<Dialog
+				open={!!selectedReceiptId}
+				onOpenChange={() => setSelectedReceiptId(null)}
+			>
 				<DialogContent className="max-w-md">
 					<DialogHeader>
 						<DialogTitle>Payment Receipt</DialogTitle>
@@ -395,34 +458,48 @@ export default function Earnings() {
 								</div>
 								<div>
 									<p className="text-sm font-medium">Amount</p>
-									<p className="text-sm text-muted-foreground">₹{formatCurrency(receipt.amount)}</p>
+									<p className="text-sm text-muted-foreground">
+										₹{formatCurrency(receipt.amount)}
+									</p>
 								</div>
 								<div>
 									<p className="text-sm font-medium">Date</p>
-									<p className="text-sm text-muted-foreground">{formatDate(receipt.created_at)}</p>
+									<p className="text-sm text-muted-foreground">
+										{formatDate(receipt.created_at)}
+									</p>
 								</div>
 								<div>
 									<p className="text-sm font-medium">Status</p>
-									<p className="text-sm text-muted-foreground capitalize">{receipt.status}</p>
+									<p className="text-sm text-muted-foreground capitalize">
+										{receipt.status}
+									</p>
 								</div>
 							</div>
-							
+
 							<div className="border-t pt-4">
 								<p className="text-sm font-medium mb-2">Payment Method</p>
 								{receipt.paymentMethod.paypal_email && (
-									<p className="text-sm text-muted-foreground">PayPal: {receipt.paymentMethod.paypal_email}</p>
+									<p className="text-sm text-muted-foreground">
+										PayPal: {receipt.paymentMethod.paypal_email}
+									</p>
 								)}
 								{receipt.paymentMethod.bank_account_number && (
 									<div className="text-sm text-muted-foreground">
 										<p>Bank: {receipt.bank_name}</p>
-										<p>Account: ****{receipt.paymentMethod.bank_account_number.slice(-4)}</p>
+										<p>
+											Account: ****
+											{receipt.paymentMethod.bank_account_number.slice(-4)}
+										</p>
 										<p>Holder: {receipt.user_name}</p>
 									</div>
 								)}
 								{receipt.paymentMethod.wallet_address && (
 									<div className="text-sm text-muted-foreground">
 										<p>Wallet: {receipt.paymentMethod.wallet_type}</p>
-										<p>Address: {receipt.paymentMethod.wallet_address.slice(0, 20)}...</p>
+										<p>
+											Address:{" "}
+											{receipt.paymentMethod.wallet_address.slice(0, 20)}...
+										</p>
 									</div>
 								)}
 							</div>
@@ -439,7 +516,9 @@ export default function Earnings() {
 					</DialogHeader>
 					<div className="space-y-4">
 						<div>
-							<label className="text-sm font-medium">New Threshold Amount (₹)</label>
+							<label className="text-sm font-medium">
+								New Threshold Amount (₹)
+							</label>
 							<Input
 								type="number"
 								value={newThreshold}
@@ -451,16 +530,18 @@ export default function Earnings() {
 								Minimum threshold is ₹1,000
 							</p>
 						</div>
-						
+
 						<div className="flex gap-2 pt-4">
-							<Button 
+							<Button
 								onClick={handleUpdateThreshold}
 								disabled={updateThresholdMutation.isPending || !newThreshold}
 							>
-								{updateThresholdMutation.isPending ? "Updating..." : "Update Threshold"}
+								{updateThresholdMutation.isPending
+									? "Updating..."
+									: "Update Threshold"}
 							</Button>
-							<Button 
-								variant="outline" 
+							<Button
+								variant="outline"
 								onClick={() => setShowThresholdDialog(false)}
 							>
 								Cancel

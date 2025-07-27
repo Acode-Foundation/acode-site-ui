@@ -1,18 +1,19 @@
 import { Edit, Eye, Package, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@/components/ui/table";
 import {
 	Pagination,
 	PaginationContent,
@@ -21,23 +22,39 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useUserPlugins, useDeletePlugin } from "@/hooks/use-user-plugins";
-import { useLoggedInUser } from "@/hooks/useLoggedInUser";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
+import { useDeletePlugin, useUserPlugins } from "@/hooks/use-user-plugins";
+import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 
 export function UserPluginsOverview() {
 	const { data: user } = useLoggedInUser();
-	const { data: plugins = [], isLoading } = useUserPlugins(user?.id?.toString() || "");
+	const { data: plugins = [], isLoading } = useUserPlugins(
+		user?.id?.toString() || "",
+	);
 	const deletePluginMutation = useDeletePlugin();
 	const [currentPage, setCurrentPage] = useState(1);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-	const [pluginToDelete, setPluginToDelete] = useState<{ id: string; name: string } | null>(null);
+	const [pluginToDelete, setPluginToDelete] = useState<{
+		id: string;
+		name: string;
+	} | null>(null);
 	const pluginsPerPage = 5;
 
 	// Pagination logic
 	const totalPages = Math.ceil(plugins.length / pluginsPerPage);
 	const startIndex = (currentPage - 1) * pluginsPerPage;
-	const paginatedPlugins = plugins.slice(startIndex, startIndex + pluginsPerPage);
+	const paginatedPlugins = plugins.slice(
+		startIndex,
+		startIndex + pluginsPerPage,
+	);
 
 	const handleDelete = (pluginId: string, pluginName: string) => {
 		setPluginToDelete({ id: pluginId, name: pluginName });
@@ -72,16 +89,23 @@ export function UserPluginsOverview() {
 		};
 
 		return (
-			<Badge className={variants[status as keyof typeof variants] || variants.pending}>
+			<Badge
+				className={
+					variants[status as keyof typeof variants] || variants.pending
+				}
+			>
 				{status}
 			</Badge>
 		);
 	};
 
 	const totalPlugins = plugins.length;
-	const approvedPlugins = plugins.filter(p => p.status === "approved").length;
-	const pendingPlugins = plugins.filter(p => p.status === "pending").length;
-	const totalDownloads = plugins.reduce((sum, plugin) => sum + plugin.downloads, 0);
+	const approvedPlugins = plugins.filter((p) => p.status === "approved").length;
+	const pendingPlugins = plugins.filter((p) => p.status === "pending").length;
+	const totalDownloads = plugins.reduce(
+		(sum, plugin) => sum + plugin.downloads,
+		0,
+	);
 
 	if (isLoading) {
 		return (
@@ -114,19 +138,27 @@ export function UserPluginsOverview() {
 				{/* Stats */}
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
 					<div className="text-center p-4 bg-muted/30 rounded-lg">
-						<div className="text-2xl font-bold text-primary">{totalPlugins}</div>
+						<div className="text-2xl font-bold text-primary">
+							{totalPlugins}
+						</div>
 						<div className="text-sm text-muted-foreground">Total Plugins</div>
 					</div>
 					<div className="text-center p-4 bg-muted/30 rounded-lg">
-						<div className="text-2xl font-bold text-green-500">{approvedPlugins}</div>
+						<div className="text-2xl font-bold text-green-500">
+							{approvedPlugins}
+						</div>
 						<div className="text-sm text-muted-foreground">Approved</div>
 					</div>
 					<div className="text-center p-4 bg-muted/30 rounded-lg">
-						<div className="text-2xl font-bold text-yellow-500">{pendingPlugins}</div>
+						<div className="text-2xl font-bold text-yellow-500">
+							{pendingPlugins}
+						</div>
 						<div className="text-sm text-muted-foreground">Pending</div>
 					</div>
 					<div className="text-center p-4 bg-muted/30 rounded-lg">
-						<div className="text-2xl font-bold text-primary">{totalDownloads.toLocaleString()}</div>
+						<div className="text-2xl font-bold text-primary">
+							{totalDownloads.toLocaleString()}
+						</div>
 						<div className="text-sm text-muted-foreground">Total Downloads</div>
 					</div>
 				</div>
@@ -161,7 +193,9 @@ export function UserPluginsOverview() {
 										/>
 										<div className="flex-1 min-w-0">
 											<div className="font-medium truncate">{plugin.name}</div>
-											<div className="text-sm text-muted-foreground">v{plugin.version}</div>
+											<div className="text-sm text-muted-foreground">
+												v{plugin.version}
+											</div>
 											<div className="flex items-center gap-2 mt-1">
 												{getStatusBadge(plugin.status)}
 											</div>
@@ -170,7 +204,9 @@ export function UserPluginsOverview() {
 									<div className="grid grid-cols-2 gap-4 text-sm mb-3">
 										<div>
 											<span className="text-muted-foreground">Downloads:</span>
-											<div className="font-medium">{plugin.downloads.toLocaleString()}</div>
+											<div className="font-medium">
+												{plugin.downloads.toLocaleString()}
+											</div>
 										</div>
 										<div>
 											<span className="text-muted-foreground">Rating:</span>
@@ -187,7 +223,10 @@ export function UserPluginsOverview() {
 												View
 											</Button>
 										</Link>
-										<Link to={`/submit-plugin?id=${plugin.id}`} className="flex-1">
+										<Link
+											to={`/submit-plugin?id=${plugin.id}`}
+											className="flex-1"
+										>
 											<Button variant="outline" size="sm" className="w-full">
 												<Edit className="w-4 h-4 mr-2" />
 												Edit
@@ -235,7 +274,9 @@ export function UserPluginsOverview() {
 													/>
 													<div>
 														<div className="font-medium">{plugin.name}</div>
-														<div className="text-sm text-muted-foreground">v{plugin.version}</div>
+														<div className="text-sm text-muted-foreground">
+															v{plugin.version}
+														</div>
 													</div>
 												</div>
 											</TableCell>
@@ -281,16 +322,20 @@ export function UserPluginsOverview() {
 								<Pagination>
 									<PaginationContent>
 										<PaginationItem>
-											<PaginationPrevious 
+											<PaginationPrevious
 												href="#"
 												onClick={(e) => {
 													e.preventDefault();
 													if (currentPage > 1) setCurrentPage(currentPage - 1);
 												}}
-												className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
+												className={
+													currentPage <= 1
+														? "pointer-events-none opacity-50"
+														: ""
+												}
 											/>
 										</PaginationItem>
-										
+
 										{[...Array(totalPages)].map((_, index) => {
 											const page = index + 1;
 											return (
@@ -308,15 +353,20 @@ export function UserPluginsOverview() {
 												</PaginationItem>
 											);
 										})}
-										
+
 										<PaginationItem>
-											<PaginationNext 
+											<PaginationNext
 												href="#"
 												onClick={(e) => {
 													e.preventDefault();
-													if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+													if (currentPage < totalPages)
+														setCurrentPage(currentPage + 1);
 												}}
-												className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
+												className={
+													currentPage >= totalPages
+														? "pointer-events-none opacity-50"
+														: ""
+												}
 											/>
 										</PaginationItem>
 									</PaginationContent>
@@ -332,12 +382,18 @@ export function UserPluginsOverview() {
 						<AlertDialogHeader>
 							<AlertDialogTitle>Delete Plugin</AlertDialogTitle>
 							<AlertDialogDescription>
-								Are you sure you want to delete "{pluginToDelete?.name}"? This action cannot be undone.
+								Are you sure you want to delete "{pluginToDelete?.name}"? This
+								action cannot be undone.
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter>
-							<AlertDialogCancel onClick={() => setPluginToDelete(null)}>Cancel</AlertDialogCancel>
-							<AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">
+							<AlertDialogCancel onClick={() => setPluginToDelete(null)}>
+								Cancel
+							</AlertDialogCancel>
+							<AlertDialogAction
+								onClick={confirmDelete}
+								className="bg-destructive hover:bg-destructive/90"
+							>
 								Delete
 							</AlertDialogAction>
 						</AlertDialogFooter>

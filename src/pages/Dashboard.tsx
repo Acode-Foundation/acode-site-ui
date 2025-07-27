@@ -25,6 +25,9 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { EarningsOverview } from "@/components/dashboard/earnings-overview";
+import { PaymentMethods } from "@/components/dashboard/payment-methods";
+import { UserPluginsOverview } from "@/components/dashboard/user-plugins-overview";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -45,9 +48,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast.ts";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser.ts";
 import { User } from "@/types";
-import { UserPluginsOverview } from "@/components/dashboard/user-plugins-overview";
-import { EarningsOverview } from "@/components/dashboard/earnings-overview";
-import { PaymentMethods } from "@/components/dashboard/payment-methods";
 
 // Mock user data
 const currentMockUser = {
@@ -385,7 +385,7 @@ export default function Dashboard() {
 				</div>
 				<div className="space-y-6">
 					<EarningsOverview />
-					
+
 					{/* Quick Actions */}
 					<Card>
 						<CardHeader>
@@ -725,7 +725,9 @@ export default function Dashboard() {
 							<div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
 								<Badge variant="outline">{currentUser.role}</Badge>
 								{currentUser.verified && (
-									<Badge variant="default" className="bg-green-500">Verified</Badge>
+									<Badge variant="default" className="bg-green-500">
+										Verified
+									</Badge>
 								)}
 							</div>
 						</div>
@@ -779,8 +781,9 @@ export default function Dashboard() {
 						<DialogContent className="sm:max-w-md">
 							<DialogTitle>Verify Your New Email</DialogTitle>
 							<DialogDescription>
-								We've sent a 6-digit verification code to <strong>{currentEmail}</strong>. 
-								Please enter the code below to confirm your email change.
+								We've sent a 6-digit verification code to{" "}
+								<strong>{currentEmail}</strong>. Please enter the code below to
+								confirm your email change.
 							</DialogDescription>
 
 							<div className="space-y-4">
@@ -791,7 +794,9 @@ export default function Dashboard() {
 										type="text"
 										value={otpValue}
 										onChange={(e) => {
-											const value = e.target.value.replace(/\D/g, "").slice(0, 6);
+											const value = e.target.value
+												.replace(/\D/g, "")
+												.slice(0, 6);
 											setOtpValue(value);
 											setOtpError("");
 										}}
@@ -838,7 +843,6 @@ export default function Dashboard() {
 
 			{/* Payment Methods */}
 			<PaymentMethods />
-
 		</div>
 	);
 
@@ -1028,7 +1032,6 @@ export default function Dashboard() {
 				<TabsContent value="profile" className="space-y-6 mt-6">
 					<ProfileManagement />
 				</TabsContent>
-
 			</Tabs>
 		</div>
 	);

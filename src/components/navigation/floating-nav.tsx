@@ -1,4 +1,13 @@
-import { LogOut, Menu, Moon, Sun, User, X, DollarSign, UserCircle } from "lucide-react";
+import {
+	DollarSign,
+	LogOut,
+	Menu,
+	Moon,
+	Sun,
+	User,
+	UserCircle,
+	X,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import acodeLogoSvg from "@/assets/acode-logo.svg";

@@ -1,10 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plugin } from "@/types/plugin";
-
-interface UserPlugin extends Plugin {
-	status: "pending" | "approved" | "rejected";
-	revenue?: number;
-}
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { UserPlugin } from "@/types";
 
 const fetchUserPlugins = async (userId: string): Promise<UserPlugin[]> => {
 	const response = await fetch(
@@ -15,7 +10,7 @@ const fetchUserPlugins = async (userId: string): Promise<UserPlugin[]> => {
 				Accept: "application/json",
 			},
 			credentials: "include",
-		}
+		},
 	);
 
 	if (!response.ok) {
@@ -34,7 +29,7 @@ const deletePlugin = async (pluginId: string): Promise<void> => {
 				Accept: "application/json",
 			},
 			credentials: "include",
-		}
+		},
 	);
 
 	if (!response.ok) {
@@ -54,7 +49,7 @@ export const useUserPlugins = (userId: string) => {
 
 export const useDeletePlugin = () => {
 	const queryClient = useQueryClient();
-	
+
 	return useMutation({
 		mutationFn: deletePlugin,
 		onSuccess: () => {

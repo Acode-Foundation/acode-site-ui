@@ -1,16 +1,14 @@
-import { ExternalLink, Filter, Loader2, Search, Edit, Trash2 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PluginCard } from "@/components/ui/plugin-card";
-import { PluginCardSkeleton } from "@/components/ui/plugin-card-skeleton";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+	Edit,
+	ExternalLink,
+	Filter,
+	Loader2,
+	Search,
+	Trash2,
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -22,12 +20,21 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { PluginCard } from "@/components/ui/plugin-card";
+import { PluginCardSkeleton } from "@/components/ui/plugin-card-skeleton";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { usePluginFilters } from "@/hooks/use-plugin-filters";
 import { usePlugins } from "@/hooks/use-plugins";
 import { useDeletePlugin } from "@/hooks/use-user-plugins";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
-import { toast } from "sonner";
-import { Link } from "react-router-dom";
 
 const filters = [
 	{
@@ -58,7 +65,7 @@ const filters = [
 export default function Plugins() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedFilter, setSelectedFilter] = useState("default");
-	
+
 	const { data: loggedInUser } = useLoggedInUser();
 	const deletePluginMutation = useDeletePlugin();
 
@@ -200,10 +207,12 @@ export default function Plugins() {
 						Showing {filteredPlugins.length} of {categoryFilteredPlugins.length}{" "}
 						plugins
 					</p>
-					<Button 
-						variant="outline" 
+					<Button
+						variant="outline"
 						size="sm"
-						onClick={() => { window.location.href = '/submit-plugin'; }}
+						onClick={() => {
+							window.location.href = "/submit-plugin";
+						}}
 					>
 						<ExternalLink className="w-4 h-4 mr-2" />
 						Submit Plugin
@@ -241,7 +250,8 @@ export default function Plugins() {
 											<AlertDialogHeader>
 												<AlertDialogTitle>Delete Plugin</AlertDialogTitle>
 												<AlertDialogDescription>
-													Are you sure you want to delete "{plugin.name}"? This action cannot be undone.
+													Are you sure you want to delete "{plugin.name}"? This
+													action cannot be undone.
 												</AlertDialogDescription>
 											</AlertDialogHeader>
 											<AlertDialogFooter>

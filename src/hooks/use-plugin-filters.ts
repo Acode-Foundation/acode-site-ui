@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { Plugin, FilterOptions } from "@/types";
+import type { FilterOptions, Plugin } from "@/types";
 
 export const usePluginFilters = (plugins: Plugin[], filters: FilterOptions) => {
 	return useMemo(() => {

@@ -27,3 +27,8 @@ export type PluginFilterType =
 	| "most-downloaded"
 	| "newest"
 	| "recently-updated";
+
+export interface UserPlugin extends Plugin {
+	status: "pending" | "approved" | "rejected";
+	revenue?: number;
+}

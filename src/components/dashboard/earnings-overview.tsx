@@ -5,7 +5,9 @@ import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 
 export function EarningsOverview() {
 	const { data: user } = useLoggedInUser();
-	const { data: earnings, isLoading } = useCurrentMonthEarnings(user?.id?.toString() || "");
+	const { data: earnings, isLoading } = useCurrentMonthEarnings(
+		user?.id?.toString() || "",
+	);
 
 	if (isLoading) {
 		return (
@@ -44,12 +46,10 @@ export function EarningsOverview() {
 							{earnings?.month} {earnings?.year}
 						</div>
 					</div>
-					
+
 					<div className="flex items-center gap-2 text-sm">
 						<TrendingUp className="w-4 h-4 text-green-500" />
-						<span className="text-muted-foreground">
-							Current month revenue
-						</span>
+						<span className="text-muted-foreground">Current month revenue</span>
 					</div>
 				</div>
 			</CardContent>

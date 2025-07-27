@@ -1,30 +1,39 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
 	Calendar,
 	CheckCircle,
 	Download,
+	Edit,
 	Github,
 	Globe,
 	Mail,
 	Package,
-	Star,
-	Edit,
-	Trash2,
 	Settings,
+	Star,
+	Trash2,
 } from "lucide-react";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { PluginCard } from "@/components/ui/plugin-card";
 import { useToast } from "@/hooks/use-toast";
-import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import { useDeletePlugin } from "@/hooks/use-user-plugins";
-import { Plugin } from "@/types/plugin";
+import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import { DeveloperProfile as DeveloperType } from "@/types/developer";
+import { Plugin } from "@/types/plugin";
 
 interface Developer extends DeveloperType {
 	role: string;
@@ -32,7 +41,9 @@ interface Developer extends DeveloperType {
 }
 
 const fetchDeveloper = async (email: string): Promise<Developer> => {
-	const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/user/${email}`);
+	const response = await fetch(
+		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/user/${email}`,
+	);
 	if (!response.ok) {
 		throw new Error("Developer not found");
 	}
@@ -40,7 +51,9 @@ const fetchDeveloper = async (email: string): Promise<Developer> => {
 };
 
 const fetchDeveloperPlugins = async (userId: string): Promise<Plugin[]> => {
-	const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugins?user=${userId}`);
+	const response = await fetch(
+		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugins?user=${userId}`,
+	);
 	if (!response.ok) {
 		return [];
 	}
@@ -182,7 +195,11 @@ export default function DeveloperProfile() {
 
 								<div className="flex flex-wrap gap-3">
 									{isOwnProfile && (
-										<Button size="sm" asChild className="bg-gradient-primary hover:shadow-glow-primary">
+										<Button
+											size="sm"
+											asChild
+											className="bg-gradient-primary hover:shadow-glow-primary"
+										>
 											<Link to="/dashboard?tab=profile">
 												<Settings className="w-4 h-4 mr-2" />
 												Edit Profile
@@ -317,12 +334,18 @@ export default function DeveloperProfile() {
 						<AlertDialogHeader>
 							<AlertDialogTitle>Delete Plugin</AlertDialogTitle>
 							<AlertDialogDescription>
-								Are you sure you want to delete this plugin? This action cannot be undone.
+								Are you sure you want to delete this plugin? This action cannot
+								be undone.
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter>
-							<AlertDialogCancel onClick={() => setPluginToDelete(null)}>Cancel</AlertDialogCancel>
-							<AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">
+							<AlertDialogCancel onClick={() => setPluginToDelete(null)}>
+								Cancel
+							</AlertDialogCancel>
+							<AlertDialogAction
+								onClick={confirmDelete}
+								className="bg-destructive hover:bg-destructive/90"
+							>
 								Delete
 							</AlertDialogAction>
 						</AlertDialogFooter>

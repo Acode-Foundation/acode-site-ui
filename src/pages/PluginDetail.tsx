@@ -4,28 +4,25 @@ import {
 	Calendar,
 	CheckCircle,
 	Download,
+	Flag,
 	Github,
 	MessageSquare,
+	Reply,
+	Send,
 	Shield,
 	Star,
 	Tag,
 	ThumbsDown,
 	ThumbsUp,
 	Users,
-	Flag,
-	Reply,
-	Send,
 } from "lucide-react";
 import MarkdownIt from "markdown-it";
-import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
 	Select,
@@ -34,17 +31,33 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import "highlight.js/styles/github-dark.css";
 import MarkdownItGitHubAlerts from "markdown-it-github-alerts";
-import { useLoggedInUser } from "@/hooks/useLoggedInUser";
-import { useReviews, useSubmitReview, useReplyToReview, useFlagComment } from "@/hooks/use-reviews";
-import { PluginData, Contributor, VOTE_UP, VOTE_DOWN, VOTE_NULL } from "@/types/plugin-detail";
 import { toast } from "sonner";
+import {
+	useFlagComment,
+	useReplyToReview,
+	useReviews,
+	useSubmitReview,
+} from "@/hooks/use-reviews";
+import { useLoggedInUser } from "@/hooks/useLoggedInUser";
+import {
+	Contributor,
+	PluginData,
+	VOTE_DOWN,
+	VOTE_NULL,
+	VOTE_UP,
+} from "@/types/plugin-detail";
 
 // Types are now imported from @/types/plugin-detail
 
 const fetchPlugin = async (pluginId: string): Promise<PluginData> => {
-	const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin/${pluginId}`);
+	const response = await fetch(
+		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin/${pluginId}`,
+	);
 	if (!response.ok) {
 		throw new Error("Plugin not found");
 	}
@@ -76,12 +89,14 @@ const md = new MarkdownIt({
 export default function PluginDetail() {
 	const { id } = useParams();
 	const { data: loggedInUser } = useLoggedInUser();
-	
+
 	// Review form state
 	const [reviewComment, setReviewComment] = useState("");
 	const [reviewVote, setReviewVote] = useState<string>("");
 	const [replyText, setReplyText] = useState<{ [key: number]: string }>({});
-	const [showReplyForm, setShowReplyForm] = useState<{ [key: number]: boolean }>({});
+	const [showReplyForm, setShowReplyForm] = useState<{
+		[key: number]: boolean;
+	}>({});
 
 	const {
 		data: plugin,
@@ -135,8 +150,10 @@ export default function PluginDetail() {
 	};
 
 	const getVoteIcon = (vote: number) => {
-		if (vote === VOTE_UP) return <ThumbsUp className="w-4 h-4 text-green-500" />;
-		if (vote === VOTE_DOWN) return <ThumbsDown className="w-4 h-4 text-red-500" />;
+		if (vote === VOTE_UP)
+			return <ThumbsUp className="w-4 h-4 text-green-500" />;
+		if (vote === VOTE_DOWN)
+			return <ThumbsDown className="w-4 h-4 text-red-500" />;
 		return null;
 	};
 
@@ -159,8 +176,12 @@ export default function PluginDetail() {
 			setReviewComment("");
 			setReviewVote("");
 			toast.success("Review submitted successfully");
-		} catch (error: any) {
-			toast.error(error.message || "Failed to submit review");
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				toast.error(error.message || "Failed to submit review");
+			} else {
+				toast.error("Failed to submit review");
+			}
 		}
 	};
 
@@ -176,11 +197,15 @@ export default function PluginDetail() {
 				commentId,
 				data: { reply },
 			});
-			setReplyText(prev => ({ ...prev, [commentId]: "" }));
-			setShowReplyForm(prev => ({ ...prev, [commentId]: false }));
+			setReplyText((prev) => ({ ...prev, [commentId]: "" }));
+			setShowReplyForm((prev) => ({ ...prev, [commentId]: false }));
 			toast.success("Reply sent successfully");
-		} catch (error: any) {
-			toast.error(error.message || "Failed to send reply");
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				toast.error(error.message || "Failed to send reply");
+			} else {
+				toast.error("Failed to send reply");
+			}
 		}
 	};
 
@@ -188,13 +213,19 @@ export default function PluginDetail() {
 		try {
 			const result = await flagMutation.mutateAsync(commentId);
 			toast.success(result.flagged ? "Comment flagged" : "Comment unflagged");
-		} catch (error: any) {
-			toast.error(error.message || "Failed to flag comment");
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				toast.error(error.message || "Failed to flag comment");
+			} else {
+				toast.error("Failed to flag comment");
+			}
 		}
 	};
 
 	const isPluginDeveloper = loggedInUser?.id === plugin?.user_id;
-	const userReview = reviews.find(review => review.user_id === loggedInUser?.id);
+	const userReview = reviews.find(
+		(review) => review.user_id === loggedInUser?.id,
+	);
 
 	return (
 		<div className="min-h-screen bg-gradient-dark">
@@ -376,7 +407,10 @@ export default function PluginDetail() {
 										<CardContent className="space-y-4">
 											<div className="space-y-2">
 												<Label htmlFor="vote">Your Rating</Label>
-												<Select value={reviewVote} onValueChange={setReviewVote}>
+												<Select
+													value={reviewVote}
+													onValueChange={setReviewVote}
+												>
 													<SelectTrigger>
 														<SelectValue placeholder="Select your rating" />
 													</SelectTrigger>
@@ -416,13 +450,15 @@ export default function PluginDetail() {
 													{reviewComment.length}/250 characters
 												</div>
 											</div>
-											<Button 
+											<Button
 												onClick={handleSubmitReview}
 												disabled={submitReviewMutation.isPending}
 												className="w-full"
 											>
 												<Send className="w-4 h-4 mr-2" />
-												{submitReviewMutation.isPending ? "Submitting..." : "Submit Review"}
+												{submitReviewMutation.isPending
+													? "Submitting..."
+													: "Submit Review"}
 											</Button>
 										</CardContent>
 									</Card>
@@ -492,8 +528,8 @@ export default function PluginDetail() {
 																			onClick={() => handleFlag(review.id)}
 																			disabled={flagMutation.isPending}
 																			className={`h-6 w-6 p-0 ${
-																				review.flagged_by_author 
-																					? "text-red-500 hover:text-red-600" 
+																				review.flagged_by_author
+																					? "text-red-500 hover:text-red-600"
 																					: "text-muted-foreground hover:text-foreground"
 																			}`}
 																		>
@@ -512,7 +548,7 @@ export default function PluginDetail() {
 																			: "Gave a thumbs down"}
 																	</p>
 																)}
-																
+
 																{/* Developer Reply */}
 																{review.author_reply && (
 																	<div className="mt-2 p-3 bg-muted/50 rounded-lg border">
@@ -538,7 +574,12 @@ export default function PluginDetail() {
 																			<Button
 																				size="sm"
 																				variant="outline"
-																				onClick={() => setShowReplyForm(prev => ({ ...prev, [review.id]: true }))}
+																				onClick={() =>
+																					setShowReplyForm((prev) => ({
+																						...prev,
+																						[review.id]: true,
+																					}))
+																				}
 																				className="h-7 px-3 text-xs"
 																			>
 																				<Reply className="w-3 h-3 mr-1" />
@@ -549,17 +590,21 @@ export default function PluginDetail() {
 																				<Textarea
 																					placeholder="Write your reply..."
 																					value={replyText[review.id] || ""}
-																					onChange={(e) => setReplyText(prev => ({ 
-																						...prev, 
-																						[review.id]: e.target.value 
-																					}))}
+																					onChange={(e) =>
+																						setReplyText((prev) => ({
+																							...prev,
+																							[review.id]: e.target.value,
+																						}))
+																					}
 																					rows={2}
 																					className="text-sm"
 																				/>
 																				<div className="flex gap-2">
 																					<Button
 																						size="sm"
-																						onClick={() => handleReply(review.id)}
+																						onClick={() =>
+																							handleReply(review.id)
+																						}
 																						disabled={replyMutation.isPending}
 																						className="h-7 px-3 text-xs"
 																					>
@@ -570,8 +615,14 @@ export default function PluginDetail() {
 																						size="sm"
 																						variant="outline"
 																						onClick={() => {
-																							setShowReplyForm(prev => ({ ...prev, [review.id]: false }));
-																							setReplyText(prev => ({ ...prev, [review.id]: "" }));
+																							setShowReplyForm((prev) => ({
+																								...prev,
+																								[review.id]: false,
+																							}));
+																							setReplyText((prev) => ({
+																								...prev,
+																								[review.id]: "",
+																							}));
 																						}}
 																						className="h-7 px-3 text-xs"
 																					>

@@ -1,12 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Review, ReviewFormData, ReplyData, FlagResponse } from "@/types/plugin-detail";
+import {
+	FlagResponse,
+	ReplyData,
+	Review,
+	ReviewFormData,
+} from "@/types/plugin-detail";
 
 const fetchReviews = async (pluginId: string): Promise<Review[]> => {
 	const response = await fetch(
 		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/comment/${pluginId}`,
 		{
 			credentials: "include",
-		}
+		},
 	);
 	if (!response.ok) {
 		return [];
@@ -14,7 +19,10 @@ const fetchReviews = async (pluginId: string): Promise<Review[]> => {
 	return response.json();
 };
 
-const submitReview = async (pluginId: string, data: ReviewFormData): Promise<void> => {
+const submitReview = async (
+	pluginId: string,
+	data: ReviewFormData,
+): Promise<void> => {
 	const response = await fetch(
 		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/comment/`,
 		{
@@ -28,7 +36,7 @@ const submitReview = async (pluginId: string, data: ReviewFormData): Promise<voi
 				comment: data.comment,
 				vote: data.vote,
 			}),
-		}
+		},
 	);
 
 	if (!response.ok) {
@@ -37,7 +45,10 @@ const submitReview = async (pluginId: string, data: ReviewFormData): Promise<voi
 	}
 };
 
-const replyToReview = async (commentId: number, data: ReplyData): Promise<void> => {
+const replyToReview = async (
+	commentId: number,
+	data: ReplyData,
+): Promise<void> => {
 	const response = await fetch(
 		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/comment/${commentId}/reply`,
 		{
@@ -47,7 +58,7 @@ const replyToReview = async (commentId: number, data: ReplyData): Promise<void> 
 			},
 			credentials: "include",
 			body: JSON.stringify(data),
-		}
+		},
 	);
 
 	if (!response.ok) {
@@ -62,7 +73,7 @@ const flagComment = async (commentId: number): Promise<FlagResponse> => {
 		{
 			method: "PATCH",
 			credentials: "include",
-		}
+		},
 	);
 
 	if (!response.ok) {
@@ -83,7 +94,7 @@ export const useReviews = (pluginId: string) => {
 
 export const useSubmitReview = (pluginId: string) => {
 	const queryClient = useQueryClient();
-	
+
 	return useMutation({
 		mutationFn: (data: ReviewFormData) => submitReview(pluginId, data),
 		onSuccess: () => {
@@ -95,9 +106,9 @@ export const useSubmitReview = (pluginId: string) => {
 
 export const useReplyToReview = (pluginId: string) => {
 	const queryClient = useQueryClient();
-	
+
 	return useMutation({
-		mutationFn: ({ commentId, data }: { commentId: number; data: ReplyData }) => 
+		mutationFn: ({ commentId, data }: { commentId: number; data: ReplyData }) =>
 			replyToReview(commentId, data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["reviews", pluginId] });
@@ -107,7 +118,7 @@ export const useReplyToReview = (pluginId: string) => {
 
 export const useFlagComment = (pluginId: string) => {
 	const queryClient = useQueryClient();
-	
+
 	return useMutation({
 		mutationFn: (commentId: number) => flagComment(commentId),
 		onSuccess: () => {
