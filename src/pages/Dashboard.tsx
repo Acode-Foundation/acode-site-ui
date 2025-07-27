@@ -1016,7 +1016,7 @@ export default function Dashboard() {
 				</TabsList>
 
 				<TabsContent value="overview" className="space-y-6 mt-6">
-					{isAdmin ? <AdminDashboard /> : <UserDashboard />}
+					<UserDashboard />
 				</TabsContent>
 
 				{isAdmin && (

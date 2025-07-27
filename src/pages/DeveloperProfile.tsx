@@ -305,8 +305,8 @@ export default function DeveloperProfile() {
 											<div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1">
 												<Button
 													size="sm"
-													variant="secondary"
-													className="h-8 w-8 p-0 bg-background/80 backdrop-blur-sm border"
+													variant="ghost"
+													className="h-8 w-8 p-0 bg-card/90 backdrop-blur-sm border border-border/50 hover:bg-muted hover:text-foreground"
 													asChild
 												>
 													<Link to={`/plugin/${plugin.sku}`}>
@@ -315,8 +315,8 @@ export default function DeveloperProfile() {
 												</Button>
 												<Button
 													size="sm"
-													variant="secondary"
-													className="h-8 w-8 p-0 bg-background/80 backdrop-blur-sm border hover:bg-destructive hover:text-destructive-foreground"
+													variant="ghost"
+													className="h-8 w-8 p-0 bg-card/90 backdrop-blur-sm border border-border/50 hover:bg-destructive hover:text-destructive-foreground"
 													onClick={() => handleDeletePlugin(plugin.id)}
 												>
 													<Trash2 className="h-3 w-3" />
