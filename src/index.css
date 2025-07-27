@@ -5,492 +5,525 @@
 /* Acode Design System - Modern code editor theme with purple/blue accents */
 
 @layer base {
-  :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+	:root {
+		--background: 240 10% 3.9%;
+		--foreground: 0 0% 98%;
 
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
+		--card: 240 10% 3.9%;
+		--card-foreground: 0 0% 98%;
 
-    --popover: 240 5% 6%;
-    --popover-foreground: 0 0% 98%;
+		--popover: 240 5% 6%;
+		--popover-foreground: 0 0% 98%;
 
-    --primary: 212 100% 55%;
-    --primary-foreground: 0 0% 98%;
+		--primary: 212 100% 55%;
+		--primary-foreground: 0 0% 98%;
 
-    --secondary: 263 70% 50%;
-    --secondary-foreground: 0 0% 98%;
+		--secondary: 263 70% 50%;
+		--secondary-foreground: 0 0% 98%;
 
-    --muted: 240 5% 6%;
-    --muted-foreground: 240 5% 64.9%;
+		--muted: 240 5% 6%;
+		--muted-foreground: 240 5% 64.9%;
 
-    --accent: 212 100% 55%;
-    --accent-foreground: 0 0% 98%;
+		--accent: 212 100% 55%;
+		--accent-foreground: 0 0% 98%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
+		--destructive: 0 72% 51%;
+		--destructive-foreground: 0 0% 98%;
 
-    --border: 240 6% 10%;
-    --input: 240 6% 10%;
-    --ring: 212 100% 55%;
+		--border: 240 6% 10%;
+		--input: 240 6% 10%;
+		--ring: 212 100% 55%;
 
-    --radius: 0.75rem;
+		--radius: 0.75rem;
 
-    /* Acode Brand Colors - Modern Blue Focus */
-    --acode-blue: 212 100% 55%;
-    --acode-blue-light: 212 90% 65%;
-    --acode-blue-dark: 212 100% 45%;
-    --acode-dark: 240 10% 3.9%;
-    --acode-darker: 240 15% 2%;
-    
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--acode-blue)), hsl(var(--acode-blue-light)));
-    --gradient-secondary: linear-gradient(135deg, hsl(var(--acode-blue-dark)), hsl(var(--acode-blue)));
-    --gradient-dark: linear-gradient(180deg, hsl(var(--acode-dark)), hsl(var(--acode-darker)));
-    
-    /* Glows and Effects */
-    --glow-primary: 0 0 40px hsl(var(--acode-blue) / 0.3);
-    --glow-blue: 0 0 40px hsl(var(--acode-blue) / 0.3);
-    --shadow-elegant: 0 10px 30px -10px hsl(var(--acode-blue) / 0.4);
-    
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+		/* Acode Brand Colors - Modern Blue Focus */
+		--acode-blue: 212 100% 55%;
+		--acode-blue-light: 212 90% 65%;
+		--acode-blue-dark: 212 100% 45%;
+		--acode-dark: 240 10% 3.9%;
+		--acode-darker: 240 15% 2%;
 
-    --sidebar-background: 0 0% 98%;
+		/* Gradients */
+		--gradient-primary: linear-gradient(
+			135deg,
+			hsl(var(--acode-blue)),
+			hsl(var(--acode-blue-light))
+		);
+		--gradient-secondary: linear-gradient(
+			135deg,
+			hsl(var(--acode-blue-dark)),
+			hsl(var(--acode-blue))
+		);
+		--gradient-dark: linear-gradient(
+			180deg,
+			hsl(var(--acode-dark)),
+			hsl(var(--acode-darker))
+		);
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+		/* Glows and Effects */
+		--glow-primary: 0 0 40px hsl(var(--acode-blue) / 0.3);
+		--glow-blue: 0 0 40px hsl(var(--acode-blue) / 0.3);
+		--shadow-elegant: 0 10px 30px -10px hsl(var(--acode-blue) / 0.4);
 
-    --sidebar-primary: 240 5.9% 10%;
+		/* Animations */
+		--transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		--transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-    --sidebar-primary-foreground: 0 0% 98%;
+		--sidebar-background: 0 0% 98%;
 
-    --sidebar-accent: 240 4.8% 95.9%;
+		--sidebar-foreground: 240 5.3% 26.1%;
 
-    --sidebar-accent-foreground: 240 5.9% 10%;
+		--sidebar-primary: 240 5.9% 10%;
 
-    --sidebar-border: 220 13% 91%;
+		--sidebar-primary-foreground: 0 0% 98%;
 
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
+		--sidebar-accent: 240 4.8% 95.9%;
 
-  .light {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 212 100% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 10% 3.9%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 212 100% 55%;
-    --accent-foreground: 0 0% 100%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 212 100% 55%;
+		--sidebar-accent-foreground: 240 5.9% 10%;
 
-    /* Acode Brand Colors - Light Mode */
-    --acode-blue: 212 100% 55%;
-    --acode-blue-light: 212 90% 65%;
-    --acode-blue-dark: 212 100% 45%;
-    --acode-dark: 0 0% 100%;
-    --acode-darker: 240 4.8% 95.9%;
-    
-    /* Gradients - Light Mode */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--acode-blue)), hsl(var(--acode-blue-light)));
-    --gradient-secondary: linear-gradient(135deg, hsl(var(--acode-blue-dark)), hsl(var(--acode-blue)));
-    --gradient-dark: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
-    
-    /* Glows and Effects - Light Mode */
-    --glow-primary: 0 0 40px hsl(var(--acode-blue) / 0.2);
-    --glow-blue: 0 0 40px hsl(var(--acode-blue) / 0.2);
-    --shadow-elegant: 0 10px 30px -10px hsl(var(--acode-blue) / 0.3);
-  }
+		--sidebar-border: 220 13% 91%;
+
+		--sidebar-ring: 217.2 91.2% 59.8%;
+	}
+
+	.light {
+		--background: 0 0% 100%;
+		--foreground: 240 10% 3.9%;
+		--card: 0 0% 100%;
+		--card-foreground: 240 10% 3.9%;
+		--popover: 0 0% 100%;
+		--popover-foreground: 240 10% 3.9%;
+		--primary: 212 100% 55%;
+		--primary-foreground: 0 0% 100%;
+		--secondary: 240 4.8% 95.9%;
+		--secondary-foreground: 240 10% 3.9%;
+		--muted: 240 4.8% 95.9%;
+		--muted-foreground: 240 3.8% 46.1%;
+		--accent: 212 100% 55%;
+		--accent-foreground: 0 0% 100%;
+		--border: 240 5.9% 90%;
+		--input: 240 5.9% 90%;
+		--ring: 212 100% 55%;
+
+		/* Acode Brand Colors - Light Mode */
+		--acode-blue: 212 100% 55%;
+		--acode-blue-light: 212 90% 65%;
+		--acode-blue-dark: 212 100% 45%;
+		--acode-dark: 0 0% 100%;
+		--acode-darker: 240 4.8% 95.9%;
+
+		/* Gradients - Light Mode */
+		--gradient-primary: linear-gradient(
+			135deg,
+			hsl(var(--acode-blue)),
+			hsl(var(--acode-blue-light))
+		);
+		--gradient-secondary: linear-gradient(
+			135deg,
+			hsl(var(--acode-blue-dark)),
+			hsl(var(--acode-blue))
+		);
+		--gradient-dark: linear-gradient(
+			180deg,
+			hsl(var(--background)),
+			hsl(var(--muted))
+		);
+
+		/* Glows and Effects - Light Mode */
+		--glow-primary: 0 0 40px hsl(var(--acode-blue) / 0.2);
+		--glow-blue: 0 0 40px hsl(var(--acode-blue) / 0.2);
+		--shadow-elegant: 0 10px 30px -10px hsl(var(--acode-blue) / 0.3);
+	}
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+	* {
+		@apply border-border;
+	}
 
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
-  }
+	body {
+		@apply bg-background text-foreground;
+		font-feature-settings:
+			"rlig" 1,
+			"calt" 1;
+	}
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
+	/* Custom scrollbar */
+	::-webkit-scrollbar {
+		width: 8px;
+	}
 
-  ::-webkit-scrollbar-track {
-    background: hsl(var(--muted));
-  }
+	::-webkit-scrollbar-track {
+		background: hsl(var(--muted));
+	}
 
-  ::-webkit-scrollbar-thumb {
-    background: hsl(var(--border));
-    border-radius: 4px;
-  }
+	::-webkit-scrollbar-thumb {
+		background: hsl(var(--border));
+		border-radius: 4px;
+	}
 
-  ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--primary));
-  }
+	::-webkit-scrollbar-thumb:hover {
+		background: hsl(var(--primary));
+	}
 
-  /* Text selection */
-  ::selection {
-    background-color: hsl(var(--primary) / 0.3);
-  }
+	/* Text selection */
+	::selection {
+		background-color: hsl(var(--primary) / 0.3);
+	}
 
-  /* Focus styles */
-  .focus-visible:focus-visible {
-    outline: 2px solid hsl(var(--ring));
-    outline-offset: 2px;
-  }
+	/* Focus styles */
+	.focus-visible:focus-visible {
+		outline: 2px solid hsl(var(--ring));
+		outline-offset: 2px;
+	}
 }
 
 @layer utilities {
-  .line-clamp-2 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-
-  .text-gradient {
-    @apply bg-gradient-primary bg-clip-text text-transparent;
-  }
-
-  .hover-glow {
-    transition: var(--transition-smooth);
-  }
-
-  .hover-glow:hover {
-    box-shadow: var(--glow-primary);
-  }
-
-  /* Markdown content styles */
-  .markdown-content {
-    @apply max-w-none;
-  }
-
-  .markdown-content h1,
-  .markdown-content h2,
-  .markdown-content h3,
-  .markdown-content h4,
-  .markdown-content h5,
-  .markdown-content h6 {
-    @apply mt-6 mb-4 font-semibold leading-tight;
-  }
-
-  .markdown-content h1 {
-    @apply text-2xl pb-3 border-b border-border;
-  }
-
-  .markdown-content h2 {
-    @apply text-xl pb-2 border-b border-border;
-  }
-
-  .markdown-content h3 {
-    @apply text-lg;
-  }
-
-  .markdown-content h4 {
-    @apply text-base;
-  }
-
-  .markdown-content h5 {
-    @apply text-sm;
-  }
-
-  .markdown-content h6 {
-    @apply text-xs text-muted-foreground;
-  }
-
-  .markdown-content p {
-    @apply mt-0 mb-4 text-foreground leading-relaxed;
-  }
-
-  .markdown-content a {
-    @apply text-primary no-underline hover:underline;
-  }
-
-  .markdown-content strong,
-  .markdown-content b {
-    @apply text-foreground font-semibold;
-  }
-
-  .markdown-content em {
-    @apply text-foreground italic;
-  }
-
-  .markdown-content code:not(pre code) {
-    @apply bg-muted text-foreground px-1 py-0.5 rounded text-sm font-mono;
-    font-size: 85%;
-  }
-
-  .markdown-content pre {
-    @apply bg-muted border border-border rounded-lg p-4 overflow-x-auto mb-4 text-sm;
-    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
-    line-height: 1.45;
-  }
-
-  .markdown-content pre code {
-    @apply bg-transparent px-0 py-0 text-foreground border-0;
-    font-size: 100%;
-  }
-
-  .markdown-content blockquote {
-    @apply border-l-4 border-border pl-4 text-muted-foreground my-4;
-    margin: 0;
-  }
-
-  .markdown-content blockquote > :first-child {
-    @apply mt-0;
-  }
-
-  .markdown-content blockquote > :last-child {
-    @apply mb-0;
-  }
-
-  .markdown-content ul,
-  .markdown-content ol {
-    @apply mt-0 mb-4 pl-8 text-foreground;
-  }
-
-  .markdown-content ul {
-    list-style-type: disc;
-  }
-
-  .markdown-content ol {
-    list-style-type: decimal;
-  }
-
-  .markdown-content ul ul,
-  .markdown-content ul ol,
-  .markdown-content ol ol,
-  .markdown-content ol ul {
-    @apply mt-0 mb-0;
-  }
-
-  .markdown-content ul ul {
-    list-style-type: circle;
-  }
-
-  .markdown-content ul ul ul,
-  .markdown-content ul ol ol,
-  .markdown-content ol ul ol,
-  .markdown-content ol ol ol {
-    list-style-type: square;
-  }
-
-  .markdown-content li {
-    @apply my-1;
-  }
-
-  .markdown-content li + li {
-    @apply mt-1;
-  }
-
-  .markdown-content li > p {
-    @apply mt-4;
-  }
-
-  .markdown-content hr {
-    @apply border-0 bg-border my-6;
-    height: 0.25em;
-    padding: 0;
-    margin: 1.5rem 0;
-    background-color: hsl(var(--border));
-    border: 0;
-  }
-
-  .markdown-content hr::before {
-    display: table;
-    content: "";
-  }
-
-  .markdown-content hr::after {
-    display: table;
-    clear: both;
-    content: "";
-  }
-  
-  .markdown-content table {
-    @apply border-collapse w-full mb-4 block max-w-full overflow-auto;
-    border-spacing: 0;
-    width: max-content;
-  }
-
-  .markdown-content th {
-    @apply border border-border bg-muted p-3 text-left font-semibold;
-  }
-
-  .markdown-content td {
-    @apply border border-border p-3;
-  }
-
-  .markdown-content tr {
-    @apply border-t border-border;
-  }
-
-  .markdown-content tr:nth-child(2n) {
-    @apply bg-muted/30;
-  }
-
-  .markdown-content td > :last-child {
-    @apply mb-0;
-  }
-
-  .markdown-content img {
-    @apply rounded-lg max-w-full h-auto mb-4;
-    box-sizing: content-box;
-  }
-
-  .markdown-content kbd {
-    @apply bg-muted text-foreground px-2 py-1 rounded text-xs font-mono border border-border;
-    display: inline-block;
-    line-height: 10px;
-    vertical-align: middle;
-    box-shadow: inset 0 -1px 0 hsl(var(--border));
-  }
-
-  .markdown-content details {
-    @apply border border-border rounded-lg p-4 mb-4;
-  }
-
-  .markdown-content summary {
-    @apply font-semibold text-foreground cursor-pointer hover:text-primary transition-colors mb-2;
-  }
-
-  .markdown-content details[open] summary {
-    @apply mb-4;
-  }
-
-  .markdown-content details > *:not(summary) {
-    @apply mt-2;
-  }
-
-  .markdown-content abbr[title] {
-    @apply border-b-0;
-    text-decoration: underline dotted;
-  }
-
-  .markdown-content mark {
-    @apply bg-yellow-200 text-yellow-900 px-1 py-0.5 rounded;
-  }
-
-  .markdown-content small {
-    font-size: 90%;
-  }
-
-  .markdown-content sub,
-  .markdown-content sup {
-    font-size: 75%;
-    line-height: 0;
-    position: relative;
-    vertical-align: baseline;
-  }
-
-  .markdown-content sub {
-    bottom: -0.25em;
-  }
-
-  .markdown-content sup {
-    top: -0.5em;
-  }
-
-  .markdown-content dfn {
-    @apply italic;
-  }
-
-  .markdown-content figure {
-    @apply mx-10 my-4;
-  }
-
-  .markdown-content figcaption {
-    @apply text-sm text-muted-foreground text-center mt-2;
-  }
-
-  .markdown-content dl {
-    @apply p-0;
-  }
-
-  .markdown-content dt {
-    @apply p-0 mt-4 text-base italic font-semibold;
-  }
-
-  .markdown-content dd {
-    @apply px-4 mb-4;
-  }
-
-  .markdown-content .octicon {
-    @apply inline-block align-text-bottom;
-    fill: currentColor;
-    overflow: visible !important;
-  }
-
-  /* GitHub Alerts */
-  .markdown-content .markdown-alert {
-    @apply p-4 mb-4 border-l-4 bg-muted/30;
-  }
-
-  .markdown-content .markdown-alert > :first-child {
-    @apply mt-0;
-  }
-
-  .markdown-content .markdown-alert > :last-child {
-    @apply mb-0;
-  }
-
-  .markdown-content .markdown-alert-title {
-    @apply flex font-medium items-center leading-none mb-2;
-  }
-
-  .markdown-content .markdown-alert-title .octicon {
-    @apply mr-2 inline-block align-text-bottom;
-  }
-
-  .markdown-content .markdown-alert-note {
-    @apply border-l-blue-500;
-  }
-
-  .markdown-content .markdown-alert-note .markdown-alert-title {
-    @apply text-blue-500;
-  }
-
-  .markdown-content .markdown-alert-important {
-    @apply border-l-purple-500;
-  }
-
-  .markdown-content .markdown-alert-important .markdown-alert-title {
-    @apply text-purple-500;
-  }
-
-  .markdown-content .markdown-alert-warning {
-    @apply border-l-yellow-500;
-  }
-
-  .markdown-content .markdown-alert-warning .markdown-alert-title {
-    @apply text-yellow-500;
-  }
-
-  .markdown-content .markdown-alert-tip {
-    @apply border-l-green-500;
-  }
-
-  .markdown-content .markdown-alert-tip .markdown-alert-title {
-    @apply text-green-500;
-  }
-
-  .markdown-content .markdown-alert-caution {
-    @apply border-l-red-500;
-  }
-
-  .markdown-content .markdown-alert-caution .markdown-alert-title {
-    @apply text-red-500;
-  }
+	.line-clamp-2 {
+		overflow: hidden;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+	}
+
+	.text-gradient {
+		@apply bg-gradient-primary bg-clip-text text-transparent;
+	}
+
+	.hover-glow {
+		transition: var(--transition-smooth);
+	}
+
+	.hover-glow:hover {
+		box-shadow: var(--glow-primary);
+	}
+
+	/* Markdown content styles */
+	.markdown-content {
+		@apply max-w-none;
+	}
+
+	.markdown-content h1,
+	.markdown-content h2,
+	.markdown-content h3,
+	.markdown-content h4,
+	.markdown-content h5,
+	.markdown-content h6 {
+		@apply mt-6 mb-4 font-semibold leading-tight;
+	}
+
+	.markdown-content h1 {
+		@apply text-2xl pb-3 border-b border-border;
+	}
+
+	.markdown-content h2 {
+		@apply text-xl pb-2 border-b border-border;
+	}
+
+	.markdown-content h3 {
+		@apply text-lg;
+	}
+
+	.markdown-content h4 {
+		@apply text-base;
+	}
+
+	.markdown-content h5 {
+		@apply text-sm;
+	}
+
+	.markdown-content h6 {
+		@apply text-xs text-muted-foreground;
+	}
+
+	.markdown-content p {
+		@apply mt-0 mb-4 text-foreground leading-relaxed;
+	}
+
+	.markdown-content a {
+		@apply text-primary no-underline hover:underline;
+	}
+
+	.markdown-content strong,
+	.markdown-content b {
+		@apply text-foreground font-semibold;
+	}
+
+	.markdown-content em {
+		@apply text-foreground italic;
+	}
+
+	.markdown-content code:not(pre code) {
+		@apply bg-muted text-foreground px-1 py-0.5 rounded text-sm font-mono;
+		font-size: 85%;
+	}
+
+	.markdown-content pre {
+		@apply bg-muted border border-border rounded-lg p-4 overflow-x-auto mb-4 text-sm;
+		font-family:
+			ui-monospace,
+			SFMono-Regular,
+			SF Mono,
+			Menlo,
+			Consolas,
+			Liberation Mono,
+			monospace;
+		line-height: 1.45;
+	}
+
+	.markdown-content pre code {
+		@apply bg-transparent px-0 py-0 text-foreground border-0;
+		font-size: 100%;
+	}
+
+	.markdown-content blockquote {
+		@apply border-l-4 border-border pl-4 text-muted-foreground my-4;
+		margin: 0;
+	}
+
+	.markdown-content blockquote > :first-child {
+		@apply mt-0;
+	}
+
+	.markdown-content blockquote > :last-child {
+		@apply mb-0;
+	}
+
+	.markdown-content ul,
+	.markdown-content ol {
+		@apply mt-0 mb-4 pl-8 text-foreground;
+	}
+
+	.markdown-content ul {
+		list-style-type: disc;
+	}
+
+	.markdown-content ol {
+		list-style-type: decimal;
+	}
+
+	.markdown-content ul ul,
+	.markdown-content ul ol,
+	.markdown-content ol ol,
+	.markdown-content ol ul {
+		@apply mt-0 mb-0;
+	}
+
+	.markdown-content ul ul {
+		list-style-type: circle;
+	}
+
+	.markdown-content ul ul ul,
+	.markdown-content ul ol ol,
+	.markdown-content ol ul ol,
+	.markdown-content ol ol ol {
+		list-style-type: square;
+	}
+
+	.markdown-content li {
+		@apply my-1;
+	}
+
+	.markdown-content li + li {
+		@apply mt-1;
+	}
+
+	.markdown-content li > p {
+		@apply mt-4;
+	}
+
+	.markdown-content hr {
+		@apply border-0 bg-border my-6;
+		height: 0.25em;
+		padding: 0;
+		margin: 1.5rem 0;
+		background-color: hsl(var(--border));
+		border: 0;
+	}
+
+	.markdown-content hr::before {
+		display: table;
+		content: "";
+	}
+
+	.markdown-content hr::after {
+		display: table;
+		clear: both;
+		content: "";
+	}
+
+	.markdown-content table {
+		@apply border-collapse w-full mb-4 block max-w-full overflow-auto;
+		border-spacing: 0;
+		width: max-content;
+	}
+
+	.markdown-content th {
+		@apply border border-border bg-muted p-3 text-left font-semibold;
+	}
+
+	.markdown-content td {
+		@apply border border-border p-3;
+	}
+
+	.markdown-content tr {
+		@apply border-t border-border;
+	}
+
+	.markdown-content tr:nth-child(2n) {
+		@apply bg-muted/30;
+	}
+
+	.markdown-content td > :last-child {
+		@apply mb-0;
+	}
+
+	.markdown-content img {
+		@apply rounded-lg max-w-full h-auto mb-4;
+		box-sizing: content-box;
+	}
+
+	.markdown-content kbd {
+		@apply bg-muted text-foreground px-2 py-1 rounded text-xs font-mono border border-border;
+		display: inline-block;
+		line-height: 10px;
+		vertical-align: middle;
+		box-shadow: inset 0 -1px 0 hsl(var(--border));
+	}
+
+	.markdown-content details {
+		@apply border border-border rounded-lg p-4 mb-4;
+	}
+
+	.markdown-content summary {
+		@apply font-semibold text-foreground cursor-pointer hover:text-primary transition-colors mb-2;
+	}
+
+	.markdown-content details[open] summary {
+		@apply mb-4;
+	}
+
+	.markdown-content details > *:not(summary) {
+		@apply mt-2;
+	}
+
+	.markdown-content abbr[title] {
+		@apply border-b-0;
+		text-decoration: underline dotted;
+	}
+
+	.markdown-content mark {
+		@apply bg-yellow-200 text-yellow-900 px-1 py-0.5 rounded;
+	}
+
+	.markdown-content small {
+		font-size: 90%;
+	}
+
+	.markdown-content sub,
+	.markdown-content sup {
+		font-size: 75%;
+		line-height: 0;
+		position: relative;
+		vertical-align: baseline;
+	}
+
+	.markdown-content sub {
+		bottom: -0.25em;
+	}
+
+	.markdown-content sup {
+		top: -0.5em;
+	}
+
+	.markdown-content dfn {
+		@apply italic;
+	}
+
+	.markdown-content figure {
+		@apply mx-10 my-4;
+	}
+
+	.markdown-content figcaption {
+		@apply text-sm text-muted-foreground text-center mt-2;
+	}
+
+	.markdown-content dl {
+		@apply p-0;
+	}
+
+	.markdown-content dt {
+		@apply p-0 mt-4 text-base italic font-semibold;
+	}
+
+	.markdown-content dd {
+		@apply px-4 mb-4;
+	}
+
+	.markdown-content .octicon {
+		@apply inline-block align-text-bottom;
+		fill: currentColor;
+		overflow: visible !important;
+	}
+
+	/* GitHub Alerts */
+	.markdown-content .markdown-alert {
+		@apply p-4 mb-4 border-l-4 bg-muted/30;
+	}
+
+	.markdown-content .markdown-alert > :first-child {
+		@apply mt-0;
+	}
+
+	.markdown-content .markdown-alert > :last-child {
+		@apply mb-0;
+	}
+
+	.markdown-content .markdown-alert-title {
+		@apply flex font-medium items-center leading-none mb-2;
+	}
+
+	.markdown-content .markdown-alert-title .octicon {
+		@apply mr-2 inline-block align-text-bottom;
+	}
+
+	.markdown-content .markdown-alert-note {
+		@apply border-l-blue-500;
+	}
+
+	.markdown-content .markdown-alert-note .markdown-alert-title {
+		@apply text-blue-500;
+	}
+
+	.markdown-content .markdown-alert-important {
+		@apply border-l-purple-500;
+	}
+
+	.markdown-content .markdown-alert-important .markdown-alert-title {
+		@apply text-purple-500;
+	}
+
+	.markdown-content .markdown-alert-warning {
+		@apply border-l-yellow-500;
+	}
+
+	.markdown-content .markdown-alert-warning .markdown-alert-title {
+		@apply text-yellow-500;
+	}
+
+	.markdown-content .markdown-alert-tip {
+		@apply border-l-green-500;
+	}
+
+	.markdown-content .markdown-alert-tip .markdown-alert-title {
+		@apply text-green-500;
+	}
+
+	.markdown-content .markdown-alert-caution {
+		@apply border-l-red-500;
+	}
+
+	.markdown-content .markdown-alert-caution .markdown-alert-title {
+		@apply text-red-500;
+	}
 }

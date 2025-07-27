@@ -1,9 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card"
-import MarkdownIt from 'markdown-it'
+import MarkdownIt from "markdown-it";
+import { Card, CardContent } from "@/components/ui/card";
 
 const md = new MarkdownIt({
-  html: true,
-  linkify: true,
+	html: true,
+	linkify: true,
 });
 
 const privacyContent = `# Privacy Policy
@@ -42,16 +42,16 @@ If you have any questions about this Privacy Policy, please contact us.
 `;
 
 export default function Privacy() {
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Card className="bg-card/50 backdrop-blur-sm border-border/20">
-        <CardContent className="p-8">
-          <div 
-            className="markdown-content"
-            dangerouslySetInnerHTML={{ __html: md.render(privacyContent) }}
-          />
-        </CardContent>
-      </Card>
-    </div>
-  )
+	return (
+		<div className="container mx-auto px-4 py-8 max-w-4xl">
+			<Card className="bg-card/50 backdrop-blur-sm border-border/20">
+				<CardContent className="p-8">
+					<div
+						className="markdown-content"
+						dangerouslySetInnerHTML={{ __html: md.render(privacyContent) }}
+					/>
+				</CardContent>
+			</Card>
+		</div>
+	);
 }
