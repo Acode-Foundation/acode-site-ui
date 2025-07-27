@@ -401,7 +401,7 @@ export default function Dashboard() {
 								<Link to="/earnings" className="block">
 									<Button variant="outline" className="w-full">
 										<BarChart3 className="w-4 h-4 mr-2" />
-										View Analytics
+										View Earnings
 									</Button>
 								</Link>
 							</div>
@@ -914,54 +914,6 @@ export default function Dashboard() {
 				</CardContent>
 			</Card>
 
-			{/* Reviews & Ratings */}
-			<Card>
-				<CardHeader>
-					<CardTitle className="flex items-center gap-2">
-						<Star className="w-5 h-5" />
-						Recent Reviews
-					</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div className="space-y-4">
-						{[
-							{
-								plugin: "My Theme Studio",
-								rating: 5,
-								review: "Amazing theme! Love the customization options.",
-								user: "DevUser123",
-							},
-							{
-								plugin: "Code Formatter Pro",
-								rating: 4,
-								review: "Great tool, saves me a lot of time.",
-								user: "CodeMaster",
-							},
-						].map((review, index) => (
-							<div
-								key={index}
-								className="p-4 border border-border/50 rounded-lg"
-							>
-								<div className="flex items-center justify-between mb-2">
-									<h4 className="font-medium">{review.plugin}</h4>
-									<div className="flex items-center gap-1">
-										{Array.from({ length: 5 }).map((_, i) => (
-											<Star
-												key={i}
-												className={`w-4 h-4 ${i < review.rating ? "fill-primary text-primary" : "text-muted-foreground"}`}
-											/>
-										))}
-									</div>
-								</div>
-								<p className="text-sm text-muted-foreground mb-1">
-									"{review.review}"
-								</p>
-								<p className="text-xs text-muted-foreground">- {review.user}</p>
-							</div>
-						))}
-					</div>
-				</CardContent>
-			</Card>
 		</div>
 	);
 
@@ -1132,10 +1084,9 @@ export default function Dashboard() {
 
 			{/* Tabs */}
 			<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-				<TabsList className="grid w-full grid-cols-4">
+				<TabsList className="grid w-full grid-cols-3">
 					<TabsTrigger value="overview">Overview</TabsTrigger>
 					<TabsTrigger value="profile">Profile</TabsTrigger>
-					<TabsTrigger value="earnings">Earnings</TabsTrigger>
 					{isAdmin && <TabsTrigger value="admin">Admin Panel</TabsTrigger>}
 				</TabsList>
 
@@ -1153,9 +1104,6 @@ export default function Dashboard() {
 					<ProfileManagement />
 				</TabsContent>
 
-				<TabsContent value="earnings" className="space-y-6 mt-6">
-					<DetailedEarningsOverview />
-				</TabsContent>
 			</Tabs>
 		</div>
 	);
