@@ -50,7 +50,7 @@ interface Plugin {
 }
 
 const fetchDeveloper = async (email: string): Promise<Developer> => {
-	const response = await fetch(`https://acode.app/api/user/${email}`);
+	const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/user/${email}`);
 	if (!response.ok) {
 		throw new Error("Developer not found");
 	}
@@ -58,7 +58,7 @@ const fetchDeveloper = async (email: string): Promise<Developer> => {
 };
 
 const fetchDeveloperPlugins = async (userId: string): Promise<Plugin[]> => {
-	const response = await fetch(`https://acode.app/api/plugins?user=${userId}`);
+	const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugins?user_id=${userId}`);
 	if (!response.ok) {
 		return [];
 	}
