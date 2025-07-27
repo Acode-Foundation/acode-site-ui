@@ -1,4 +1,4 @@
-import { LogOut, Menu, Moon, Sun, User, X } from "lucide-react";
+import { LogOut, Menu, Moon, Sun, User, X, DollarSign, UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import acodeLogoSvg from "@/assets/acode-logo.svg";
@@ -174,6 +174,24 @@ export function FloatingNav() {
 										Dashboard
 									</Link>
 								</DropdownMenuItem>
+								<DropdownMenuItem asChild>
+									<Link
+										to="/earnings"
+										className="flex items-center cursor-pointer"
+									>
+										<DollarSign className="h-4 w-4 mr-2" />
+										Earnings
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem asChild>
+									<Link
+										to={`/developer/${user?.email}`}
+										className="flex items-center cursor-pointer"
+									>
+										<UserCircle className="h-4 w-4 mr-2" />
+										Profile
+									</Link>
+								</DropdownMenuItem>
 								<DropdownMenuItem
 									onClick={handleLogout}
 									className="flex items-center cursor-pointer"
@@ -273,6 +291,22 @@ export function FloatingNav() {
 									>
 										<User className="h-4 w-4 mr-2" />
 										Dashboard
+									</Link>
+									<Link
+										to="/earnings"
+										className="flex items-center text-base font-medium transition-colors duration-200 hover:text-primary py-2"
+										onClick={() => setIsMobileMenuOpen(false)}
+									>
+										<DollarSign className="h-4 w-4 mr-2" />
+										Earnings
+									</Link>
+									<Link
+										to={`/developer/${user?.email}`}
+										className="flex items-center text-base font-medium transition-colors duration-200 hover:text-primary py-2"
+										onClick={() => setIsMobileMenuOpen(false)}
+									>
+										<UserCircle className="h-4 w-4 mr-2" />
+										Profile
 									</Link>
 									<button
 										onClick={() => {
