@@ -45,6 +45,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast.ts";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser.ts";
 import { User } from "@/types";
+import { UserPluginsOverview } from "@/components/dashboard/user-plugins-overview";
+import { EarningsOverview } from "@/components/dashboard/earnings-overview";
 
 // Mock user data
 const currentMockUser = {
@@ -375,165 +377,38 @@ export default function Dashboard() {
 
 	const UserDashboard = () => (
 		<div className="space-y-6">
-			{/* Stats Cards */}
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">My Plugins</CardTitle>
-						<Upload className="h-4 w-4 text-muted-foreground" />
-					</CardHeader>
-					<CardContent>
-						{(isPluginsLoading && (
-							<div className="text-2xl font-bold">Loading...</div>
-						)) || (
-							<>
-								<div className="text-2xl font-bold">{userPlugins.length}</div>
-								<p className="text-xs text-muted-foreground">
-									{userPlugins.filter((p) => p.status === "approved").length}{" "}
-									approved
-								</p>
-							</>
-						)}
-					</CardContent>
-				</Card>
-
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">
-							Total Downloads
-						</CardTitle>
-						<BarChart3 className="h-4 w-4 text-muted-foreground" />
-					</CardHeader>
-					<CardContent>
-						{(isPluginsLoading && (
-							<div className="text-2xl font-bold">Loading...</div>
-						)) || (
-							<>
-								<div className="text-2xl font-bold">
-									{userPlugins
-										.reduce((sum, p) => sum + p.downloads, 0)
-										.toLocaleString()}
-								</div>
-								<p className="text-xs text-muted-foreground">
-									Across all plugins
-								</p>
-							</>
-						)}
-					</CardContent>
-				</Card>
-
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-						<DollarSign className="h-4 w-4 text-muted-foreground" />
-					</CardHeader>
-					<CardContent>
-						{(isPluginsLoading && (
-							<div className="text-2xl font-bold">Loading...</div>
-						)) || (
-							<>
-								<div className="text-2xl font-bold">
-									$
-									{userPlugins
-										.reduce((sum, p) => sum + p.revenue, 0)
-										.toFixed(2)}
-								</div>
-								<p className="text-xs text-muted-foreground">This month</p>
-							</>
-						)}
-					</CardContent>
-				</Card>
+			{/* Overview Grid */}
+			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+				<div className="lg:col-span-2">
+					<UserPluginsOverview />
+				</div>
+				<div className="space-y-6">
+					<EarningsOverview />
+					
+					{/* Quick Actions */}
+					<Card>
+						<CardHeader>
+							<CardTitle>Quick Actions</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<div className="space-y-3">
+								<Link to="/submit-plugin" className="block">
+									<Button className="w-full bg-gradient-primary hover:shadow-glow-primary">
+										<Plus className="w-4 h-4 mr-2" />
+										Submit New Plugin
+									</Button>
+								</Link>
+								<Link to="/earnings" className="block">
+									<Button variant="outline" className="w-full">
+										<BarChart3 className="w-4 h-4 mr-2" />
+										View Analytics
+									</Button>
+								</Link>
+							</div>
+						</CardContent>
+					</Card>
+				</div>
 			</div>
-
-			{/* Quick Actions */}
-			<Card>
-				<CardHeader>
-					<CardTitle>Quick Actions</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div className="flex flex-wrap gap-4">
-						<Button className="bg-gradient-primary hover:shadow-glow-primary">
-							<Plus className="w-4 h-4 mr-2" />
-							Submit New Plugin
-						</Button>
-						<Button variant="outline">
-							<Upload className="w-4 h-4 mr-2" />
-							Upload Update
-						</Button>
-						<Button variant="outline">
-							<BarChart3 className="w-4 h-4 mr-2" />
-							View Analytics
-						</Button>
-					</div>
-				</CardContent>
-			</Card>
-
-			{/* My Plugins */}
-			<Card>
-				<CardHeader>
-					<CardTitle>My Plugins</CardTitle>
-				</CardHeader>
-				{pluginsError ? (
-					pluginsError.message
-				) : (
-					<CardContent>
-						<div className="space-y-4">
-							{userPlugins?.length > 0 ? (
-								userPlugins.map((plugin) => (
-									<div
-										key={plugin.id}
-										className="flex items-center justify-between p-4 border border-border/50 rounded-lg"
-									>
-										<div className="flex items-center space-x-4">
-											<div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center text-white font-bold">
-												{plugin.name.charAt(0)}
-											</div>
-											<div>
-												<h3 className="font-semibold">{plugin.name}</h3>
-												<div className="flex items-center space-x-2">
-													<Badge
-														variant={
-															plugin.status === "approved"
-																? "default"
-																: "secondary"
-														}
-													>
-														{plugin.status}
-													</Badge>
-													<span className="text-sm text-muted-foreground">
-														{plugin.downloads.toLocaleString()} downloads
-													</span>
-												</div>
-											</div>
-										</div>
-										<div className="flex items-center space-x-2">
-											<Button variant="outline" size="sm">
-												<Edit className="w-4 h-4" />
-											</Button>
-											<Button variant="outline" size="sm">
-												<Eye className="w-4 h-4" />
-											</Button>
-										</div>
-									</div>
-								))
-							) : (
-								<div className="text-center py-12">
-									{isPluginsLoading ? (
-										<div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-									) : (
-										<Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-									)}
-									<p className="text-muted-foreground">
-										{isPluginsLoading
-											? "Plugins are Loading..."
-											: "No plugins published yet."}
-									</p>
-								</div>
-							)}
-						</div>
-					</CardContent>
-				)}
-			</Card>
 		</div>
 	);
 
@@ -1090,7 +965,7 @@ export default function Dashboard() {
 		</div>
 	);
 
-	const EarningsOverview = () => (
+	const DetailedEarningsOverview = () => (
 		<div className="space-y-6">
 			{/* Quick Stats */}
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1279,7 +1154,7 @@ export default function Dashboard() {
 				</TabsContent>
 
 				<TabsContent value="earnings" className="space-y-6 mt-6">
-					<EarningsOverview />
+					<DetailedEarningsOverview />
 				</TabsContent>
 			</Tabs>
 		</div>
