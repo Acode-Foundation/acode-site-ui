@@ -292,26 +292,30 @@ export default function DeveloperProfile() {
 								{plugins.map((plugin, index) => (
 									<div key={plugin.id} className="relative group">
 										<PluginCard plugin={plugin} index={index} />
-										{isOwnProfile && (
+										{(isOwnProfile || loggedInUser?.role === "admin") && (
 											<div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1">
-												<Button
-													size="sm"
-													variant="ghost"
-													className="h-8 w-8 p-0 bg-card/90 backdrop-blur-sm border border-border/50 hover:bg-muted hover:text-foreground"
-													asChild
-												>
-													<Link to={`/submit-plugin?id=${plugin.id}`}>
-														<Edit className="h-3 w-3" />
-													</Link>
-												</Button>
-												<Button
-													size="sm"
-													variant="ghost"
-													className="h-8 w-8 p-0 bg-card/90 backdrop-blur-sm border border-border/50 hover:bg-destructive hover:text-destructive-foreground"
-													onClick={() => handleDeletePlugin(plugin.id)}
-												>
-													<Trash2 className="h-3 w-3" />
-												</Button>
+												{isOwnProfile && (
+													<Button
+														size="sm"
+														variant="ghost"
+														className="h-8 w-8 p-0 bg-card/90 backdrop-blur-sm border border-border/50 hover:bg-muted hover:text-foreground"
+														asChild
+													>
+														<Link to={`/submit-plugin?id=${plugin.id}`}>
+															<Edit className="h-3 w-3" />
+														</Link>
+													</Button>
+												)}
+												{(isOwnProfile || loggedInUser?.role === "admin") && (
+													<Button
+														size="sm"
+														variant="ghost"
+														className="h-8 w-8 p-0 bg-card/90 backdrop-blur-sm border border-border/50 hover:bg-destructive hover:text-destructive-foreground"
+														onClick={() => handleDeletePlugin(plugin.id)}
+													>
+														<Trash2 className="h-3 w-3" />
+													</Button>
+												)}
 											</div>
 										)}
 									</div>
