@@ -4,6 +4,7 @@ import {
 	Calendar,
 	CheckCircle,
 	Download,
+	Edit,
 	Flag,
 	Github,
 	MessageSquare,
@@ -14,11 +15,23 @@ import {
 	Tag,
 	ThumbsDown,
 	ThumbsUp,
+	Trash2,
 	Users,
 } from "lucide-react";
 import MarkdownIt from "markdown-it";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -38,6 +51,10 @@ import "highlight.js/styles/github-dark.css";
 import MarkdownItGitHubAlerts from "markdown-it-github-alerts";
 import { toast } from "sonner";
 import {
+	useDeleteReply,
+	useDeleteReview,
+	useEditReply,
+	useEditReview,
 	useFlagComment,
 	useReplyToReview,
 	useReviews,
@@ -97,6 +114,11 @@ export default function PluginDetail() {
 	const [showReplyForm, setShowReplyForm] = useState<{
 		[key: number]: boolean;
 	}>({});
+	const [editingReview, setEditingReview] = useState<number | null>(null);
+	const [editComment, setEditComment] = useState("");
+	const [editVote, setEditVote] = useState<string>("");
+	const [editingReply, setEditingReply] = useState<number | null>(null);
+	const [editReplyText, setEditReplyText] = useState("");
 
 	const {
 		data: plugin,
@@ -110,7 +132,11 @@ export default function PluginDetail() {
 
 	const { data: reviews = [] } = useReviews(id!);
 	const submitReviewMutation = useSubmitReview(id!);
+	const editReviewMutation = useEditReview(id!);
+	const deleteReviewMutation = useDeleteReview(id!);
 	const replyMutation = useReplyToReview(id!);
+	const editReplyMutation = useEditReply(id!);
+	const deleteReplyMutation = useDeleteReply(id!);
 	const flagMutation = useFlagComment(id!);
 
 	if (isLoading) {
@@ -220,6 +246,108 @@ export default function PluginDetail() {
 				toast.error("Failed to flag comment");
 			}
 		}
+	};
+
+	const handleEditReview = async (reviewId: number) => {
+		if (!editComment.trim() && !editVote) {
+			toast.error("Please provide a comment or vote");
+			return;
+		}
+
+		try {
+			await editReviewMutation.mutateAsync({
+				comment: editComment.trim(),
+				vote: editVote ? parseInt(editVote) : VOTE_NULL,
+			});
+			setEditingReview(null);
+			setEditComment("");
+			setEditVote("");
+			toast.success("Review updated successfully");
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				toast.error(error.message || "Failed to update review");
+			} else {
+				toast.error("Failed to update review");
+			}
+		}
+	};
+
+	const handleDeleteReview = async (reviewId: number) => {
+		try {
+			await deleteReviewMutation.mutateAsync(reviewId);
+			toast.success("Review deleted successfully");
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				toast.error(error.message || "Failed to delete review");
+			} else {
+				toast.error("Failed to delete review");
+			}
+		}
+	};
+
+	const startEditReview = (review: {
+		id: number;
+		comment: string | null;
+		vote: number;
+	}) => {
+		setEditingReview(review.id);
+		setEditComment(review.comment || "");
+		setEditVote(review.vote.toString());
+	};
+
+	const cancelEditReview = () => {
+		setEditingReview(null);
+		setEditComment("");
+		setEditVote("");
+	};
+
+	const handleEditReply = async (commentId: number) => {
+		if (!editReplyText.trim()) {
+			toast.error("Please enter a reply");
+			return;
+		}
+
+		try {
+			await editReplyMutation.mutateAsync({
+				commentId,
+				data: { reply: editReplyText.trim() },
+			});
+			setEditingReply(null);
+			setEditReplyText("");
+			toast.success("Reply updated successfully");
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				toast.error(error.message || "Failed to update reply");
+			} else {
+				toast.error("Failed to update reply");
+			}
+		}
+	};
+
+	const handleDeleteReply = async (commentId: number) => {
+		try {
+			await deleteReplyMutation.mutateAsync({
+				commentId,
+				data: { reply: "" },
+			});
+			toast.success("Reply deleted successfully");
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				toast.error(error.message || "Failed to delete reply");
+			} else {
+				toast.error("Failed to delete reply");
+			}
+		}
+	};
+
+	const startEditReply = (commentId: number, currentReply: string) => {
+		setEditingReply(commentId);
+		setEditReplyText(currentReply);
+	};
+
+	const cancelEditReply = () => {
+		setEditingReply(null);
+		setEditReplyText("");
 	};
 
 	const isPluginDeveloper = loggedInUser?.id === plugin?.user_id;
@@ -536,23 +664,208 @@ export default function PluginDetail() {
 																			<Flag className="w-3 h-3" />
 																		</Button>
 																	)}
+																	{/* Edit and Delete buttons for user's own review */}
+																	{loggedInUser?.id === review.user_id && (
+																		<div className="flex gap-1">
+																			<Button
+																				size="sm"
+																				variant="ghost"
+																				onClick={() => startEditReview(review)}
+																				className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+																			>
+																				<Edit className="w-3 h-3" />
+																			</Button>
+																			<AlertDialog>
+																				<AlertDialogTrigger asChild>
+																					<Button
+																						size="sm"
+																						variant="ghost"
+																						disabled={
+																							deleteReviewMutation.isPending
+																						}
+																						className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+																					>
+																						<Trash2 className="w-3 h-3" />
+																					</Button>
+																				</AlertDialogTrigger>
+																				<AlertDialogContent>
+																					<AlertDialogHeader>
+																						<AlertDialogTitle>
+																							Delete Review
+																						</AlertDialogTitle>
+																						<AlertDialogDescription>
+																							Are you sure you want to delete
+																							this review? This action cannot be
+																							undone.
+																						</AlertDialogDescription>
+																					</AlertDialogHeader>
+																					<AlertDialogFooter>
+																						<AlertDialogCancel>
+																							Cancel
+																						</AlertDialogCancel>
+																						<AlertDialogAction
+																							onClick={() =>
+																								handleDeleteReview(review.id)
+																							}
+																							className="bg-red-600 hover:bg-red-700"
+																						>
+																							Delete
+																						</AlertDialogAction>
+																					</AlertDialogFooter>
+																				</AlertDialogContent>
+																			</AlertDialog>
+																		</div>
+																	)}
+																	{/* Admin delete button for any review */}
+																	{loggedInUser?.role === "admin" &&
+																		loggedInUser?.id !== review.user_id && (
+																			<AlertDialog>
+																				<AlertDialogTrigger asChild>
+																					<Button
+																						size="sm"
+																						variant="ghost"
+																						disabled={
+																							deleteReviewMutation.isPending
+																						}
+																						className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+																						title="Delete review (Admin)"
+																					>
+																						<Trash2 className="w-3 h-3" />
+																					</Button>
+																				</AlertDialogTrigger>
+																				<AlertDialogContent>
+																					<AlertDialogHeader>
+																						<AlertDialogTitle>
+																							Delete Review (Admin Action)
+																						</AlertDialogTitle>
+																						<AlertDialogDescription>
+																							As an admin, you are about to
+																							delete this user's review. This
+																							action cannot be undone and will
+																							permanently remove the review from
+																							the plugin.
+																						</AlertDialogDescription>
+																					</AlertDialogHeader>
+																					<AlertDialogFooter>
+																						<AlertDialogCancel>
+																							Cancel
+																						</AlertDialogCancel>
+																						<AlertDialogAction
+																							onClick={() =>
+																								handleDeleteReview(review.id)
+																							}
+																							className="bg-red-600 hover:bg-red-700"
+																						>
+																							Delete Review
+																						</AlertDialogAction>
+																					</AlertDialogFooter>
+																				</AlertDialogContent>
+																			</AlertDialog>
+																		)}
 																</div>
-																{review.comment ? (
-																	<p className="text-sm text-muted-foreground mb-2">
-																		{review.comment}
-																	</p>
+																{editingReview === review.id ? (
+																	<div className="space-y-3 mb-2">
+																		<div className="space-y-2">
+																			<Label htmlFor="edit-vote">
+																				Your Rating
+																			</Label>
+																			<Select
+																				value={editVote}
+																				onValueChange={setEditVote}
+																			>
+																				<SelectTrigger>
+																					<SelectValue placeholder="Select your rating" />
+																				</SelectTrigger>
+																				<SelectContent>
+																					<SelectItem
+																						value={VOTE_UP.toString()}
+																					>
+																						<div className="flex items-center gap-2">
+																							<ThumbsUp className="w-4 h-4 text-green-500" />
+																							Thumbs Up
+																						</div>
+																					</SelectItem>
+																					<SelectItem
+																						value={VOTE_DOWN.toString()}
+																					>
+																						<div className="flex items-center gap-2">
+																							<ThumbsDown className="w-4 h-4 text-red-500" />
+																							Thumbs Down
+																						</div>
+																					</SelectItem>
+																					<SelectItem
+																						value={VOTE_NULL.toString()}
+																					>
+																						<div className="flex items-center gap-2">
+																							<MessageSquare className="w-4 h-4" />
+																							Comment Only
+																						</div>
+																					</SelectItem>
+																				</SelectContent>
+																			</Select>
+																		</div>
+																		<div className="space-y-2">
+																			<Label htmlFor="edit-comment">
+																				Comment (optional)
+																			</Label>
+																			<Textarea
+																				id="edit-comment"
+																				placeholder="Share your thoughts about this plugin..."
+																				value={editComment}
+																				onChange={(e) =>
+																					setEditComment(e.target.value)
+																				}
+																				rows={3}
+																				maxLength={250}
+																			/>
+																			<div className="text-xs text-muted-foreground text-right">
+																				{editComment.length}/250 characters
+																			</div>
+																		</div>
+																		<div className="flex gap-2">
+																			<Button
+																				size="sm"
+																				onClick={() =>
+																					handleEditReview(review.id)
+																				}
+																				disabled={editReviewMutation.isPending}
+																				className="h-7 px-3 text-xs"
+																			>
+																				<Send className="w-3 h-3 mr-1" />
+																				{editReviewMutation.isPending
+																					? "Updating..."
+																					: "Update Review"}
+																			</Button>
+																			<Button
+																				size="sm"
+																				variant="outline"
+																				onClick={cancelEditReview}
+																				className="h-7 px-3 text-xs"
+																			>
+																				Cancel
+																			</Button>
+																		</div>
+																	</div>
 																) : (
-																	<p className="text-sm text-muted-foreground/60 italic mb-2">
-																		{review.vote === VOTE_UP
-																			? "Gave a thumbs up"
-																			: "Gave a thumbs down"}
-																	</p>
+																	<>
+																		{review.comment ? (
+																			<p className="text-sm text-muted-foreground mb-2">
+																				{review.comment}
+																			</p>
+																		) : (
+																			<p className="text-sm text-muted-foreground/60 italic mb-2">
+																				{review.vote === VOTE_UP
+																					? "Gave a thumbs up"
+																					: "Gave a thumbs down"}
+																			</p>
+																		)}
+																	</>
 																)}
 
 																{/* Developer Reply */}
 																{review.author_reply && (
 																	<div className="mt-2 p-3 bg-muted/50 rounded-lg border">
-																		<div className="flex items-center gap-2 mb-1">
+																		<div className="flex items-center justify-between gap-2 mb-1">
 																			<Badge
 																				variant="outline"
 																				className="text-xs bg-primary/10 text-primary border-primary/20"
@@ -560,10 +873,106 @@ export default function PluginDetail() {
 																				<CheckCircle className="w-3 h-3 mr-1" />
 																				Developer Reply
 																			</Badge>
+																			{/* Edit and Delete buttons for developer's own reply */}
+																			{isPluginDeveloper && (
+																				<div className="flex gap-1">
+																					<Button
+																						size="sm"
+																						variant="ghost"
+																						onClick={() =>
+																							startEditReply(
+																								review.id,
+																								review.author_reply,
+																							)
+																						}
+																						className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+																					>
+																						<Edit className="w-3 h-3" />
+																					</Button>
+																					<AlertDialog>
+																						<AlertDialogTrigger asChild>
+																							<Button
+																								size="sm"
+																								variant="ghost"
+																								disabled={
+																									deleteReplyMutation.isPending
+																								}
+																								className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+																							>
+																								<Trash2 className="w-3 h-3" />
+																							</Button>
+																						</AlertDialogTrigger>
+																						<AlertDialogContent>
+																							<AlertDialogHeader>
+																								<AlertDialogTitle>
+																									Delete Reply
+																								</AlertDialogTitle>
+																								<AlertDialogDescription>
+																									Are you sure you want to
+																									delete this reply? This action
+																									cannot be undone.
+																								</AlertDialogDescription>
+																							</AlertDialogHeader>
+																							<AlertDialogFooter>
+																								<AlertDialogCancel>
+																									Cancel
+																								</AlertDialogCancel>
+																								<AlertDialogAction
+																									onClick={() =>
+																										handleDeleteReply(review.id)
+																									}
+																									className="bg-red-600 hover:bg-red-700"
+																								>
+																									Delete
+																								</AlertDialogAction>
+																							</AlertDialogFooter>
+																						</AlertDialogContent>
+																					</AlertDialog>
+																				</div>
+																			)}
 																		</div>
-																		<p className="text-sm">
-																			{review.author_reply}
-																		</p>
+																		{editingReply === review.id ? (
+																			<div className="space-y-2">
+																				<Textarea
+																					placeholder="Edit your reply..."
+																					value={editReplyText}
+																					onChange={(e) =>
+																						setEditReplyText(e.target.value)
+																					}
+																					rows={2}
+																					className="text-sm"
+																				/>
+																				<div className="flex gap-2">
+																					<Button
+																						size="sm"
+																						onClick={() =>
+																							handleEditReply(review.id)
+																						}
+																						disabled={
+																							editReplyMutation.isPending
+																						}
+																						className="h-7 px-3 text-xs"
+																					>
+																						<Send className="w-3 h-3 mr-1" />
+																						{editReplyMutation.isPending
+																							? "Updating..."
+																							: "Update Reply"}
+																					</Button>
+																					<Button
+																						size="sm"
+																						variant="outline"
+																						onClick={cancelEditReply}
+																						className="h-7 px-3 text-xs"
+																					>
+																						Cancel
+																					</Button>
+																				</div>
+																			</div>
+																		) : (
+																			<p className="text-sm">
+																				{review.author_reply}
+																			</p>
+																		)}
 																	</div>
 																)}
 
