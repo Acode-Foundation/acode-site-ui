@@ -7,6 +7,7 @@ import {
 	TrendingUp,
 } from "lucide-react";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,6 +49,7 @@ import {
 } from "@/lib/date-utils";
 
 export default function Earnings() {
+	const { userId: routeUserId } = useParams();
 	const { year: currentYear, month: currentMonth } = getCurrentDateDetails();
 	const [selectedYear, setSelectedYear] = useState(currentYear);
 	const [selectedMonth, setSelectedMonth] = useState(currentMonth - 1); // Keep 0-indexed for compatibility
@@ -64,7 +66,10 @@ export default function Earnings() {
 	const itemsPerPage = 10;
 
 	const { data: user } = useLoggedInUser();
-	const userId = user?.id?.toString() || "";
+	const userId = routeUserId || user?.id?.toString() || "";
+	const isViewingOwnEarnings =
+		!routeUserId || routeUserId === user?.id?.toString();
+	const isAdmin = user?.role === "admin";
 	const { toast } = useToast();
 
 	const { data: unpaidEarnings } = useUnpaidEarnings(userId);
@@ -76,6 +81,18 @@ export default function Earnings() {
 	const { data: payments } = usePayments(userId, selectedPaymentYear);
 	const { data: receipt } = usePaymentReceipt(selectedReceiptId);
 	const updateThresholdMutation = useUpdateThreshold();
+
+	// Access control: only admins can view other users' earnings
+	if (routeUserId && !isViewingOwnEarnings && !isAdmin) {
+		return (
+			<div className="container mx-auto px-4 py-8 text-center">
+				<h1 className="text-2xl font-bold text-destructive">Access Denied</h1>
+				<p className="text-muted-foreground mt-2">
+					You don't have permission to view other users' earnings.
+				</p>
+			</div>
+		);
+	}
 
 	const years = generateYearsArray();
 	const months = MONTHS.map((m) => m.label); // Keep as string array for compatibility
@@ -142,14 +159,22 @@ export default function Earnings() {
 		<div className="container mx-auto px-4 py-8">
 			{/* Header */}
 			<div className="mb-8">
-				<h1 className="text-3xl font-bold">Earnings Overview</h1>
+				<h1 className="text-3xl font-bold">
+					{isViewingOwnEarnings
+						? "Earnings Overview"
+						: "User Earnings Overview"}
+				</h1>
 				<p className="text-muted-foreground">
-					Track your plugin sales and payments
+					{isViewingOwnEarnings
+						? "Track your plugin sales and payments"
+						: `Viewing earnings for user ID: ${userId}`}
 				</p>
 			</div>
 
 			{/* Stats Cards */}
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+			<div
+				className={`grid grid-cols-1 ${isViewingOwnEarnings ? "md:grid-cols-3" : "md:grid-cols-2"} gap-6 mb-8`}
+			>
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">
@@ -200,36 +225,38 @@ export default function Earnings() {
 					</CardContent>
 				</Card>
 
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">
-							Payment Threshold
-						</CardTitle>
-						<TrendingUp className="h-4 w-4 text-muted-foreground" />
-					</CardHeader>
-					<CardContent>
-						<div className="flex items-center justify-between">
-							<div>
-								<div className="text-2xl font-bold">
-									₹{formatCurrency(user?.threshold || 0)}
+				{isViewingOwnEarnings && (
+					<Card>
+						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+							<CardTitle className="text-sm font-medium">
+								Payment Threshold
+							</CardTitle>
+							<TrendingUp className="h-4 w-4 text-muted-foreground" />
+						</CardHeader>
+						<CardContent>
+							<div className="flex items-center justify-between">
+								<div>
+									<div className="text-2xl font-bold">
+										₹{formatCurrency(user?.threshold || 0)}
+									</div>
+									<p className="text-xs text-muted-foreground">
+										Minimum payout amount
+									</p>
 								</div>
-								<p className="text-xs text-muted-foreground">
-									Minimum payout amount
-								</p>
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={() => {
+										setNewThreshold(user?.threshold?.toString() || "");
+										setShowThresholdDialog(true);
+									}}
+								>
+									Update
+								</Button>
 							</div>
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={() => {
-									setNewThreshold(user?.threshold?.toString() || "");
-									setShowThresholdDialog(true);
-								}}
-							>
-								Update
-							</Button>
-						</div>
-					</CardContent>
-				</Card>
+						</CardContent>
+					</Card>
+				)}
 			</div>
 
 			{/* Monthly Earnings */}
@@ -484,47 +511,52 @@ export default function Earnings() {
 			</Dialog>
 
 			{/* Threshold Update Dialog */}
-			<Dialog open={showThresholdDialog} onOpenChange={setShowThresholdDialog}>
-				<DialogContent className="max-w-md">
-					<DialogHeader>
-						<DialogTitle>Update Payment Threshold</DialogTitle>
-					</DialogHeader>
-					<div className="space-y-4">
-						<div>
-							<label className="text-sm font-medium">
-								New Threshold Amount (₹)
-							</label>
-							<Input
-								type="number"
-								value={newThreshold}
-								onChange={(e) => setNewThreshold(e.target.value)}
-								placeholder="Enter minimum amount (min: 1000)"
-								min="1000"
-							/>
-							<p className="text-xs text-muted-foreground mt-1">
-								Minimum threshold is ₹1,000
-							</p>
-						</div>
+			{isViewingOwnEarnings && (
+				<Dialog
+					open={showThresholdDialog}
+					onOpenChange={setShowThresholdDialog}
+				>
+					<DialogContent className="max-w-md">
+						<DialogHeader>
+							<DialogTitle>Update Payment Threshold</DialogTitle>
+						</DialogHeader>
+						<div className="space-y-4">
+							<div>
+								<label className="text-sm font-medium">
+									New Threshold Amount (₹)
+								</label>
+								<Input
+									type="number"
+									value={newThreshold}
+									onChange={(e) => setNewThreshold(e.target.value)}
+									placeholder="Enter minimum amount (min: 1000)"
+									min="1000"
+								/>
+								<p className="text-xs text-muted-foreground mt-1">
+									Minimum threshold is ₹1,000
+								</p>
+							</div>
 
-						<div className="flex gap-2 pt-4">
-							<Button
-								onClick={handleUpdateThreshold}
-								disabled={updateThresholdMutation.isPending || !newThreshold}
-							>
-								{updateThresholdMutation.isPending
-									? "Updating..."
-									: "Update Threshold"}
-							</Button>
-							<Button
-								variant="outline"
-								onClick={() => setShowThresholdDialog(false)}
-							>
-								Cancel
-							</Button>
+							<div className="flex gap-2 pt-4">
+								<Button
+									onClick={handleUpdateThreshold}
+									disabled={updateThresholdMutation.isPending || !newThreshold}
+								>
+									{updateThresholdMutation.isPending
+										? "Updating..."
+										: "Update Threshold"}
+								</Button>
+								<Button
+									variant="outline"
+									onClick={() => setShowThresholdDialog(false)}
+								>
+									Cancel
+								</Button>
+							</div>
 						</div>
-					</div>
-				</DialogContent>
-			</Dialog>
+					</DialogContent>
+				</Dialog>
+			)}
 		</div>
 	);
 }
