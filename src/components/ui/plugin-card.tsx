@@ -1,4 +1,12 @@
-import { Download, Star, Verified } from "lucide-react";
+import {
+	CheckCircle,
+	Clock,
+	Download,
+	Star,
+	Trash,
+	Verified,
+	XCircle,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -16,14 +24,68 @@ interface Plugin {
 	votes_down: number;
 	author_verified: number;
 	author_email?: string;
+	status?: "pending" | "approved" | "rejected" | "deleted";
+	user_id?: number;
 }
 
 interface PluginCardProps {
 	plugin: Plugin;
 	index?: number;
+	showStatus?: boolean;
+	currentUserId?: number;
+	isAdmin?: boolean;
 }
 
-export function PluginCard({ plugin, index = 0 }: PluginCardProps) {
+const getStatusBadge = (status?: string) => {
+	switch (status) {
+		case "approved":
+			return {
+				icon: CheckCircle,
+				label: "Approved",
+				variant: "default" as const,
+				className:
+					"bg-green-500/10 text-green-500 border-green-500/20 hover:bg-green-500/20",
+			};
+		case "pending":
+			return {
+				icon: Clock,
+				label: "Pending",
+				variant: "secondary" as const,
+				className:
+					"bg-yellow-500/10 text-yellow-500 border-yellow-500/20 hover:bg-yellow-500/20",
+			};
+		case "rejected":
+			return {
+				icon: XCircle,
+				label: "Rejected",
+				variant: "destructive" as const,
+				className:
+					"bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20",
+			};
+		case "deleted":
+			return {
+				icon: Trash,
+				label: "Deleted",
+				variant: "outline" as const,
+				className:
+					"bg-gray-500/10 text-gray-500 border-gray-500/20 hover:bg-gray-500/20",
+			};
+		default:
+			return null;
+	}
+};
+
+export function PluginCard({
+	plugin,
+	index = 0,
+	showStatus = false,
+	currentUserId,
+	isAdmin = false,
+}: PluginCardProps) {
+	const statusInfo = getStatusBadge(plugin.status);
+	const shouldShowStatus =
+		showStatus && (isAdmin || plugin.user_id === currentUserId) && statusInfo;
+
 	return (
 		<Link key={plugin.id} to={`/plugins/${plugin.id}`}>
 			<Card
@@ -47,9 +109,20 @@ export function PluginCard({ plugin, index = 0 }: PluginCardProps) {
 								{plugin.name.charAt(0)}
 							</div>
 						</div>
-						<Badge variant="outline" className="text-xs">
-							v{plugin.version}
-						</Badge>
+						<div className="flex flex-col items-end gap-1">
+							<Badge variant="outline" className="text-xs">
+								v{plugin.version}
+							</Badge>
+							{shouldShowStatus && (
+								<Badge
+									variant={statusInfo.variant}
+									className={`text-xs flex items-center gap-1 ${statusInfo.className}`}
+								>
+									<statusInfo.icon className="w-3 h-3" />
+									{statusInfo.label}
+								</Badge>
+							)}
+						</div>
 					</div>
 
 					<div>

@@ -9,18 +9,8 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { DeletePluginDialog } from "@/components/ui/delete-plugin-dialog";
 import { Input } from "@/components/ui/input";
 import { PluginCard } from "@/components/ui/plugin-card";
 import { PluginCardSkeleton } from "@/components/ui/plugin-card-skeleton";
@@ -105,10 +95,15 @@ export default function Plugins() {
 		searchQuery,
 	});
 
-	const handleDeletePlugin = async (pluginId: string) => {
+	const handleDeletePlugin = async (
+		pluginId: string,
+		mode: "soft" | "hard",
+	) => {
 		try {
-			await deletePluginMutation.mutateAsync(pluginId);
-			toast.success("Plugin deleted successfully");
+			await deletePluginMutation.mutateAsync({ pluginId, mode });
+			toast.success(
+				`Plugin ${mode === "hard" ? "permanently deleted" : "deleted"} successfully`,
+			);
 		} catch (error) {
 			toast.error("Failed to delete plugin");
 		}
@@ -223,7 +218,13 @@ export default function Plugins() {
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 					{filteredPlugins.map((plugin, index) => (
 						<div key={plugin.id} className="relative group">
-							<PluginCard plugin={plugin} index={index} />
+							<PluginCard
+								plugin={plugin}
+								index={index}
+								showStatus={true}
+								currentUserId={loggedInUser?.id}
+								isAdmin={loggedInUser?.role === "admin"}
+							/>
 							{(loggedInUser?.id === plugin.user_id ||
 								loggedInUser?.role === "admin") && (
 								<div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
@@ -241,8 +242,13 @@ export default function Plugins() {
 									)}
 									{(loggedInUser?.id === plugin.user_id ||
 										loggedInUser?.role === "admin") && (
-										<AlertDialog>
-											<AlertDialogTrigger asChild>
+										<DeletePluginDialog
+											pluginName={plugin.name}
+											isOwner={loggedInUser?.id === plugin.user_id}
+											isAdmin={loggedInUser?.role === "admin"}
+											onDelete={(mode) => handleDeletePlugin(plugin.id, mode)}
+											isDeleting={deletePluginMutation.isPending}
+											trigger={
 												<Button
 													size="sm"
 													variant="secondary"
@@ -250,26 +256,8 @@ export default function Plugins() {
 												>
 													<Trash2 className="h-3 w-3" />
 												</Button>
-											</AlertDialogTrigger>
-											<AlertDialogContent>
-												<AlertDialogHeader>
-													<AlertDialogTitle>Delete Plugin</AlertDialogTitle>
-													<AlertDialogDescription>
-														Are you sure you want to delete "{plugin.name}"?
-														This action cannot be undone.
-													</AlertDialogDescription>
-												</AlertDialogHeader>
-												<AlertDialogFooter>
-													<AlertDialogCancel>Cancel</AlertDialogCancel>
-													<AlertDialogAction
-														onClick={() => handleDeletePlugin(plugin.id)}
-														className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-													>
-														Delete
-													</AlertDialogAction>
-												</AlertDialogFooter>
-											</AlertDialogContent>
-										</AlertDialog>
+											}
+										/>
 									)}
 								</div>
 							)}

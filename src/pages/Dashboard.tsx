@@ -7,6 +7,8 @@ import {
 import {
 	BarChart3,
 	Building2,
+	CheckCircle,
+	Clock,
 	CreditCard,
 	DollarSign,
 	Edit,
@@ -22,6 +24,7 @@ import {
 	Users,
 	Wallet,
 	X,
+	XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -32,6 +35,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DeletePluginDialog } from "@/components/ui/delete-plugin-dialog";
 import {
 	Dialog,
 	DialogClose,
@@ -46,6 +50,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast.ts";
+import { useDeletePlugin } from "@/hooks/use-user-plugins";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser.ts";
 import { User } from "@/types";
 
@@ -304,6 +309,7 @@ export default function Dashboard() {
 	});
 
 	const queryClient = useQueryClient();
+	const deletePluginMutation = useDeletePlugin();
 	const {
 		data: currentLoggedUser,
 		isError,
@@ -375,6 +381,25 @@ export default function Dashboard() {
 
 	const isAdmin = currentUser.role === "admin";
 	// useEffect(() => setCurrentEmail(currentUser.email), [currentLoggedUser.email]);
+
+	const handleDeletePlugin = async (
+		pluginId: string,
+		mode: "soft" | "hard",
+	) => {
+		try {
+			await deletePluginMutation.mutateAsync({ pluginId, mode });
+			toast({
+				title: "Plugin Deleted",
+				description: `Plugin ${mode === "hard" ? "permanently deleted" : "deleted"} successfully`,
+			});
+		} catch (error) {
+			toast({
+				title: "Delete Failed",
+				description: "Failed to delete plugin. Please try again.",
+				variant: "destructive",
+			});
+		}
+	};
 
 	const UserDashboard = () => (
 		<div className="space-y-6">
