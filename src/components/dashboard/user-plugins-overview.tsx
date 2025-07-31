@@ -1,8 +1,10 @@
 import {
+	BarChart3,
 	CheckCircle,
 	Clock,
 	Edit,
 	Eye,
+	MoreHorizontal,
 	Package,
 	Trash2,
 	XCircle,
@@ -13,6 +15,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DeletePluginDialog } from "@/components/ui/delete-plugin-dialog";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
 	Pagination,
 	PaginationContent,
@@ -236,6 +245,17 @@ export function UserPluginsOverview() {
 												View
 											</Button>
 										</Link>
+										{plugin.status === "approved" && plugin.price > 0 && (
+											<Link
+												to={`/plugin-orders/${plugin.id}`}
+												className="flex-1"
+											>
+												<Button variant="outline" size="sm" className="w-full">
+													<BarChart3 className="w-4 h-4 mr-2" />
+													Orders
+												</Button>
+											</Link>
+										)}
 										<Link
 											to={`/submit-plugin?id=${plugin.id}`}
 											className="flex-1"
@@ -309,32 +329,60 @@ export function UserPluginsOverview() {
 												</div>
 											</TableCell>
 											<TableCell>
-												<div className="flex items-center gap-2">
-													<Link to={`/plugins/${plugin.id}`}>
-														<Button variant="ghost" size="sm">
-															<Eye className="w-4 h-4" />
+												<DropdownMenu>
+													<DropdownMenuTrigger>
+														<Button
+															variant="ghost"
+															size="sm"
+															className="h-8 w-8 p-0"
+														>
+															<MoreHorizontal className="h-4 w-4" />
+															<span className="sr-only">Open menu</span>
 														</Button>
-													</Link>
-													<Link to={`/submit-plugin?id=${plugin.id}`}>
-														<Button variant="ghost" size="sm">
-															<Edit className="w-4 h-4" />
-														</Button>
-													</Link>
-													<DeletePluginDialog
-														pluginName={plugin.name}
-														isOwner={true}
-														isAdmin={user?.role === "admin"}
-														onDelete={(mode) =>
-															handleDeletePlugin(plugin.id, mode)
-														}
-														isDeleting={deletePluginMutation.isPending}
-														trigger={
-															<Button variant="ghost" size="sm">
-																<Trash2 className="w-4 h-4" />
-															</Button>
-														}
-													/>
-												</div>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent align="end" className="w-48">
+														<Link to={`/plugins/${plugin.id}`}>
+															<DropdownMenuItem>
+																<Eye className="mr-2 h-4 w-4" />
+																View Plugin
+															</DropdownMenuItem>
+														</Link>
+														{plugin.status === "approved" &&
+															plugin.price > 0 && (
+																<Link to={`/plugin-orders/${plugin.id}`}>
+																	<DropdownMenuItem>
+																		<BarChart3 className="mr-2 h-4 w-4" />
+																		View Orders
+																	</DropdownMenuItem>
+																</Link>
+															)}
+														<Link to={`/submit-plugin?id=${plugin.id}`}>
+															<DropdownMenuItem>
+																<Edit className="mr-2 h-4 w-4" />
+																Edit Plugin
+															</DropdownMenuItem>
+														</Link>
+														<DropdownMenuSeparator className="bg-border" />
+														<DeletePluginDialog
+															pluginName={plugin.name}
+															isOwner={true}
+															isAdmin={user?.role === "admin"}
+															onDelete={(mode) =>
+																handleDeletePlugin(plugin.id, mode)
+															}
+															isDeleting={deletePluginMutation.isPending}
+															trigger={
+																<DropdownMenuItem
+																	onSelect={(e) => e.preventDefault()}
+																	className="text-red-600 focus:bg-red-50 focus:text-red-600 dark:text-red-400 dark:focus:bg-red-950/50 dark:focus:text-red-400"
+																>
+																	<Trash2 className="mr-2 h-4 w-4" />
+																	Delete Plugin
+																</DropdownMenuItem>
+															}
+														/>
+													</DropdownMenuContent>
+												</DropdownMenu>
 											</TableCell>
 										</TableRow>
 									))}

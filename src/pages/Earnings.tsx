@@ -39,12 +39,18 @@ import { useToast } from "@/hooks/use-toast";
 import { useUnpaidEarnings } from "@/hooks/use-unpaid-earnings";
 import { useUpdateThreshold } from "@/hooks/use-update-threshold";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
+import {
+	formatCurrency,
+	formatDate,
+	generateYearsArray,
+	getCurrentDateDetails,
+	MONTHS,
+} from "@/lib/date-utils";
 
 export default function Earnings() {
-	const currentYear = new Date().getFullYear();
-	const currentMonth = new Date().getMonth();
+	const { year: currentYear, month: currentMonth } = getCurrentDateDetails();
 	const [selectedYear, setSelectedYear] = useState(currentYear);
-	const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+	const [selectedMonth, setSelectedMonth] = useState(currentMonth - 1); // Keep 0-indexed for compatibility
 	const [selectedPaymentYear, setSelectedPaymentYear] = useState<
 		number | undefined
 	>(undefined);
@@ -71,24 +77,8 @@ export default function Earnings() {
 	const { data: receipt } = usePaymentReceipt(selectedReceiptId);
 	const updateThresholdMutation = useUpdateThreshold();
 
-	const years = Array.from(
-		{ length: currentYear - 2023 + 1 },
-		(_, i) => currentYear - i,
-	);
-	const months = [
-		"January",
-		"February",
-		"March",
-		"April",
-		"May",
-		"June",
-		"July",
-		"August",
-		"September",
-		"October",
-		"November",
-		"December",
-	];
+	const years = generateYearsArray();
+	const months = MONTHS.map((m) => m.label); // Keep as string array for compatibility
 
 	// Pagination for payments
 	const paginatedPayments = payments
@@ -98,21 +88,6 @@ export default function Earnings() {
 			)
 		: [];
 	const totalPages = payments ? Math.ceil(payments.length / itemsPerPage) : 0;
-
-	const formatDate = (dateString: string) => {
-		return new Date(dateString).toLocaleDateString("en-US", {
-			year: "numeric",
-			month: "short",
-			day: "numeric",
-		});
-	};
-
-	const formatCurrency = (amount: number) => {
-		return amount.toLocaleString("en-IN", {
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2,
-		});
-	};
 
 	const getNextPaymentDate = () => {
 		const now = new Date();

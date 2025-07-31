@@ -15,6 +15,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import PluginDetail from "./pages/PluginDetail";
+import PluginOrders from "./pages/PluginOrders";
 import Plugins from "./pages/Plugins";
 import Privacy from "./pages/Privacy";
 import Signup from "./pages/Signup";
@@ -57,6 +58,10 @@ const App = () => (
 								<Route path="/forgot-password" element={<ForgotPassword />} />
 								<Route path="/dashboard" element={<Dashboard />} />
 								<Route path="/earnings" element={<Earnings />} />
+								<Route
+									path="/plugin-orders/:pluginId"
+									element={<PluginOrders />}
+								/>
 								<Route
 									path="/developer/:email"
 									element={<DeveloperProfile />}
