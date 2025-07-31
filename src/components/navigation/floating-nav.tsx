@@ -3,6 +3,7 @@ import {
 	LogOut,
 	Menu,
 	Moon,
+	Shield,
 	Sun,
 	User,
 	UserCircle,
@@ -192,6 +193,17 @@ export function FloatingNav() {
 										Profile
 									</Link>
 								</DropdownMenuItem>
+								{user?.role === "admin" && (
+									<DropdownMenuItem asChild>
+										<Link
+											to="/admin"
+											className="flex items-center cursor-pointer"
+										>
+											<Shield className="h-4 w-4 mr-2" />
+											Admin Dashboard
+										</Link>
+									</DropdownMenuItem>
+								)}
 								<DropdownMenuItem
 									onClick={handleLogout}
 									className="flex items-center cursor-pointer"
@@ -300,6 +312,16 @@ export function FloatingNav() {
 										<UserCircle className="h-4 w-4 mr-2" />
 										Profile
 									</Link>
+									{user?.role === "admin" && (
+										<Link
+											to="/admin"
+											className="flex items-center text-base font-medium transition-colors duration-200 hover:text-primary py-2"
+											onClick={() => setIsMobileMenuOpen(false)}
+										>
+											<Shield className="h-4 w-4 mr-2" />
+											Admin Dashboard
+										</Link>
+									)}
 									<button
 										onClick={() => {
 											handleLogout();

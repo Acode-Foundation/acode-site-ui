@@ -6,6 +6,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import AdminDashboard from "./pages/AdminDashboard";
 import Dashboard from "./pages/Dashboard";
 import DeveloperProfile from "./pages/DeveloperProfile";
 import Earnings from "./pages/Earnings";
@@ -57,7 +58,9 @@ const App = () => (
 								<Route path="/register" element={<Signup />} />
 								<Route path="/forgot-password" element={<ForgotPassword />} />
 								<Route path="/dashboard" element={<Dashboard />} />
+								<Route path="/admin" element={<AdminDashboard />} />
 								<Route path="/earnings" element={<Earnings />} />
+								<Route path="/earnings/:userId" element={<Earnings />} />
 								<Route
 									path="/plugin-orders/:pluginId"
 									element={<PluginOrders />}
