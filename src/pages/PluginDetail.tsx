@@ -380,6 +380,10 @@ export default function PluginDetail() {
 		(review) => review.user_id === loggedInUser?.id,
 	);
 
+	const isAndroidDevice = () => {
+		return /android/i.test(navigator.userAgent);
+	};
+
 	return (
 		<div className="min-h-screen bg-gradient-dark">
 			<div className="container mx-auto px-4 py-8">
@@ -499,13 +503,18 @@ export default function PluginDetail() {
 
 							{/* Action Buttons */}
 							<div className="flex flex-wrap gap-3">
-								<Button
-									size="lg"
-									className="bg-gradient-primary hover:shadow-glow-primary"
-								>
-									<Download className="w-5 h-5 mr-2" />
-									Install Plugin
-								</Button>
+								{isAndroidDevice() && (
+									<Button
+										size="lg"
+										className="bg-gradient-primary hover:shadow-glow-primary"
+										asChild
+									>
+										<a href={`acode://plugin/install/${plugin.id}`} target="_blank">
+											<Download className="w-5 h-5 mr-2" />
+											Install Plugin
+										</a>
+									</Button>
+								)}
 								{plugin.repository && (
 									<Button variant="outline" size="lg" asChild>
 										<a
