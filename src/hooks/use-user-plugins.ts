@@ -20,9 +20,12 @@ const fetchUserPlugins = async (userId: string): Promise<UserPlugin[]> => {
 	return response.json();
 };
 
-const deletePlugin = async (pluginId: string): Promise<void> => {
+const deletePlugin = async (
+	pluginId: string,
+	mode: "soft" | "hard" = "soft",
+): Promise<void> => {
 	const response = await fetch(
-		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugins/${pluginId}`,
+		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin/${pluginId}?mode=${mode}`,
 		{
 			method: "DELETE",
 			headers: {
@@ -51,7 +54,13 @@ export const useDeletePlugin = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: deletePlugin,
+		mutationFn: ({
+			pluginId,
+			mode,
+		}: {
+			pluginId: string;
+			mode?: "soft" | "hard";
+		}) => deletePlugin(pluginId, mode),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["userPlugins"] });
 		},

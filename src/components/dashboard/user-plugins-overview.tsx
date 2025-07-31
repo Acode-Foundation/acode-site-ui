@@ -1,19 +1,18 @@
-import { Edit, Eye, Package, Trash2 } from "lucide-react";
+import {
+	CheckCircle,
+	Clock,
+	Edit,
+	Eye,
+	Package,
+	Trash2,
+	XCircle,
+} from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DeletePluginDialog } from "@/components/ui/delete-plugin-dialog";
 import {
 	Pagination,
 	PaginationContent,
@@ -41,11 +40,6 @@ export function UserPluginsOverview() {
 	);
 	const deletePluginMutation = useDeletePlugin();
 	const [currentPage, setCurrentPage] = useState(1);
-	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-	const [pluginToDelete, setPluginToDelete] = useState<{
-		id: string;
-		name: string;
-	} | null>(null);
 	const pluginsPerPage = 5;
 
 	// Pagination logic
@@ -56,25 +50,19 @@ export function UserPluginsOverview() {
 		startIndex + pluginsPerPage,
 	);
 
-	const handleDelete = (pluginId: string, pluginName: string) => {
-		setPluginToDelete({ id: pluginId, name: pluginName });
-		setDeleteDialogOpen(true);
-	};
-
-	const confirmDelete = async () => {
-		if (!pluginToDelete) return;
-
+	const handleDeletePlugin = async (
+		pluginId: string,
+		mode: "soft" | "hard",
+	) => {
 		try {
-			await deletePluginMutation.mutateAsync(pluginToDelete.id);
+			await deletePluginMutation.mutateAsync({ pluginId, mode });
 			toast({
-				title: "Plugin deleted",
-				description: `${pluginToDelete.name} has been deleted successfully.`,
+				title: "Plugin Deleted",
+				description: `Plugin ${mode === "hard" ? "permanently deleted" : "deleted"} successfully`,
 			});
-			setDeleteDialogOpen(false);
-			setPluginToDelete(null);
 		} catch (error) {
 			toast({
-				title: "Error",
+				title: "Delete Failed",
 				description: "Failed to delete plugin. Please try again.",
 				variant: "destructive",
 			});
@@ -82,21 +70,46 @@ export function UserPluginsOverview() {
 	};
 
 	const getStatusBadge = (status: string) => {
-		const variants = {
-			approved: "bg-green-500/10 text-green-500 border-green-500/20",
-			pending: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
-			rejected: "bg-red-500/10 text-red-500 border-red-500/20",
-		};
-
-		return (
-			<Badge
-				className={
-					variants[status as keyof typeof variants] || variants.pending
-				}
-			>
-				{status}
-			</Badge>
-		);
+		switch (status) {
+			case "approved":
+				return (
+					<Badge className="bg-green-500/10 text-green-500 border-green-500/20 hover:bg-green-500/20 gap-1">
+						<CheckCircle className="w-3 h-3" />
+						Approved
+					</Badge>
+				);
+			case "pending":
+				return (
+					<Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 hover:bg-yellow-500/20 gap-1">
+						<Clock className="w-3 h-3" />
+						Pending
+					</Badge>
+				);
+			case "rejected":
+				return (
+					<Badge className="bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20 gap-1">
+						<XCircle className="w-3 h-3" />
+						Rejected
+					</Badge>
+				);
+			case "deleted":
+				return (
+					<Badge
+						variant="outline"
+						className="bg-gray-500/10 text-gray-500 border-gray-500/20 hover:bg-gray-500/20 gap-1"
+					>
+						<Trash2 className="w-3 h-3" />
+						Deleted
+					</Badge>
+				);
+			default:
+				return (
+					<Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 hover:bg-yellow-500/20 gap-1">
+						<Clock className="w-3 h-3" />
+						Unknown
+					</Badge>
+				);
+		}
 	};
 
 	const totalPlugins = plugins.length;
@@ -232,15 +245,22 @@ export function UserPluginsOverview() {
 												Edit
 											</Button>
 										</Link>
-										<Button
-											variant="outline"
-											size="sm"
-											onClick={() => handleDelete(plugin.id, plugin.name)}
-											disabled={deletePluginMutation.isPending}
-											className="flex-shrink-0"
-										>
-											<Trash2 className="w-4 h-4" />
-										</Button>
+										<DeletePluginDialog
+											pluginName={plugin.name}
+											isOwner={true}
+											isAdmin={user?.role === "admin"}
+											onDelete={(mode) => handleDeletePlugin(plugin.id, mode)}
+											isDeleting={deletePluginMutation.isPending}
+											trigger={
+												<Button
+													variant="outline"
+													size="sm"
+													className="flex-shrink-0"
+												>
+													<Trash2 className="w-4 h-4" />
+												</Button>
+											}
+										/>
 									</div>
 								</Card>
 							))}
@@ -300,14 +320,20 @@ export function UserPluginsOverview() {
 															<Edit className="w-4 h-4" />
 														</Button>
 													</Link>
-													<Button
-														variant="ghost"
-														size="sm"
-														onClick={() => handleDelete(plugin.id, plugin.name)}
-														disabled={deletePluginMutation.isPending}
-													>
-														<Trash2 className="w-4 h-4" />
-													</Button>
+													<DeletePluginDialog
+														pluginName={plugin.name}
+														isOwner={true}
+														isAdmin={user?.role === "admin"}
+														onDelete={(mode) =>
+															handleDeletePlugin(plugin.id, mode)
+														}
+														isDeleting={deletePluginMutation.isPending}
+														trigger={
+															<Button variant="ghost" size="sm">
+																<Trash2 className="w-4 h-4" />
+															</Button>
+														}
+													/>
 												</div>
 											</TableCell>
 										</TableRow>
@@ -375,30 +401,6 @@ export function UserPluginsOverview() {
 						)}
 					</>
 				)}
-
-				{/* Delete Confirmation Dialog */}
-				<AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-					<AlertDialogContent>
-						<AlertDialogHeader>
-							<AlertDialogTitle>Delete Plugin</AlertDialogTitle>
-							<AlertDialogDescription>
-								Are you sure you want to delete "{pluginToDelete?.name}"? This
-								action cannot be undone.
-							</AlertDialogDescription>
-						</AlertDialogHeader>
-						<AlertDialogFooter>
-							<AlertDialogCancel onClick={() => setPluginToDelete(null)}>
-								Cancel
-							</AlertDialogCancel>
-							<AlertDialogAction
-								onClick={confirmDelete}
-								className="bg-destructive hover:bg-destructive/90"
-							>
-								Delete
-							</AlertDialogAction>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialog>
 			</CardContent>
 		</Card>
 	);
