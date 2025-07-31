@@ -527,10 +527,21 @@ export default function Dashboard() {
 											)}
 										</div>
 									</div>
-									<div className="flex items-center space-x-1">
-										<Button variant="outline" size="sm">
-											<Eye className="w-3 h-3" />
-										</Button>
+									<div className="flex items-center gap-1">
+										<Link to={`/plugins/${plugin.id}`}>
+											<Button variant="outline" size="sm">
+												<Eye className="w-3 h-3" />
+											</Button>
+										</Link>
+										<div className="flex w-8 justify-center">
+											{"revenue" in plugin && plugin.revenue > 0 ? (
+												<Link to={`/plugin-orders/${plugin.id}`}>
+													<Button variant="outline" size="sm">
+														<BarChart3 className="w-3 h-3" />
+													</Button>
+												</Link>
+											) : null}
+										</div>
 										<Button variant="outline" size="sm">
 											<Edit className="w-3 h-3" />
 										</Button>

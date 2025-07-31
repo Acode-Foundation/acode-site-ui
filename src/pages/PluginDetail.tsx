@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import hljs from "highlight.js";
 import {
+	BarChart3,
 	Calendar,
 	CheckCircle,
 	Download,
@@ -509,9 +510,35 @@ export default function PluginDetail() {
 										className="bg-gradient-primary hover:shadow-glow-primary"
 										asChild
 									>
-										<a href={`acode://plugin/install/${plugin.id}`} target="_blank">
+										<a
+											href={`acode://plugin/install/${plugin.id}`}
+											target="_blank"
+										>
 											<Download className="w-5 h-5 mr-2" />
 											Install Plugin
+										</a>
+									</Button>
+								)}
+								{(loggedInUser?.role === "admin" ||
+									loggedInUser?.id === plugin.user_id) &&
+									plugin.price > 0 && (
+										<Button variant="outline" size="lg" asChild>
+											<Link to={`/plugin-orders/${plugin.id}`}>
+												<BarChart3 className="w-5 h-5 mr-2" />
+												View Orders
+											</Link>
+										</Button>
+									)}
+								{loggedInUser?.role === "admin" && (
+									<Button variant="outline" size="lg" asChild>
+										<a
+											href={`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin/download/${plugin.id}`}
+											download
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											<Download className="w-5 h-5 mr-2" />
+											Download ZIP
 										</a>
 									</Button>
 								)}
