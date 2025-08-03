@@ -1,3 +1,5 @@
+import { PluginStatus } from "./plugin";
+
 export interface PluginData {
 	id: string;
 	sku: string;
@@ -21,6 +23,7 @@ export interface PluginData {
 	description: string;
 	author_email: string;
 	author_github: string;
+	status?: PluginStatus;
 }
 
 export interface Contributor {
