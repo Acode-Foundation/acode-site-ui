@@ -44,6 +44,13 @@ const fetchDeveloper = async (email: string): Promise<Developer> => {
 const fetchDeveloperPlugins = async (userId: string): Promise<Plugin[]> => {
 	const response = await fetch(
 		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugins?user=${userId}`,
+		{
+			method: "GET",
+			headers: {
+				Accept: "application/json",
+			},
+			credentials: "include",
+		},
 	);
 	if (!response.ok) {
 		return [];

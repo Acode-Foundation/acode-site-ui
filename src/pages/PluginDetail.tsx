@@ -70,11 +70,16 @@ import {
 	VOTE_UP,
 } from "@/types/plugin-detail";
 
-// Types are now imported from @/types/plugin-detail
-
 const fetchPlugin = async (pluginId: string): Promise<PluginData> => {
 	const response = await fetch(
 		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin/${pluginId}`,
+		{
+			method: "GET",
+			headers: {
+				Accept: "application/json",
+			},
+			credentials: "include",
+		},
 	);
 	if (!response.ok) {
 		throw new Error("Plugin not found");
