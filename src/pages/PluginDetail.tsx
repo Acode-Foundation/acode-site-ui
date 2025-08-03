@@ -4,6 +4,7 @@ import {
 	BarChart3,
 	Calendar,
 	CheckCircle,
+	Clock,
 	Download,
 	Edit,
 	Flag,
@@ -16,8 +17,10 @@ import {
 	Tag,
 	ThumbsDown,
 	ThumbsUp,
+	Trash,
 	Trash2,
 	Users,
+	XCircle,
 } from "lucide-react";
 import MarkdownIt from "markdown-it";
 import { useState } from "react";
@@ -108,6 +111,45 @@ const md = new MarkdownIt({
 		);
 	},
 }).use(MarkdownItGitHubAlerts);
+
+const getStatusBadge = (status?: string) => {
+	switch (status) {
+		case "approved":
+			return {
+				icon: CheckCircle,
+				label: "Approved",
+				variant: "default" as const,
+				className:
+					"bg-green-500/10 text-green-500 border-green-500/20 hover:bg-green-500/20",
+			};
+		case "pending":
+			return {
+				icon: Clock,
+				label: "Pending",
+				variant: "secondary" as const,
+				className:
+					"bg-yellow-500/10 text-yellow-500 border-yellow-500/20 hover:bg-yellow-500/20",
+			};
+		case "rejected":
+			return {
+				icon: XCircle,
+				label: "Rejected",
+				variant: "destructive" as const,
+				className:
+					"bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20",
+			};
+		case "deleted":
+			return {
+				icon: Trash,
+				label: "Deleted",
+				variant: "outline" as const,
+				className:
+					"bg-gray-500/10 text-gray-500 border-gray-500/20 hover:bg-gray-500/20",
+			};
+		default:
+			return null;
+	}
+};
 
 export default function PluginDetail() {
 	const { id } = useParams();
@@ -386,6 +428,10 @@ export default function PluginDetail() {
 		(review) => review.user_id === loggedInUser?.id,
 	);
 
+	const statusInfo = getStatusBadge(plugin?.status);
+	const shouldShowStatus =
+		loggedInUser && (loggedInUser.role === "admin" || isPluginDeveloper) && statusInfo;
+
 	const isAndroidDevice = () => {
 		return /android/i.test(navigator.userAgent);
 	};
@@ -439,6 +485,15 @@ export default function PluginDetail() {
 										>
 											{plugin.license}
 										</Badge>
+										{shouldShowStatus && (
+											<Badge
+												variant={statusInfo.variant}
+												className={`text-sm px-3 py-1 flex items-center gap-1 ${statusInfo.className}`}
+											>
+												<statusInfo.icon className="w-3 h-3" />
+												{statusInfo.label}
+											</Badge>
+										)}
 									</div>
 								</div>
 								<div className="flex items-center gap-2 text-muted-foreground mb-4">
