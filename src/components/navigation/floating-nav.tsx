@@ -7,6 +7,7 @@ import {
 	Sun,
 	User,
 	UserCircle,
+	Wallet,
 	X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -194,15 +195,26 @@ export function FloatingNav() {
 									</Link>
 								</DropdownMenuItem>
 								{user?.role === "admin" && (
-									<DropdownMenuItem asChild>
-										<Link
-											to="/admin"
-											className="flex items-center cursor-pointer"
-										>
-											<Shield className="h-4 w-4 mr-2" />
-											Admin Dashboard
-										</Link>
-									</DropdownMenuItem>
+									<>
+										<DropdownMenuItem asChild>
+											<Link
+												to="/admin"
+												className="flex items-center cursor-pointer"
+											>
+												<Shield className="h-4 w-4 mr-2" />
+												Admin Dashboard
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem asChild>
+											<Link
+												to="/admin/payments"
+												className="flex items-center cursor-pointer"
+											>
+												<Wallet className="h-4 w-4 mr-2" />
+												Payments
+											</Link>
+										</DropdownMenuItem>
+									</>
 								)}
 								<DropdownMenuItem
 									onClick={handleLogout}
@@ -313,14 +325,24 @@ export function FloatingNav() {
 										Profile
 									</Link>
 									{user?.role === "admin" && (
-										<Link
-											to="/admin"
-											className="flex items-center text-base font-medium transition-colors duration-200 hover:text-primary py-2"
-											onClick={() => setIsMobileMenuOpen(false)}
-										>
-											<Shield className="h-4 w-4 mr-2" />
-											Admin Dashboard
-										</Link>
+										<>
+											<Link
+												to="/admin"
+												className="flex items-center text-base font-medium transition-colors duration-200 hover:text-primary py-2"
+												onClick={() => setIsMobileMenuOpen(false)}
+											>
+												<Shield className="h-4 w-4 mr-2" />
+												Admin Dashboard
+											</Link>
+											<Link
+												to="/admin/payments"
+												className="flex items-center text-base font-medium transition-colors duration-200 hover:text-primary py-2"
+												onClick={() => setIsMobileMenuOpen(false)}
+											>
+												<Wallet className="h-4 w-4 mr-2" />
+												Payments
+											</Link>
+										</>
 									)}
 									<button
 										onClick={() => {

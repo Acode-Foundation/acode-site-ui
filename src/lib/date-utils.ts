@@ -27,8 +27,15 @@ export const generateYearsArray = (startYear: number = 2023): number[] => {
 	);
 };
 
-// Common date formatting function
-export const formatDate = (dateString: string): string => {
+export const formatDate = (dateString: string) => {
+	return new Date(dateString).toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+	});
+};
+
+export const formatDateTime = (dateString: string): string => {
 	return new Date(dateString).toLocaleDateString("en-US", {
 		year: "numeric",
 		month: "short",
@@ -38,7 +45,6 @@ export const formatDate = (dateString: string): string => {
 	});
 };
 
-// Common currency formatting function
 export const formatCurrency = (amount: number): string => {
 	return amount.toLocaleString("en-IN", {
 		minimumFractionDigits: 2,

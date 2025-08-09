@@ -430,7 +430,9 @@ export default function PluginDetail() {
 
 	const statusInfo = getStatusBadge(plugin?.status);
 	const shouldShowStatus =
-		loggedInUser && (loggedInUser.role === "admin" || isPluginDeveloper) && statusInfo;
+		loggedInUser &&
+		(loggedInUser.role === "admin" || isPluginDeveloper) &&
+		statusInfo;
 
 	const isAndroidDevice = () => {
 		return /android/i.test(navigator.userAgent);
