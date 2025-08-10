@@ -10,23 +10,7 @@ import {
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-
-interface Plugin {
-	id: string;
-	icon: string;
-	name: string;
-	price: number;
-	author: string;
-	version: string;
-	license: string;
-	votes_up: number;
-	downloads: number;
-	votes_down: number;
-	author_verified: number;
-	author_email?: string;
-	status?: "pending" | "approved" | "rejected" | "deleted";
-	user_id?: number;
-}
+import { Plugin } from "@/types";
 
 interface PluginCardProps {
 	plugin: Plugin;

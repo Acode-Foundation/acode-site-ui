@@ -42,7 +42,7 @@ import { useUpdateThreshold } from "@/hooks/use-update-threshold";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import {
 	formatCurrency,
-	formatDate,
+	formatDateTime,
 	generateYearsArray,
 	getCurrentDateDetails,
 	MONTHS,
@@ -189,7 +189,7 @@ export default function Earnings() {
 						<p className="text-xs text-muted-foreground">
 							Period:{" "}
 							{unpaidEarnings?.from && unpaidEarnings?.to
-								? `${formatDate(unpaidEarnings.from)} - ${formatDate(unpaidEarnings.to)}`
+								? `${formatDateTime(unpaidEarnings.from)} - ${formatDateTime(unpaidEarnings.to)}`
 								: "N/A"}
 						</p>
 						<div className="mt-2">
@@ -360,7 +360,7 @@ export default function Earnings() {
 							<TableBody>
 								{paginatedPayments?.map((payment) => (
 									<TableRow key={payment.id}>
-										<TableCell>{formatDate(payment.created_at)}</TableCell>
+										<TableCell>{formatDateTime(payment.created_at)}</TableCell>
 										<TableCell className="font-medium">
 											₹{formatCurrency(payment.amount)}
 										</TableCell>
@@ -467,7 +467,7 @@ export default function Earnings() {
 								<div>
 									<p className="text-sm font-medium">Date</p>
 									<p className="text-sm text-muted-foreground">
-										{formatDate(receipt.created_at)}
+										{formatDateTime(receipt.created_at)}
 									</p>
 								</div>
 								<div>

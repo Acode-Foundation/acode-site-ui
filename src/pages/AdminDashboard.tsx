@@ -49,7 +49,7 @@ import {
 } from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
-import { formatCurrency } from "@/lib/date-utils";
+import { formatCurrency, formatDate } from "@/lib/date-utils";
 import { User } from "@/types";
 
 interface AdminStats {
@@ -166,14 +166,6 @@ export default function AdminDashboard() {
 			</div>
 		);
 	}
-
-	const formatDate = (dateString: string) => {
-		return new Date(dateString).toLocaleDateString("en-US", {
-			year: "numeric",
-			month: "short",
-			day: "numeric",
-		});
-	};
 
 	const formatNumber = (num: number) => {
 		if (num >= 1000000) {

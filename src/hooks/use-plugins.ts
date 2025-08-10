@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import type { Plugin, PluginFilterType } from "@/types";
 
 const fallbackPlugins: Plugin[] = [
@@ -64,6 +65,7 @@ const fallbackPlugins: Plugin[] = [
 const fetchPlugins = async (
 	filter: PluginFilterType = "default",
 	page = 1,
+	isAuthenticated = false,
 ): Promise<Plugin[]> => {
 	try {
 		let url = `${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugins`;
@@ -93,7 +95,7 @@ const fetchPlugins = async (
 				"Content-Type": "application/json",
 			},
 			mode: "cors",
-			credentials: "omit",
+			credentials: isAuthenticated ? "include" : "omit",
 		});
 
 		if (!response.ok) {
@@ -109,9 +111,13 @@ const fetchPlugins = async (
 };
 
 export const usePlugins = (filter: PluginFilterType = "default") => {
+	const { data: loggedInUser } = useLoggedInUser();
+	const isAuthenticated = !!loggedInUser;
+
 	return useInfiniteQuery({
-		queryKey: ["plugins", filter],
-		queryFn: ({ pageParam = 1 }) => fetchPlugins(filter, pageParam),
+		queryKey: ["plugins", filter, isAuthenticated],
+		queryFn: ({ pageParam = 1 }) =>
+			fetchPlugins(filter, pageParam, isAuthenticated),
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, allPages) => {
 			// If last page has less than 20 items, we've reached the end
@@ -127,10 +133,13 @@ export const usePlugins = (filter: PluginFilterType = "default") => {
 };
 
 export const useFeaturedPlugins = () => {
+	const { data: loggedInUser } = useLoggedInUser();
+	const isAuthenticated = !!loggedInUser;
+
 	return useQuery({
-		queryKey: ["plugins", "featured"],
+		queryKey: ["plugins", "featured", isAuthenticated],
 		queryFn: async () => {
-			const plugins = await fetchPlugins("default");
+			const plugins = await fetchPlugins("default", 1, isAuthenticated);
 			return plugins.slice(0, 4); // Return first 4 as featured
 		},
 		staleTime: 10 * 60 * 1000, // 10 minutes

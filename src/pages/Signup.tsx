@@ -39,10 +39,6 @@ export default function Signup() {
 								<Github className="w-4 h-4 mr-2" />
 								Continue with GitHub
 							</Button>
-							<Button variant="outline" className="w-full">
-								<Mail className="w-4 h-4 mr-2" />
-								Continue with Google
-							</Button>
 						</div>
 
 						<div className="relative">

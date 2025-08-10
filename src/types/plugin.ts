@@ -16,6 +16,7 @@ export interface Plugin {
 	comment_count: number;
 	author_verified: number;
 	min_version_code: number;
+	status?: PluginStatus;
 }
 
 export interface FilterOptions {
@@ -29,6 +30,7 @@ export type PluginFilterType =
 	| "recently-updated";
 
 export interface UserPlugin extends Plugin {
-	status: "pending" | "approved" | "rejected";
 	revenue?: number;
 }
+
+export type PluginStatus = "pending" | "approved" | "rejected" | "deleted";

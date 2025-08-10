@@ -112,14 +112,6 @@ export default function Login() {
 								<Github className="w-4 h-4 mr-2" />
 								Continue with GitHub
 							</Button>
-							<Button
-								variant="outline"
-								className="w-full"
-								onClick={() => handleSocialLogin("Google")}
-							>
-								<Mail className="w-4 h-4 mr-2" />
-								Continue with Google
-							</Button>
 						</div>
 
 						<div className="relative">

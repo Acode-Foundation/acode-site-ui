@@ -24,7 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import {
 	formatCurrency,
-	formatDate,
+	formatDateTime,
 	generateYearsArray,
 	getCurrentDateDetails,
 	getMonthName,
@@ -319,7 +319,7 @@ export default function PluginOrders() {
 											<TableCell className="font-mono text-sm">
 												****{order.order_id?.slice(-6)}
 											</TableCell>
-											<TableCell>{formatDate(order.created_at)}</TableCell>
+											<TableCell>{formatDateTime(order.created_at)}</TableCell>
 											<TableCell className="font-medium">
 												₹{formatCurrency(order.amount)}
 											</TableCell>
