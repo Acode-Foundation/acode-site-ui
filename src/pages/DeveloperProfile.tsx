@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DeletePluginDialog } from "@/components/ui/delete-plugin-dialog";
 import { PluginCard } from "@/components/ui/plugin-card";
+import { VerificationToggle } from "@/components/ui/verification-toggle";
 import { useToast } from "@/hooks/use-toast";
 import { useDeletePlugin } from "@/hooks/use-user-plugins";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
@@ -195,6 +196,14 @@ export default function DeveloperProfile() {
 												Edit Profile
 											</Link>
 										</Button>
+									)}
+									{loggedInUser?.role === "admin" && !isOwnProfile && (
+										<VerificationToggle
+											userId={developer.id.toString()}
+											isVerified={developer.verified === 1}
+											userName={developer.name}
+											size="sm"
+										/>
 									)}
 									{developer.website && (
 										<Button variant="outline" size="sm" asChild>

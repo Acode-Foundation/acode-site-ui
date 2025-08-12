@@ -9,6 +9,8 @@ import {
 	MoreHorizontal,
 	Package,
 	Search,
+	ShieldCheck,
+	ShieldX,
 	ShoppingCart,
 	Trash2,
 	UserIcon,
@@ -47,6 +49,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { VerificationToggle } from "@/components/ui/verification-toggle";
 import { toast } from "@/hooks/use-toast";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import { formatCurrency, formatDate } from "@/lib/date-utils";
@@ -443,6 +446,28 @@ export default function AdminDashboard() {
 																	Earnings
 																</Link>
 															</DropdownMenuItem>
+															<VerificationToggle
+																userId={user.id.toString()}
+																isVerified={user.verified === 1}
+																userName={user.name}
+																variant="menu"
+															>
+																<DropdownMenuItem
+																	onSelect={(e) => e.preventDefault()}
+																>
+																	{user.verified === 1 ? (
+																		<>
+																			<ShieldX className="w-4 h-4 mr-2" />
+																			Revoke Verification
+																		</>
+																	) : (
+																		<>
+																			<ShieldCheck className="w-4 h-4 mr-2" />
+																			Verify User
+																		</>
+																	)}
+																</DropdownMenuItem>
+															</VerificationToggle>
 															<AlertDialog>
 																<AlertDialogTrigger asChild>
 																	<DropdownMenuItem
