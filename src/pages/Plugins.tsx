@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { usePluginFilters } from "@/hooks/use-plugin-filters";
 import { usePlugins } from "@/hooks/use-plugins";
+import { usePluginsByStatus } from "@/hooks/use-plugins-by-status";
 import { useDeletePlugin } from "@/hooks/use-user-plugins";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 
@@ -52,12 +53,53 @@ const filters = [
 		label: "Paid",
 	},
 ];
+
+const adminFilters = [
+	{
+		value: "pending",
+		label: "Pending",
+	},
+	{
+		value: "approved",
+		label: "Approved",
+	},
+	{
+		value: "rejected",
+		label: "Rejected",
+	},
+	{
+		value: "deleted",
+		label: "Deleted",
+	},
+];
 export default function Plugins() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedFilter, setSelectedFilter] = useState("default");
 
 	const { data: loggedInUser } = useLoggedInUser();
 	const deletePluginMutation = useDeletePlugin();
+
+	// Check if it's an admin status filter
+	const isAdminFilter = ["pending", "approved", "rejected", "deleted"].includes(
+		selectedFilter,
+	);
+	const isAdmin = loggedInUser?.role === "admin";
+
+	// Get status number for admin filters
+	const getStatusNumber = (filter: string): 0 | 1 | 2 | 3 => {
+		switch (filter) {
+			case "pending":
+				return 0;
+			case "approved":
+				return 1;
+			case "rejected":
+				return 2;
+			case "deleted":
+				return 3;
+			default:
+				return 1;
+		}
+	};
 
 	// Determine API filter type
 	const apiFilter = [
@@ -68,6 +110,8 @@ export default function Plugins() {
 	].includes(selectedFilter)
 		? (selectedFilter as import("@/types").PluginFilterType)
 		: "default";
+
+	// Use regular plugins query
 	const {
 		data,
 		isLoading,
@@ -77,10 +121,26 @@ export default function Plugins() {
 		error,
 	} = usePlugins(apiFilter);
 
+	// Admin status query
+	const {
+		data: adminPluginsData,
+		isLoading: adminPluginsLoading,
+		error: adminPluginsError,
+		isFetchingNextPage: adminIsFetchingNextPage,
+		hasNextPage: adminHasNextPage,
+		fetchNextPage: adminFetchNextPage,
+	} = usePluginsByStatus(
+		getStatusNumber(selectedFilter),
+		isAdminFilter && isAdmin,
+	);
+
 	// Flatten all pages into a single array
 	const allPlugins = useMemo(() => {
+		if (isAdminFilter && isAdmin) {
+			return adminPluginsData?.pages.flatMap((page) => page) || [];
+		}
 		return data?.pages.flatMap((page) => page) || [];
-	}, [data]);
+	}, [data, adminPluginsData, isAdminFilter, isAdmin]);
 
 	// Filter for free/paid plugins
 	const categoryFilteredPlugins = useMemo(() => {
@@ -91,9 +151,21 @@ export default function Plugins() {
 		}
 		return allPlugins;
 	}, [allPlugins, selectedFilter]);
+
 	const filteredPlugins = usePluginFilters(categoryFilteredPlugins, {
 		searchQuery,
 	});
+
+	// Combine loading states
+	const actualIsLoading =
+		isAdminFilter && isAdmin ? adminPluginsLoading : isLoading;
+	const actualError = isAdminFilter && isAdmin ? adminPluginsError : error;
+	const actualIsFetchingNextPage =
+		isAdminFilter && isAdmin ? adminIsFetchingNextPage : isFetchingNextPage;
+	const actualHasNextPage =
+		isAdminFilter && isAdmin ? adminHasNextPage : hasNextPage;
+	const actualFetchNextPage =
+		isAdminFilter && isAdmin ? adminFetchNextPage : fetchNextPage;
 
 	const handleDeletePlugin = async (
 		pluginId: string,
@@ -115,16 +187,25 @@ export default function Plugins() {
 			window.innerHeight + document.documentElement.scrollTop + 1000 >=
 			document.documentElement.scrollHeight
 		) {
-			if (hasNextPage && !isFetchingNextPage && !searchQuery) {
-				fetchNextPage();
+			if (actualHasNextPage && !actualIsFetchingNextPage && !searchQuery) {
+				actualFetchNextPage();
 			}
 		}
-	}, [hasNextPage, isFetchingNextPage, fetchNextPage, searchQuery]);
+	}, [
+		actualHasNextPage,
+		actualIsFetchingNextPage,
+		actualFetchNextPage,
+		searchQuery,
+	]);
 	useEffect(() => {
 		window.addEventListener("scroll", handleScroll);
 		return () => window.removeEventListener("scroll", handleScroll);
 	}, [handleScroll]);
-	if (isLoading) {
+
+	// Combine filters based on admin status
+	const availableFilters = isAdmin ? [...filters, ...adminFilters] : filters;
+
+	if (actualIsLoading) {
 		return (
 			<div className="min-h-screen py-8">
 				<div className="container mx-auto px-4">
@@ -186,7 +267,7 @@ export default function Plugins() {
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
-								{filters.map((filter) => (
+								{availableFilters.map((filter) => (
 									<SelectItem key={filter.value} value={filter.value}>
 										{filter.label}
 									</SelectItem>
@@ -266,7 +347,7 @@ export default function Plugins() {
 				</div>
 
 				{/* Loading More Indicator */}
-				{isFetchingNextPage && (
+				{actualIsFetchingNextPage && (
 					<div className="flex justify-center items-center py-8">
 						<Loader2 className="w-6 h-6 animate-spin mr-2" />
 						<span className="text-muted-foreground">
@@ -277,12 +358,12 @@ export default function Plugins() {
 
 				{/* Load More Button (fallback for infinite scroll) */}
 				{!searchQuery &&
-					hasNextPage &&
-					!isFetchingNextPage &&
+					actualHasNextPage &&
+					!actualIsFetchingNextPage &&
 					filteredPlugins.length > 0 && (
 						<div className="flex justify-center mt-8">
 							<Button
-								onClick={() => fetchNextPage()}
+								onClick={() => actualFetchNextPage()}
 								variant="outline"
 								className="px-8"
 							>

@@ -7,9 +7,11 @@ import {
 	Verified,
 	XCircle,
 } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { PluginStatusToggle } from "@/components/ui/plugin-status-toggle";
 import { Plugin } from "@/types";
 
 interface PluginCardProps {
@@ -66,7 +68,8 @@ export function PluginCard({
 	currentUserId,
 	isAdmin = false,
 }: PluginCardProps) {
-	const statusInfo = getStatusBadge(plugin.status);
+	const [currentPluginStatus, setCurrentPluginStatus] = useState(plugin.status);
+	const statusInfo = getStatusBadge(currentPluginStatus);
 	const shouldShowStatus =
 		showStatus && (isAdmin || plugin.user_id === currentUserId) && statusInfo;
 
@@ -98,13 +101,41 @@ export function PluginCard({
 								v{plugin.version}
 							</Badge>
 							{shouldShowStatus && (
-								<Badge
-									variant={statusInfo.variant}
-									className={`text-xs flex items-center gap-1 ${statusInfo.className}`}
+								<div
+									onClick={(e) => {
+										if (isAdmin) {
+											e.preventDefault();
+											e.stopPropagation();
+										}
+									}}
+									className={isAdmin ? "cursor-pointer" : ""}
 								>
-									<statusInfo.icon className="w-3 h-3" />
-									{statusInfo.label}
-								</Badge>
+									{isAdmin ? (
+										<PluginStatusToggle
+											pluginId={plugin.id}
+											pluginName={plugin.name}
+											currentStatus={currentPluginStatus || ""}
+											onStatusChange={setCurrentPluginStatus}
+											variant="menu"
+										>
+											<Badge
+												variant={statusInfo.variant}
+												className={`text-xs flex items-center gap-1 ${statusInfo.className} hover:opacity-80 transition-opacity`}
+											>
+												<statusInfo.icon className="w-3 h-3" />
+												{statusInfo.label}
+											</Badge>
+										</PluginStatusToggle>
+									) : (
+										<Badge
+											variant={statusInfo.variant}
+											className={`text-xs flex items-center gap-1 ${statusInfo.className}`}
+										>
+											<statusInfo.icon className="w-3 h-3" />
+											{statusInfo.label}
+										</Badge>
+									)}
+								</div>
 							)}
 						</div>
 					</div>

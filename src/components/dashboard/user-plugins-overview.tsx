@@ -1,15 +1,20 @@
 import {
+	ArrowDown,
+	ArrowUp,
+	ArrowUpDown,
 	BarChart3,
 	CheckCircle,
 	Clock,
 	Edit,
 	Eye,
+	Filter,
 	MoreHorizontal,
 	Package,
+	Search,
 	Trash2,
 	XCircle,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +27,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
 	Pagination,
 	PaginationContent,
@@ -30,6 +36,13 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import {
 	Table,
 	TableBody,
@@ -49,15 +62,66 @@ export function UserPluginsOverview() {
 	);
 	const deletePluginMutation = useDeletePlugin();
 	const [currentPage, setCurrentPage] = useState(1);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [statusFilter, setStatusFilter] = useState("all");
+	const [sortBy, setSortBy] = useState<"downloads">("downloads");
+	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 	const pluginsPerPage = 5;
 
+	// Filter and sort plugins
+	const filteredAndSortedPlugins = useMemo(() => {
+		let filtered = plugins;
+
+		// Apply search filter
+		if (searchQuery) {
+			filtered = filtered.filter(
+				(plugin) =>
+					plugin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+					plugin.keywords?.toLowerCase().includes(searchQuery.toLowerCase()),
+			);
+		}
+
+		// Apply status filter
+		if (statusFilter !== "all") {
+			filtered = filtered.filter((plugin) => plugin.status === statusFilter);
+		}
+
+		// Apply sorting
+		filtered.sort((a, b) => {
+			let aValue: string | number;
+			let bValue: string | number;
+
+			switch (sortBy) {
+				case "downloads":
+					aValue = a.downloads;
+					bValue = b.downloads;
+					break;
+			}
+
+			if (sortOrder === "asc") {
+				return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+			} else {
+				return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+			}
+		});
+
+		return filtered;
+	}, [plugins, searchQuery, statusFilter, sortBy, sortOrder]);
+
 	// Pagination logic
-	const totalPages = Math.ceil(plugins.length / pluginsPerPage);
+	const totalPages = Math.ceil(
+		filteredAndSortedPlugins.length / pluginsPerPage,
+	);
 	const startIndex = (currentPage - 1) * pluginsPerPage;
-	const paginatedPlugins = plugins.slice(
+	const paginatedPlugins = filteredAndSortedPlugins.slice(
 		startIndex,
 		startIndex + pluginsPerPage,
 	);
+
+	// Reset pagination when filters change
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [searchQuery, statusFilter, sortBy, sortOrder]);
 
 	const handleDeletePlugin = async (
 		pluginId: string,
@@ -121,13 +185,35 @@ export function UserPluginsOverview() {
 		}
 	};
 
-	const totalPlugins = plugins.length;
-	const approvedPlugins = plugins.filter((p) => p.status === "approved").length;
-	const pendingPlugins = plugins.filter((p) => p.status === "pending").length;
-	const totalDownloads = plugins.reduce(
+	const totalPlugins = filteredAndSortedPlugins.length;
+	const approvedPlugins = filteredAndSortedPlugins.filter(
+		(p) => p.status === "approved",
+	).length;
+	const pendingPlugins = filteredAndSortedPlugins.filter(
+		(p) => p.status === "pending",
+	).length;
+	const totalDownloads = filteredAndSortedPlugins.reduce(
 		(sum, plugin) => sum + plugin.downloads,
 		0,
 	);
+
+	const handleSort = (column: "downloads") => {
+		if (sortBy === column) {
+			setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+		} else {
+			setSortBy(column);
+			setSortOrder("desc");
+		}
+	};
+
+	const getSortIcon = (column: "downloads") => {
+		if (sortBy !== column) return <ArrowUpDown className="w-4 h-4" />;
+		return sortOrder === "asc" ? (
+			<ArrowUp className="w-4 h-4" />
+		) : (
+			<ArrowDown className="w-4 h-4" />
+		);
+	};
 
 	if (isLoading) {
 		return (
@@ -185,13 +271,43 @@ export function UserPluginsOverview() {
 					</div>
 				</div>
 
+				{/* Search and Filters */}
+				<div className="bg-card/60 backdrop-blur-lg border border-border/50 rounded-xl p-4 mb-6 shadow-sm">
+					<div className="flex flex-col lg:flex-row gap-4">
+						<div className="relative flex-1">
+							<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+							<Input
+								placeholder="Search plugins..."
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+								className="pl-10 bg-background/80 border-border/50"
+							/>
+						</div>
+						<Select value={statusFilter} onValueChange={setStatusFilter}>
+							<SelectTrigger className="w-full lg:w-48 bg-background/80 border-border/50">
+								<Filter className="w-4 h-4 mr-2" />
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="all">All Status</SelectItem>
+								<SelectItem value="approved">Approved</SelectItem>
+								<SelectItem value="pending">Pending</SelectItem>
+								<SelectItem value="rejected">Rejected</SelectItem>
+								<SelectItem value="deleted">Deleted</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+				</div>
+
 				{/* Plugins Table */}
 				{plugins.length === 0 ? (
 					<div className="text-center py-8">
 						<Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
 						<h3 className="text-lg font-medium mb-2">No plugins yet</h3>
 						<p className="text-muted-foreground mb-4">
-							Start by submitting your first plugin to the store.
+							{searchQuery || statusFilter !== "all"
+								? "No plugins match your search criteria."
+								: "Start by submitting your first plugin to the store."}
 						</p>
 						<Link to="/submit-plugin">
 							<Button>Submit Plugin</Button>
@@ -291,11 +407,28 @@ export function UserPluginsOverview() {
 							<Table>
 								<TableHeader>
 									<TableRow>
-										<TableHead>Plugin</TableHead>
-										<TableHead>Status</TableHead>
-										<TableHead>Downloads</TableHead>
-										<TableHead>Rating</TableHead>
-										<TableHead>Actions</TableHead>
+										<TableHead className="font-semibold text-foreground">
+											Plugin
+										</TableHead>
+										<TableHead className="font-semibold text-foreground">
+											Status
+										</TableHead>
+										<TableHead>
+											<Button
+												variant="ghost"
+												size="sm"
+												className="h-auto p-0 font-semibold text-foreground hover:bg-muted/50 hover:text-foreground flex items-center gap-1"
+												onClick={() => handleSort("downloads")}
+											>
+												Downloads {getSortIcon("downloads")}
+											</Button>
+										</TableHead>
+										<TableHead className="font-semibold text-foreground">
+											Rating
+										</TableHead>
+										<TableHead className="font-semibold text-foreground">
+											Actions
+										</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
@@ -341,27 +474,36 @@ export function UserPluginsOverview() {
 														</Button>
 													</DropdownMenuTrigger>
 													<DropdownMenuContent align="end" className="w-48">
-														<Link to={`/plugins/${plugin.id}`}>
-															<DropdownMenuItem>
+														<DropdownMenuItem asChild>
+															<Link
+																to={`/plugins/${plugin.id}`}
+																className="flex items-center"
+															>
 																<Eye className="mr-2 h-4 w-4" />
 																View Plugin
-															</DropdownMenuItem>
-														</Link>
+															</Link>
+														</DropdownMenuItem>
 														{plugin.status === "approved" &&
 															plugin.price > 0 && (
-																<Link to={`/plugin-orders/${plugin.id}`}>
-																	<DropdownMenuItem>
+																<DropdownMenuItem asChild>
+																	<Link
+																		to={`/plugin-orders/${plugin.id}`}
+																		className="flex items-center"
+																	>
 																		<BarChart3 className="mr-2 h-4 w-4" />
 																		View Orders
-																	</DropdownMenuItem>
-																</Link>
+																	</Link>
+																</DropdownMenuItem>
 															)}
-														<Link to={`/submit-plugin?id=${plugin.id}`}>
-															<DropdownMenuItem>
+														<DropdownMenuItem asChild>
+															<Link
+																to={`/submit-plugin?id=${plugin.id}`}
+																className="flex items-center"
+															>
 																<Edit className="mr-2 h-4 w-4" />
 																Edit Plugin
-															</DropdownMenuItem>
-														</Link>
+															</Link>
+														</DropdownMenuItem>
 														<DropdownMenuSeparator className="bg-border" />
 														<DeletePluginDialog
 															pluginName={plugin.name}
