@@ -475,26 +475,35 @@ export function UserPluginsOverview() {
 													</DropdownMenuTrigger>
 													<DropdownMenuContent align="end" className="w-48">
 														<DropdownMenuItem asChild>
-															<Link to={`/plugins/${plugin.id}`} className="flex items-center">
+															<Link
+																to={`/plugins/${plugin.id}`}
+																className="flex items-center"
+															>
 																<Eye className="mr-2 h-4 w-4" />
 																View Plugin
 															</Link>
 														</DropdownMenuItem>
 														{plugin.status === "approved" &&
 															plugin.price > 0 && (
-																<Link to={`/plugin-orders/${plugin.id}`}>
-																	<DropdownMenuItem>
+																<DropdownMenuItem asChild>
+																	<Link
+																		to={`/plugin-orders/${plugin.id}`}
+																		className="flex items-center"
+																	>
 																		<BarChart3 className="mr-2 h-4 w-4" />
 																		View Orders
-																	</DropdownMenuItem>
-																</Link>
+																	</Link>
+																</DropdownMenuItem>
 															)}
-														<Link to={`/submit-plugin?id=${plugin.id}`}>
-															<DropdownMenuItem>
+														<DropdownMenuItem asChild>
+															<Link
+																to={`/submit-plugin?id=${plugin.id}`}
+																className="flex items-center"
+															>
 																<Edit className="mr-2 h-4 w-4" />
 																Edit Plugin
-															</DropdownMenuItem>
-														</Link>
+															</Link>
+														</DropdownMenuItem>
 														<DropdownMenuSeparator className="bg-border" />
 														<DeletePluginDialog
 															pluginName={plugin.name}
