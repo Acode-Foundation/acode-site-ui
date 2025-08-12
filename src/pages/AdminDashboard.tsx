@@ -5,6 +5,7 @@ import {
 	CheckCircle,
 	ChevronLeft,
 	ChevronRight,
+	Clock,
 	Download,
 	MoreHorizontal,
 	Package,
@@ -16,6 +17,7 @@ import {
 	UserIcon,
 	Users,
 	Wallet,
+	XCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -41,6 +43,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { PluginStatusToggle } from "@/components/ui/plugin-status-toggle";
 import {
 	Table,
 	TableBody,
@@ -50,10 +53,11 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { VerificationToggle } from "@/components/ui/verification-toggle";
+import { usePluginsByStatus } from "@/hooks/use-plugins-by-status";
 import { toast } from "@/hooks/use-toast";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import { formatCurrency, formatDate } from "@/lib/date-utils";
-import { User } from "@/types";
+import { Plugin, User } from "@/types";
 
 interface AdminStats {
 	users: number;
@@ -141,7 +145,18 @@ export default function AdminDashboard() {
 		gcTime: 10 * 60 * 1000, // 10 minutes
 	});
 
-	const error = statsError || usersError;
+	// Fetch pending plugins for admin review
+	const {
+		data: pendingPluginsData,
+		isLoading: pendingPluginsLoading,
+		error: pendingPluginsError,
+	} = usePluginsByStatus(0, currentUser?.role === "admin");
+
+	// Flatten pending plugins data
+	const pendingPlugins =
+		pendingPluginsData?.pages.flatMap((page) => page) || [];
+
+	const error = statsError || usersError || pendingPluginsError;
 
 	// Redirect if not admin
 	if (currentUser && currentUser.role !== "admin") {
@@ -312,6 +327,131 @@ export default function AdminDashboard() {
 					</CardContent>
 				</Card>
 			</div>
+
+			{/* Pending Plugins Section */}
+			<Card className="mb-8 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-200 dark:border-amber-800">
+				<CardHeader className="pb-4">
+					<div className="flex items-center justify-between">
+						<CardTitle className="flex items-center gap-3">
+							<div className="flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50">
+								<Clock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+							</div>
+							<div>
+								<h2 className="text-xl font-semibold text-amber-900 dark:text-amber-100">
+									Pending Plugin Reviews
+								</h2>
+								<p className="text-sm text-amber-700 dark:text-amber-300 font-normal">
+									{pendingPlugins.length} plugins awaiting your approval
+								</p>
+							</div>
+						</CardTitle>
+						{pendingPlugins.length > 0 && (
+							<Badge
+								variant="secondary"
+								className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200"
+							>
+								{pendingPlugins.length} pending
+							</Badge>
+						)}
+					</div>
+				</CardHeader>
+				<CardContent>
+					{pendingPluginsLoading ? (
+						<div className="flex items-center justify-center py-12">
+							<div className="flex items-center gap-3">
+								<div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+								<span className="text-amber-700 dark:text-amber-300">
+									Loading pending plugins...
+								</span>
+							</div>
+						</div>
+					) : pendingPlugins.length > 0 ? (
+						<div className="space-y-4">
+							{pendingPlugins.map((plugin: Plugin) => (
+								<div
+									key={plugin.id}
+									className="flex items-center justify-between p-5 bg-white/70 dark:bg-gray-900/30 rounded-xl border border-amber-200/60 dark:border-amber-700/40 hover:bg-white/90 dark:hover:bg-gray-900/50 hover:border-amber-300/80 dark:hover:border-amber-600/60 hover:shadow-lg transition-all duration-200"
+								>
+									<div className="flex items-center gap-5 flex-1">
+										<div className="relative">
+											<img
+												src={plugin.icon}
+												alt={plugin.name}
+												className="w-14 h-14 rounded-xl border-2 border-amber-200/60 dark:border-amber-700/40 object-cover shadow-sm"
+												onError={(e) => {
+													const target = e.target as HTMLImageElement;
+													target.style.display = "none";
+													target.nextElementSibling?.classList.remove("hidden");
+												}}
+											/>
+											<div className="hidden w-14 h-14 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center text-white font-bold text-xl border-2 border-amber-200/60 dark:border-amber-700/40 shadow-sm">
+												{plugin.name.charAt(0)}
+											</div>
+										</div>
+										<div className="flex-1 min-w-0">
+											<div className="flex items-center gap-3 mb-2">
+												<Link
+													to={`/plugins/${plugin.id}`}
+													className="font-semibold text-lg text-gray-900 dark:text-gray-100 hover:text-amber-700 dark:hover:text-amber-300 hover:underline truncate"
+												>
+													{plugin.name}
+												</Link>
+												<Badge
+													variant="secondary"
+													className="text-xs px-2 py-1 bg-amber-100/80 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 border-amber-200/60 dark:border-amber-700/40 font-medium shrink-0"
+												>
+													v{plugin.version}
+												</Badge>
+											</div>
+											<div className="flex items-center gap-4 text-sm text-gray-700 dark:text-gray-300">
+												<div className="flex items-center gap-2">
+													<span className="font-medium">
+														by {plugin.author}
+													</span>
+													{plugin.author_verified === 1 && (
+														<CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+													)}
+												</div>
+												<div className="flex items-center">
+													<span
+														className={`px-2 py-1 rounded-md text-xs font-semibold ${
+															plugin.price === 0
+																? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300"
+																: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300"
+														}`}
+													>
+														{plugin.price === 0 ? "Free" : `₹${plugin.price}`}
+													</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div className="flex items-center gap-3 shrink-0">
+										<PluginStatusToggle
+											pluginId={plugin.id}
+											pluginName={plugin.name}
+											currentStatus="pending"
+											variant="button"
+										/>
+									</div>
+								</div>
+							))}
+						</div>
+					) : (
+						<div className="text-center py-12">
+							<div className="flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/50 mx-auto mb-4">
+								<CheckCircle className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+							</div>
+							<h3 className="text-lg font-medium text-amber-900 dark:text-amber-100 mb-2">
+								All caught up!
+							</h3>
+							<p className="text-amber-700 dark:text-amber-300">
+								No pending plugin submissions at the moment.
+							</p>
+						</div>
+					)}
+				</CardContent>
+			</Card>
 
 			{/* Users Table */}
 			<Card>
