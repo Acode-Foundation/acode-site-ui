@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { GITHUB_CONFIG } from "@/config/links";
 
 export interface GitHubStats {
 	stars: number;
@@ -18,19 +19,16 @@ interface GitHubReleaseResponse {
 const fetchGitHubStats = async (): Promise<GitHubStats> => {
 	try {
 		const [repoResponse, releaseResponse] = await Promise.all([
-			fetch("https://api.github.com/repos/Acode-Foundation/Acode", {
+			fetch(GITHUB_CONFIG.apiUrl, {
 				headers: {
 					Accept: "application/vnd.github.v3+json",
 				},
 			}),
-			fetch(
-				"https://api.github.com/repos/Acode-Foundation/Acode/releases/latest",
-				{
-					headers: {
-						Accept: "application/vnd.github.v3+json",
-					},
+			fetch(GITHUB_CONFIG.releasesApiUrl, {
+				headers: {
+					Accept: "application/vnd.github.v3+json",
 				},
-			),
+			}),
 		]);
 
 		if (!repoResponse.ok || !releaseResponse.ok) {

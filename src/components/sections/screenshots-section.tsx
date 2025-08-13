@@ -101,7 +101,7 @@ export function ScreenshotsSection() {
 				</div>
 
 				{/* Screenshots Carousel */}
-				<div className="max-w-7xl mx-auto mb-16">
+				<div className="max-w-7xl mx-auto">
 					<Carousel
 						className="w-full"
 						opts={{
@@ -181,53 +181,6 @@ export function ScreenshotsSection() {
 						<CarouselPrevious className="-left-4 bg-card/80 border-border/50 hover:bg-primary hover:text-white" />
 						<CarouselNext className="-right-4 bg-card/80 border-border/50 hover:bg-primary hover:text-white" />
 					</Carousel>
-				</div>
-
-				{/* Key Features */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-					<div className="text-center group">
-						<div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-							<Palette className="w-8 h-8 text-white" />
-						</div>
-						<h3 className="text-xl font-semibold mb-3">Beautiful Themes</h3>
-						<p className="text-muted-foreground leading-relaxed">
-							Choose from stunning themes or create your own with the built-in
-							theme editor.
-						</p>
-					</div>
-
-					<div className="text-center group">
-						<div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-							<Layers className="w-8 h-8 text-white" />
-						</div>
-						<h3 className="text-xl font-semibold mb-3">Smart Plugins</h3>
-						<p className="text-muted-foreground leading-relaxed">
-							Extend functionality with a rich ecosystem of plugins for every
-							development need.
-						</p>
-					</div>
-
-					<div className="text-center group">
-						<div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-							<Settings className="w-8 h-8 text-white" />
-						</div>
-						<h3 className="text-xl font-semibold mb-3">Fully Customizable</h3>
-						<p className="text-muted-foreground leading-relaxed">
-							Tailor every aspect of your coding environment to match your
-							workflow preferences.
-						</p>
-					</div>
-
-					<div className="text-center group">
-						<div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-							<Zap className="w-8 h-8 text-white" />
-						</div>
-						<h3 className="text-xl font-semibold mb-3">Lightning Fast</h3>
-						<p className="text-muted-foreground leading-relaxed">
-							Optimized performance ensures smooth coding experience across all
-							devices and platforms.
-						</p>
-					</div>
 				</div>
 			</div>
 		</section>

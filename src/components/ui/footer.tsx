@@ -1,19 +1,21 @@
 import { ExternalLink, Github, Heart, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
 import acodeLogoSvg from "@/assets/acode-logo.svg";
+import { EXTERNAL_LINKS } from "@/config/links";
 
 const footerLinks = [
 	{ name: "FAQ", href: "/faq" },
 	{ name: "Plugins", href: "/plugins" },
-	{ name: "Documentation", href: "https://docs.acode.app", external: true },
+	{ name: "Documentation", href: EXTERNAL_LINKS.docs, external: true },
 	{ name: "Privacy Policy", href: "/privacy" },
 	{ name: "Terms & Conditions", href: "/terms" },
 	{
 		name: "GitHub",
-		href: "https://github.com/deadlyjack/Acode",
+		href: EXTERNAL_LINKS.github,
 		external: true,
 	},
-	{ name: "Discord", href: "https://discord.gg/acode", external: true },
+	{ name: "Discord", href: EXTERNAL_LINKS.discord, external: true },
+	{ name: "Telegram", href: EXTERNAL_LINKS.telegram, external: true },
 ];
 
 export function Footer() {
