@@ -11,26 +11,6 @@ export function CTASection() {
 
 			<div className="container mx-auto px-4 relative z-10">
 				<div className="text-center max-w-4xl mx-auto">
-					{/* Ad Placeholder */}
-					<div className="bg-card/30 backdrop-blur-sm border border-border rounded-2xl p-8 mb-12 relative group hover:border-primary/30 transition-colors">
-						<div className="absolute top-4 right-4">
-							<span className="text-xs text-muted-foreground bg-secondary/50 px-2 py-1 rounded">
-								Sponsored
-							</span>
-						</div>
-						<div className="h-32 flex items-center justify-center">
-							<div className="text-center">
-								<div className="w-16 h-16 bg-gradient-secondary rounded-lg flex items-center justify-center mx-auto mb-4">
-									<ExternalLink className="w-8 h-8 text-white" />
-								</div>
-								<h3 className="text-lg font-semibold mb-2">Your Ad Here</h3>
-								<p className="text-muted-foreground text-sm">
-									Reach thousands of developers using Acode
-								</p>
-							</div>
-						</div>
-					</div>
-
 					{/* Main CTA */}
 					<h2 className="text-4xl md:text-6xl font-bold mb-6 animate-slide-up">
 						Ready to code

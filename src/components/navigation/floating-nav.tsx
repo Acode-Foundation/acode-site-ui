@@ -22,6 +22,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/components/ui/theme-provider";
+import { EXTERNAL_LINKS } from "@/config/links";
 import { useToast } from "@/hooks/use-toast";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import { cn } from "@/lib/utils";
@@ -29,7 +30,7 @@ import { cn } from "@/lib/utils";
 const baseNavItems = [
 	{ name: "FAQ", href: "/faq", external: false },
 	{ name: "Plugins", href: "/plugins", external: false },
-	{ name: "Docs", href: "https://docs.acode.app", external: true },
+	{ name: "Docs", href: EXTERNAL_LINKS.docs, external: true },
 ];
 
 const authNavItems = [

@@ -6,43 +6,43 @@ const features = [
 		icon: Code,
 		title: "Syntax Highlighting",
 		description:
-			"Support for 100+ programming languages with beautiful syntax highlighting and code completion.",
+			"Enjoy beautiful syntax highlighting and intelligent code completion for different programming languages.",
 		color: "text-blue-500",
 	},
 	{
 		icon: Palette,
 		title: "Customizable Themes",
 		description:
-			"Choose from dozens of themes or create your own. Dark mode, light mode, and everything in between.",
+			"Personalize your workspace with a wide range of themes, including dark and light modes, or create your own.",
 		color: "text-purple-500",
 	},
 	{
-		icon: Zap,
-		title: "Fast & Efficient",
-		description:
-			"Optimized for mobile devices. Lightning-fast performance even with large files.",
-		color: "text-yellow-500",
-	},
-	{
 		icon: Layers,
-		title: "Plugin System",
+		title: "Plugin Ecosystem",
 		description:
-			"Extend functionality with powerful plugins. Auto-completion, git integration, and more.",
+			"Access a large plugin ecosystem with color schemes, fonts, multiple intellisense plugins, file icons, and more.",
 		color: "text-green-500",
-	},
-	{
-		icon: Shield,
-		title: "Secure Coding",
-		description:
-			"Built-in security features to protect your code. Local storage and encrypted connections.",
-		color: "text-red-500",
 	},
 	{
 		icon: Smartphone,
 		title: "Mobile Optimized",
 		description:
-			"Designed specifically for touch interfaces. Gesture support and mobile-friendly UI.",
+			"Designed for touch interfaces with gesture support and a mobile-friendly, intuitive UI.",
 		color: "text-indigo-500",
+	},
+	{
+		icon: Shield,
+		title: "SFTP/FTP Support",
+		description:
+			"Connect to remote servers with built-in SFTP and FTP support for seamless file management.",
+		color: "text-cyan-500",
+	},
+	{
+		icon: Code,
+		title: "Built-in Terminal",
+		description:
+			"Integrated terminal powered by Alpine Linux, with touch and mouse support.",
+		color: "text-orange-500",
 	},
 ];
 
