@@ -1,3 +1,4 @@
+// TODO: Replace GITHUB from lucide-react to simple icons; or with it's own svg. Ref: https://github.com/lucide-icons/lucide/issues/670
 import { ArrowRight, Eye, EyeOff, Github, Mail, User } from "lucide-react";
 import { useState } from "react";
 import { Link, redirect, useNavigate, useParams } from "react-router-dom";
@@ -88,14 +89,26 @@ export default function Signup() {
 			return;
 		}
 
+		const formData = new FormData(e.target as HTMLFormElement);
+
+		console.log("Signup FormData", formData,
+			formData.get("email"),
+			formData.get("password").toString(),
+			formData.get("confirmPassword").toString(),
+			formData.get("otp"),
+			(formData.get("password").toString().localeCompare(formData.get("confirmPassword").toString()))
+		);
+
+		if(formData.get("password") !== formData.get("confirmPassword")) {
+
+			toast({
+				description: "Password & Confirm Password both Must be the same.",
+				variant: "destructive",
+			})
+			return;
+		}
+
 		try {
-			const formData = new FormData(e.target as HTMLFormElement);
-			// formData.append("name", `${formData.get("firstName") as string} ${formData.get("lastName") as string}`);
-			console.log("Signup FormData", formData,
-				formData.get("email"),
-				formData.get("password"),
-				formData.get("otp"),
-			);
 
 			console.log("Signup env", import.meta.env);
 
@@ -164,9 +177,9 @@ export default function Signup() {
 				<Card className="bg-card/50 backdrop-blur-sm border-border">
 					<CardHeader className="space-y-1 pb-4">
 						<div className="space-y-2">
-							<Button variant="outline" className="w-full">
+							<Button variant="outline" className="w-full" disabled aria-disabled>
 								<Github className="w-4 h-4 mr-2" />
-								Continue with GitHub
+								Continue with GitHub (Soon)
 							</Button>
 						</div>
 
@@ -184,28 +197,6 @@ export default function Signup() {
 
 					<CardContent>
 						<form className="space-y-4" onSubmit={handleSignup}>
-							{/* <div className="grid grid-cols-2 gap-4">
-								<div className="space-y-2">
-									<Label htmlFor="firstName">First Name</Label>
-									<Input
-										id="firstName"
-										name="firstName"
-										placeholder="John"
-										required
-										className="bg-background/50"
-									/>
-								</div>
-								<div className="space-y-2">
-									<Label htmlFor="lastName">Last Name</Label>
-									<Input
-										id="lastName"
-										placeholder="Doe"
-										name="lastName"
-										required
-										className="bg-background/50"
-									/>
-								</div>
-							</div> */}
 
 							<div className="space-y-2">
 								<Label htmlFor="username">Username</Label>
@@ -241,7 +232,8 @@ export default function Signup() {
 									size="sm"
 									onClick={handleSendOtp}
 									disabled={isOtpLoading}
-									className="w-full"
+									title="Press it, After entering your Email Above"
+									className="w-full border-slate-700 hover:border-none"
 								>
 									{isOtpLoading ? "Sending..." : otpSent ? "Resend OTP" : "Send OTP"}
 								</Button>
@@ -295,6 +287,7 @@ export default function Signup() {
 								<div className="relative">
 									<Input
 										id="confirmPassword"
+										name="confirmPassword"
 										type={showConfirmPassword ? "text" : "password"}
 										placeholder="Confirm your password"
 										autoComplete="new-password"
