@@ -324,7 +324,7 @@ export default function Dashboard() {
 		...currentLoggedUser,
 	};
 
-	// Filter plugins based on search query
+	// Filter plugins based on a search query
 	const filteredUserPlugins =
 		userPlugins?.filter(
 			(plugin) =>

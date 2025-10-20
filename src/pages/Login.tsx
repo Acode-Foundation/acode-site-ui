@@ -48,7 +48,7 @@ export default function Login() {
 				return toast({
 					title: "Login Failed",
 					description:
-						responseData?.error ||
+						`${responseData?.error}` ||
 						`Something went wrong, server responded empty (request status code: ${response.status}). Please try again.`,
 					// destructive = bg Red (shown as error)
 					variant: "destructive",
