@@ -244,13 +244,14 @@ export default function Signup() {
 									<Label htmlFor="otp">Enter OTP</Label>
 									<Input
 										id="otp"
-										type="text"
+										type="number"
 										placeholder="Enter 6-digit OTP"
 										name="otp"
 										value={otp}
 										onChange={(e) => setOtp(e.target.value)}
 										required
-										maxLength={6}
+										min={6}
+										max={6}
 										className="bg-background/50 text-center text-lg tracking-widest"
 									/>
 								</div>
