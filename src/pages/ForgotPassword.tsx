@@ -1,4 +1,12 @@
-import { ArrowLeft, ArrowRight, CheckCircle, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import {
+	ArrowLeft,
+	ArrowRight,
+	CheckCircle,
+	Eye,
+	EyeOff,
+	Lock,
+	Mail,
+} from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -31,13 +39,16 @@ export default function ForgotPassword() {
 
 		setIsLoading(true);
 		try {
-			const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/otp?type=reset`, {
-				method: "POST",
-				body: JSON.stringify({ email }),
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetch(
+				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/otp?type=reset`,
+				{
+					method: "POST",
+					body: JSON.stringify({ email }),
+					headers: {
+						"Content-Type": "application/json",
+					},
 				},
-			});
+			);
 
 			if (response.ok) {
 				setCurrentStep("otp");
@@ -50,7 +61,8 @@ export default function ForgotPassword() {
 				const responseBody = await response.json();
 				toast({
 					title: "Error",
-					description: responseBody.error || "Failed to send OTP. Please try again.",
+					description:
+						responseBody.error || "Failed to send OTP. Please try again.",
 					variant: "destructive",
 				});
 			}
@@ -65,10 +77,9 @@ export default function ForgotPassword() {
 		}
 	};
 
-
 	const handleResetPassword = async (e: React.FormEvent) => {
 		e.preventDefault();
-		
+
 		if (otp.length !== 6) {
 			toast({
 				title: "Invalid OTP",
@@ -98,13 +109,16 @@ export default function ForgotPassword() {
 
 		setIsLoading(true);
 		try {
-			const response = await fetch(`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/password/reset`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetch(
+				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/password/reset`,
+				{
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ email, otp, password }),
 				},
-				body: JSON.stringify({ email, otp, password }),
-			});
+			);
 
 			if (response.ok) {
 				setCurrentStep("success");
@@ -118,13 +132,15 @@ export default function ForgotPassword() {
 				if (error.message && error.message.toLowerCase().includes("otp")) {
 					toast({
 						title: "Invalid OTP",
-						description: "The verification code is invalid or expired. Please try again.",
+						description:
+							"The verification code is invalid or expired. Please try again.",
 						variant: "destructive",
 					});
 				} else {
 					toast({
 						title: "Reset Failed",
-						description: error.message || "Failed to reset password. Please try again.",
+						description:
+							error.message || "Failed to reset password. Please try again.",
 						variant: "destructive",
 					});
 				}
@@ -145,7 +161,8 @@ export default function ForgotPassword() {
 			case "email":
 				return {
 					title: "Forgot Password?",
-					description: "No worries! Enter your email and we'll send you a verification code",
+					description:
+						"No worries! Enter your email and we'll send you a verification code",
 					icon: <Mail className="w-8 h-8 text-white" />,
 					content: (
 						<form onSubmit={handleSendOTP} className="space-y-4">
@@ -181,7 +198,12 @@ export default function ForgotPassword() {
 			case "otp":
 				return {
 					title: "Enter Verification Code & New Password",
-					description: `We've sent a 6-digit code to ${email}. Enter the code and your new password below.`,
+					description: (
+						<>
+							`We've sent a 6-digit code to <b>{email}</b>. Enter the code and
+							your new password below.`
+						</>
+					),
 					icon: <Lock className="w-8 h-8 text-white" />,
 					content: (
 						<form onSubmit={handleResetPassword} className="space-y-4">
@@ -192,7 +214,9 @@ export default function ForgotPassword() {
 									type="text"
 									placeholder="Enter 6-digit code"
 									value={otp}
-									onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+									onChange={(e) =>
+										setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+									}
 									required
 									className="text-center text-lg tracking-widest bg-background/50"
 									maxLength={6}
@@ -282,11 +306,11 @@ export default function ForgotPassword() {
 					),
 				};
 
-
 			case "success":
 				return {
 					title: "Password Reset Successful!",
-					description: "Your password has been reset successfully. You can now log in with your new password.",
+					description:
+						"Your password has been reset successfully. You can now log in with your new password.",
 					icon: <CheckCircle className="w-8 h-8 text-white" />,
 					content: (
 						<div className="space-y-4">
