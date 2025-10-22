@@ -248,7 +248,7 @@ export default function Signup() {
 										placeholder="Enter 6-digit OTP"
 										name="otp"
 										value={otp}
-										onChange={(e) => setOtp(e.target.value)}
+										onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
 										required
 										min={6}
 										max={6}
