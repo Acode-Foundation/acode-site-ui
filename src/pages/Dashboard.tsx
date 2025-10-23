@@ -14,20 +14,13 @@ import {
 	Edit,
 	Eye,
 	LogOut,
-	Package,
 	Plus,
-	Search,
 	Settings,
 	Shield,
-	Star,
-	Trash2,
-	Upload,
-	Users,
-	Wallet,
 	X,
 	XCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, memo } from "react";
 import { Link } from "react-router-dom";
 import { EarningsOverview } from "@/components/dashboard/earnings-overview";
 import { PaymentMethods } from "@/components/dashboard/payment-methods";
@@ -150,7 +143,7 @@ const handleUpdateProfile = async (
 	if (emailOtp) formData.append("otp", emailOtp.toString());
 
 	const response = await fetch(
-		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}api/user`,
+		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/user`,
 		{
 			method: "PUT",
 			body: formData,
@@ -193,13 +186,252 @@ const handleUpdateProfile = async (
 	};
 };
 
+const hasEmailChanged = (originalEmail: string, currentEmail: string) => {
+	return originalEmail !== currentEmail;
+};
+
+// Memoized ProfileManagement component to prevent unnecessary re-renders
+const ProfileManagement = memo(({ 
+	currentUser, 
+	name, 
+	currentEmail, 
+	originalEmail, 
+	website, 
+	github, 
+	handleSubmit, 
+	isSubmitting, 
+	showOTPDialog, 
+	otpValue, 
+	otpError, 
+	isSendingOTP, 
+	isVerifyingOTP, 
+	handleOTPVerification, 
+	handleResendOTP, 
+	handleCancel,
+	queryClient,
+	handleLogOut,
+	setName,
+	setCurrentEmail,
+	setWebsite,
+	setGithub,
+	setOtpValue,
+	setOtpError
+}: {
+	currentUser: any;
+	name: string;
+	currentEmail: string;
+	originalEmail: string;
+	website: string;
+	github: string;
+	handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+	isSubmitting: boolean;
+	showOTPDialog: boolean;
+	otpValue: string;
+	otpError: string;
+	isSendingOTP: boolean;
+	isVerifyingOTP: boolean;
+	handleOTPVerification: () => void;
+	handleResendOTP: () => void;
+	handleCancel: () => void;
+	queryClient: any;
+	handleLogOut: (queryClient: any, e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+	setName: (name: string) => void;
+	setCurrentEmail: (email: string) => void;
+	setWebsite: (website: string) => void;
+	setGithub: (github: string) => void;
+	setOtpValue: (value: string) => void;
+	setOtpError: (error: string) => void;
+}) => (
+	<div className="space-y-6">
+		{/* Profile Information */}
+		<Card>
+			<CardHeader>
+				<div className="flex items-center justify-between">
+					<CardTitle className="flex items-center gap-2">
+						<Settings className="w-5 h-5" />
+						Profile Information
+					</CardTitle>
+					<Button
+						variant="destructive"
+						size="sm"
+						onClick={(e) => handleLogOut(queryClient, e)}
+					>
+						<LogOut className="w-4 h-4 mr-2" />
+						Logout
+					</Button>
+				</div>
+			</CardHeader>
+			<CardContent className="space-y-6">
+				<div className="flex flex-col sm:flex-row items-center gap-6 p-6 bg-gradient-subtle rounded-lg border border-border/50">
+					<Avatar className="w-24 h-24 ring-2 ring-primary/20">
+						{currentUser.github ? (
+							<AvatarImage
+								src={`https://avatars.githubusercontent.com/${currentUser.github}`}
+								alt={currentUser.name}
+							/>
+						) : null}
+						<AvatarFallback className="text-2xl bg-gradient-primary text-white">
+							{currentUser.name
+								.split(" ")
+								.map((n) => n[0])
+								.join("")}
+						</AvatarFallback>
+					</Avatar>
+					<div className="flex-1 text-center sm:text-left">
+						<h3 className="text-xl font-semibold">{currentUser.name}</h3>
+						<p className="text-muted-foreground">{currentUser.email}</p>
+						<div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
+							<Badge variant="outline">{currentUser.role}</Badge>
+							{currentUser.verified && (
+								<Badge variant="default" className="bg-green-500">
+									Verified
+								</Badge>
+							)}
+						</div>
+					</div>
+					<Button variant="outline" size="sm">
+						Change Avatar
+					</Button>
+				</div>
+				<form onSubmit={(e) => handleSubmit(e)} className="space-y-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div className="space-y-2">
+							<Label htmlFor="name">Full Name</Label>
+							<Input 
+								id="name" 
+								name="name"
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+							/>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="email">Email</Label>
+							<Input
+								id="email"
+								name="email"
+								type="email"
+								value={currentEmail}
+								onChange={(e) => setCurrentEmail(e.target.value)}
+							/>
+							{/* Visual indicator when email has changed */}
+							{hasEmailChanged(originalEmail, currentEmail) && (
+								<p className="text-sm text-orange-600 mt-1">
+									Email will be changed from: {originalEmail}
+								</p>
+							)}
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="website">Website</Label>
+							<Input 
+								id="website" 
+								name="website"
+								value={website}
+								onChange={(e) => setWebsite(e.target.value)}
+							/>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="github">GitHub</Label>
+							<Input 
+								id="github" 
+								name="github"
+								value={github}
+								onChange={(e) => setGithub(e.target.value)}
+							/>
+						</div>
+					</div>
+
+					<Button
+						className="bg-gradient-primary transition-colors disabled:bg-gradient-dark"
+						type="submit"
+						disabled={isSubmitting}
+					>
+						{isSubmitting ? "Updating..." : "Update Profile"}
+					</Button>
+				</form>
+
+				{/* Radix-UI Dialog for OTP Verification */}
+
+				<Dialog open={showOTPDialog} onOpenChange={() => {}}>
+					<DialogContent className="sm:max-w-md">
+						<DialogTitle>Verify Your New Email</DialogTitle>
+						<DialogDescription>
+							We've sent a 6-digit verification code to{" "}
+							<strong>{currentEmail}</strong>. Please enter the code below to
+							confirm your email change.
+						</DialogDescription>
+
+						<div className="space-y-4">
+							<div>
+								<Label htmlFor="otp">Verification Code</Label>
+								<Input
+									id="otp"
+									type="text"
+									value={otpValue}
+									onChange={(e) => {
+										const value = e.target.value
+											.replace(/\D/g, "")
+											.slice(0, 6);
+										setOtpValue(value);
+										setOtpError("");
+									}}
+									placeholder="Enter 6-digit code"
+									maxLength={6}
+									className="text-center text-lg tracking-widest"
+								/>
+								{otpError && (
+									<p className="text-sm text-destructive mt-1">{otpError}</p>
+								)}
+							</div>
+
+							<div className="text-center">
+								<Button
+									variant="link"
+									onClick={handleResendOTP}
+									disabled={isSendingOTP}
+								>
+									{isSendingOTP ? "Sending..." : "Resend Code"}
+								</Button>
+							</div>
+
+							<div className="flex gap-2 pt-4">
+								<Button
+									onClick={handleOTPVerification}
+									disabled={isVerifyingOTP || !otpValue.trim()}
+									className="flex-1"
+								>
+									{isVerifyingOTP ? "Verifying..." : "Verify & Update"}
+								</Button>
+								<Button
+									variant="outline"
+									onClick={handleCancel}
+									className="flex-1"
+								>
+									Cancel
+								</Button>
+							</div>
+						</div>
+					</DialogContent>
+				</Dialog>
+			</CardContent>
+		</Card>
+
+		{/* Payment Methods */}
+		<PaymentMethods />
+	</div>
+));
+
 export default function Dashboard() {
 	// states
-	const [activeTab, setActiveTab] = useState("overview");
+	// const [activeTab, setActiveTab] = useState("overview");
 	const [formData, setFormData] = useState(new FormData());
-	const [originalEmail, setOriginalEmail] = useState<string>();
+	const [originalEmail, setOriginalEmail] = useState<string>("");
 	const [currentEmail, setCurrentEmail] = useState<string>("");
 	const [pluginSearchQuery, setPluginSearchQuery] = useState("");
+	
+	// Form input states
+	const [name, setName] = useState("");
+	const [website, setWebsite] = useState("");
+	const [github, setGithub] = useState("");
 
 	// State to control when the OTP dialog should be open
 	const [showOTPDialog, setShowOTPDialog] = useState(false);
@@ -215,44 +447,7 @@ export default function Dashboard() {
 	// State for Error Msgs.
 	const [otpError, setOtpError] = useState("");
 
-	const userMutation = useMutation({
-		mutationFn: async (body: {
-			formData: FormData;
-			currentUser: User;
-			emailOtp?: number;
-		}) =>
-			await handleUpdateProfile(body.formData, body.currentUser, body.emailOtp),
-		onSuccess: async (data) => {
-			const { statusCode, body } = data;
-
-			// handleUpdateProfile, handles 401. & redirects the User.
-			if (statusCode !== 401 && body.message) {
-				toast({
-					title: "Successfully Updated - User Profile",
-					description: `${body.message}` || "User Updated",
-				});
-				await queryClient.invalidateQueries({ queryKey: ["LoggedInUser"] });
-
-				setIsSubmitting(false);
-				setIsVerifyingOTP(false);
-				setOriginalEmail(currentEmail);
-				return;
-			}
-
-			return;
-		},
-		onError: (error) => {
-			toast({
-				title: "Failed to Update Profile",
-				description: `${error.message}`,
-				variant: "destructive",
-			});
-
-			setOtpError(`${error.message}`);
-			return;
-		},
-	});
-
+	// All hooks must be called before any conditional returns
 	const queryClient = useQueryClient();
 	const deletePluginMutation = useDeletePlugin();
 	const {
@@ -261,98 +456,26 @@ export default function Dashboard() {
 		isLoading,
 		...args
 	} = useLoggedInUser();
-	const {
-		data: userPlugins,
-		isLoading: isPluginsLoading,
-		error: pluginsError,
-		...pluginArgs
-	} = useQuery({
-		queryKey: ["loggedInUser", "plugins"],
-		staleTime: 2 * 60 * 1000, // 2 minutes
-		gcTime: 10 * 60 * 1000, // 10 minutes
-		refetchOnWindowFocus: false,
-		queryFn: async () => {
-			const response = await fetch(
-				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin?user=${currentLoggedUser.id}`,
-			);
-			const data = response.headers
-				.get("content-type")
-				.includes("application/json")
-				? await response.json()
-				: null;
 
-			if (!response.ok) {
-				throw new Error(
-					`Could not get Your Plugins (request status code: ${response.status})`,
-				);
-			}
-
-			return data;
-		},
-		enabled: !!currentLoggedUser?.id,
-	});
-
-	console.log(
-		"Logged In User: ",
-		currentLoggedUser,
-		"IsError: ",
-		isError,
-		"isLoading: ",
-		isLoading,
-		"Args: ",
-		args,
-	);
-	console.log(userPlugins, isPluginsLoading, pluginsError, pluginArgs);
-	if (isError) {
-		toast({
-			title: "User Not Logged in. redirecting...",
-		});
-		//
-		// setTimeout(() => {
-		//   window.location.href = "/login"
-		// }, 1000)
-		return;
-	}
-
-	if (isLoading) {
-		return <LoadingDashboard />;
-	}
-
-	// also using mocked data for now.
-	const currentUser = {
+	// Memoize currentUser to prevent unnecessary re-renders
+	const currentUser = useMemo(() => ({
 		...currentMockUser,
 		...currentLoggedUser,
-	};
+	}), [currentLoggedUser]);
 
-	// Filter plugins based on search query
-	const filteredUserPlugins =
-		userPlugins?.filter(
-			(plugin) =>
-				plugin.name.toLowerCase().includes(pluginSearchQuery.toLowerCase()) ||
-				plugin.author?.toLowerCase().includes(pluginSearchQuery.toLowerCase()),
-		) || [];
-	// useEffect(() => setCurrentEmail(currentUser.email), [currentLoggedUser.email]);
-
-	const handleDeletePlugin = async (
-		pluginId: string,
-		mode: "soft" | "hard",
-	) => {
-		try {
-			await deletePluginMutation.mutateAsync({ pluginId, mode });
-			toast({
-				title: "Plugin Deleted",
-				description: `Plugin ${mode === "hard" ? "permanently deleted" : "deleted"} successfully`,
-			});
-		} catch (error) {
-			toast({
-				title: "Delete Failed",
-				description: "Failed to delete plugin. Please try again.",
-				variant: "destructive",
-			});
+	useEffect(() => {
+		if (currentLoggedUser?.email) {
+			console.log("useEffect :: setCurrentEmail")
+			setCurrentEmail(currentUser.email);
+			setOriginalEmail(currentUser.email);
+			setName(currentUser.name || "");
+			setWebsite(currentUser.website || "");
+			setGithub(currentUser.github || "");
 		}
-	};
+	}, [currentUser.email, currentUser.name, currentUser.website, currentUser.github]);
 
-	const UserDashboard = () => (
+	// Memoize UserDashboard component to prevent unnecessary re-renders
+	const UserDashboard = useMemo(() => (
 		<div className="space-y-6">
 			{/* Overview Grid */}
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -387,12 +510,110 @@ export default function Dashboard() {
 				</div>
 			</div>
 		</div>
-	);
+	), []);
 
-	// Profile Management Utils
-	const hasEmailChanged = () => {
-		return originalEmail !== currentEmail;
-	};
+
+	// const {
+	// 	data: userPlugins,
+	// 	isLoading: isPluginsLoading,
+	// 	error: pluginsError,
+	// 	...pluginArgs
+	// } = useQuery({
+	// 	queryKey: ["loggedInUser", "plugins"],
+	// 	staleTime: 2 * 60 * 1000, // 2 minutes
+	// 	gcTime: 10 * 60 * 1000, // 10 minutes
+	// 	refetchOnWindowFocus: false,
+	// 	queryFn: async () => {
+	// 		const response = await fetch(
+	// 			`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/plugin?user=${currentLoggedUser.id}`,
+	// 		);
+	// 		const data = response.headers
+	// 			.get("content-type")
+	// 			.includes("application/json")
+	// 			? await response.json()
+	// 			: null;
+
+	// 		if (!response.ok) {
+	// 			throw new Error(
+	// 				`Could not get Your Plugins (request status code: ${response.status})`,
+	// 			);
+	// 		}
+
+	// 		return data;
+	// 	},
+	// 	enabled: !!currentLoggedUser?.id,
+	// });
+
+	const userMutation = useMutation({
+		mutationFn: async (body: {
+			formData: FormData;
+			currentUser: User;
+			emailOtp?: number;
+		}) =>
+			await handleUpdateProfile(body.formData, body.currentUser, body.emailOtp),
+		onSuccess: async (data) => {
+			const { statusCode, body } = data;
+
+			// handleUpdateProfile, handles 401. & redirects the User.
+			if (statusCode !== 401 && body.message) {
+				toast({
+					title: "Successfully Updated - User Profile",
+					description: `${body.message}` || "User Updated",
+				});
+				await queryClient.invalidateQueries({ queryKey: ["LoggedInUser"] });
+
+				setIsSubmitting(false);
+				setIsVerifyingOTP(false);
+				setOriginalEmail(currentEmail);
+				return;
+			}
+
+			return;
+		},
+		onError: (error) => {
+			toast({
+				title: "Failed to Update Profile",
+				description: `${error.message}`,
+				variant: "destructive",
+			});
+			setIsSubmitting(false)
+			setOtpError(`${error.message}`);
+			return;
+		},
+	});
+
+	console.log(
+		"Logged In User: ",
+		currentLoggedUser,
+		"IsError: ",
+		isError,
+		"isLoading: ",
+		isLoading,
+		"Args: ",
+		args,
+	);
+	// console.log(userPlugins, isPluginsLoading, pluginsError, pluginArgs);
+
+	// const handleDeletePlugin = async (
+	// 	pluginId: string,
+	// 	mode: "soft" | "hard",
+	// ) => {
+	// 	try {
+	// 		await deletePluginMutation.mutateAsync({ pluginId, mode });
+	// 		toast({
+	// 			title: "Plugin Deleted",
+	// 			description: `Plugin ${mode === "hard" ? "permanently deleted" : "deleted"} successfully`,
+	// 		});
+	// 	} catch (error) {
+	// 		toast({
+	// 			title: "Delete Failed",
+	// 			description: "Failed to delete plugin. Please try again.",
+	// 			variant: "destructive",
+	// 		});
+	// 	}
+	// };
+
+	// Profile Management Utils - memoize callback functions
 
 	const sendOTPToNewEmail = async (
 		email: string,
@@ -428,12 +649,32 @@ export default function Dashboard() {
 		}
 	};
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleActualSubmit = useCallback(async (emailOtp?: number) => {
+		setIsSubmitting(true);
+
+		userMutation.mutate({
+			formData,
+			currentUser,
+			emailOtp,
+		});
+
+		// not resetting the states here,
+		// as we don't know if it success or failed. We clear/set updated states in mutation itself.
+	}, [formData, currentUser, userMutation]);
+
+	const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		// Create FormData from current form state
+		const newFormData = new FormData();
+		newFormData.append("name", name);
+		newFormData.append("email", currentEmail);
+		newFormData.append("website", website);
+		newFormData.append("github", github);
+		
+		console.log("handleSubmit", formData)
+		setFormData(newFormData);
 
-		setFormData(new FormData(e.target as HTMLFormElement));
-
-		if (hasEmailChanged()) {
+		if (hasEmailChanged(originalEmail, currentEmail)) {
 			// Email has changed, show OTP dialog and send OTP
 			setShowOTPDialog(true);
 
@@ -452,24 +693,10 @@ export default function Dashboard() {
 		} else {
 			await handleActualSubmit();
 		}
-	};
+	}, [name, currentEmail, website, github, originalEmail, sendOTPToNewEmail, handleActualSubmit]);
 
-	const handleActualSubmit = async (emailOtp?: number) => {
-		setIsSubmitting(true);
-
-		userMutation.mutate({
-			formData,
-			currentUser,
-			emailOtp,
-		});
-
-		// not resetting the states here,
-		// as we don't know if it success or failed. We clear/set updated states in mutation itself.
-	};
-
-	// Handle OTP verification
-
-	const handleOTPVerification = async () => {
+	// Handle OTP verification - memoize callback
+	const handleOTPVerification = useCallback(async () => {
 		if (!otpValue.trim()) {
 			setOtpError("Please enter the OTP");
 			return;
@@ -484,317 +711,48 @@ export default function Dashboard() {
 		} else {
 			setOtpError("Invalid OTP. Please check and try again.");
 		}
-	};
+	}, [otpValue, handleActualSubmit]);
 
-	// Handle when user cancels the OTP dialog
-	const handleCancel = () => {
+	// Handle when user cancels the OTP dialog - memoize callback
+	const handleCancel = useCallback(() => {
 		setShowOTPDialog(false);
 		setOtpValue("");
 		setOtpError("");
 		// Optionally reset the email to original value
 		setCurrentEmail(originalEmail);
-	};
+	}, [originalEmail]);
 
-	// Handle resending OTP
-	const handleResendOTP = async () => {
+	// Handle resending OTP - memoize callback
+	const handleResendOTP = useCallback(async () => {
 		setOtpValue(""); // Clear current OTP input
 		await sendOTPToNewEmail(currentEmail);
-	};
+	}, [currentEmail, sendOTPToNewEmail]);
 
-	const ProfileManagement = () => (
-		<div className="space-y-6">
-			{/* Profile Information */}
-			<Card>
-				<CardHeader>
-					<div className="flex items-center justify-between">
-						<CardTitle className="flex items-center gap-2">
-							<Settings className="w-5 h-5" />
-							Profile Information
-						</CardTitle>
-						<Button
-							variant="destructive"
-							size="sm"
-							onClick={(e) => handleLogOut(queryClient, e)}
-						>
-							<LogOut className="w-4 h-4 mr-2" />
-							Logout
-						</Button>
-					</div>
-				</CardHeader>
-				<CardContent className="space-y-6">
-					<div className="flex flex-col sm:flex-row items-center gap-6 p-6 bg-gradient-subtle rounded-lg border border-border/50">
-						<Avatar className="w-24 h-24 ring-2 ring-primary/20">
-							{currentUser.github ? (
-								<AvatarImage
-									src={`https://avatars.githubusercontent.com/${currentUser.github}`}
-									alt={currentUser.name}
-								/>
-							) : null}
-							<AvatarFallback className="text-2xl bg-gradient-primary text-white">
-								{currentUser.name
-									.split(" ")
-									.map((n) => n[0])
-									.join("")}
-							</AvatarFallback>
-						</Avatar>
-						<div className="flex-1 text-center sm:text-left">
-							<h3 className="text-xl font-semibold">{currentUser.name}</h3>
-							<p className="text-muted-foreground">{currentUser.email}</p>
-							<div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
-								<Badge variant="outline">{currentUser.role}</Badge>
-								{currentUser.verified && (
-									<Badge variant="default" className="bg-green-500">
-										Verified
-									</Badge>
-								)}
-							</div>
-						</div>
-						<Button variant="outline" size="sm">
-							Change Avatar
-						</Button>
-					</div>
-					<form onSubmit={(e) => handleSubmit(e)} className="space-y-4">
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<div className="space-y-2">
-								<Label htmlFor="name">Full Name</Label>
-								<Input id="name" defaultValue={currentUser.name} />
-							</div>
-							<div className="space-y-2">
-								<Label htmlFor="email">Email</Label>
-								<Input
-									id="email"
-									type="email"
-									defaultValue={currentUser.email}
-									onChange={(e) => setCurrentEmail(e.target.value)}
-								/>
-								{/* Visual indicator when email has changed */}
-								{hasEmailChanged() && (
-									<p className="text-sm text-orange-600 mt-1">
-										Email will be changed from: {originalEmail}
-									</p>
-								)}
-							</div>
-							<div className="space-y-2">
-								<Label htmlFor="website">Website</Label>
-								<Input id="website" defaultValue={currentUser.website} />
-							</div>
-							<div className="space-y-2">
-								<Label htmlFor="github">GitHub</Label>
-								<Input id="github" defaultValue={currentUser.github} />
-							</div>
-						</div>
 
-						<Button
-							className="bg-gradient-primary transition-colors disabled:bg-gradient-dark"
-							type="submit"
-							disabled={isSubmitting}
-						>
-							{isSubmitting ? "Updating..." : "Update Profile"}
-						</Button>
-					</form>
+	if (isError) {
+		console.log("User Not Logged in. redirecting...")
+		//
+		// setTimeout(() => {
+		//   window.location.href = "/login"
+		// }, 1000)
+		return (
+			<div className="min-h-80 bg-gradient-dark flex flex-col items-center justify-center">
+					<XCircle className="w-16 h-16 text-destructive mb-4" />
+					<h2 className="text-2xl font-bold mb-2 text-primary-foreground">User Not Logged In.</h2>
+					<p className="text-muted-foreground mb-6 max-w-md">
+						You're not logged in! Redirecting...
+					</p>
+				</div>
+		);
+	}
 
-					{/* Radix-UI Dialog for OTP Verification */}
+	// if (isLoading) {
+	// 	console.log("showing loading Dashboard")
+	// 	return <LoadingDashboard />;
+	// }
 
-					<Dialog open={showOTPDialog} onOpenChange={setShowOTPDialog}>
-						<DialogContent className="sm:max-w-md">
-							<DialogTitle>Verify Your New Email</DialogTitle>
-							<DialogDescription>
-								We've sent a 6-digit verification code to{" "}
-								<strong>{currentEmail}</strong>. Please enter the code below to
-								confirm your email change.
-							</DialogDescription>
-
-							<div className="space-y-4">
-								<div>
-									<Label htmlFor="otp">Verification Code</Label>
-									<Input
-										id="otp"
-										type="text"
-										value={otpValue}
-										onChange={(e) => {
-											const value = e.target.value
-												.replace(/\D/g, "")
-												.slice(0, 6);
-											setOtpValue(value);
-											setOtpError("");
-										}}
-										placeholder="Enter 6-digit code"
-										maxLength={6}
-										className="text-center text-lg tracking-widest"
-									/>
-									{otpError && (
-										<p className="text-sm text-destructive mt-1">{otpError}</p>
-									)}
-								</div>
-
-								<div className="text-center">
-									<Button
-										variant="link"
-										onClick={handleResendOTP}
-										disabled={isSendingOTP}
-									>
-										{isSendingOTP ? "Sending..." : "Resend Code"}
-									</Button>
-								</div>
-
-								<div className="flex gap-2 pt-4">
-									<Button
-										onClick={handleOTPVerification}
-										disabled={isVerifyingOTP || !otpValue.trim()}
-										className="flex-1"
-									>
-										{isVerifyingOTP ? "Verifying..." : "Verify & Update"}
-									</Button>
-									<Button
-										variant="outline"
-										onClick={handleCancel}
-										className="flex-1"
-									>
-										Cancel
-									</Button>
-								</div>
-							</div>
-						</DialogContent>
-					</Dialog>
-				</CardContent>
-			</Card>
-
-			{/* Payment Methods */}
-			<PaymentMethods />
-		</div>
-	);
-
-	const DetailedEarningsOverview = () => (
-		<div className="space-y-6">
-			{/* Quick Stats */}
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">
-							Total Earnings
-						</CardTitle>
-						<DollarSign className="h-4 w-4 text-muted-foreground" />
-					</CardHeader>
-					<CardContent>
-						{/*<div className="text-2xl font-bold">${currentUser.totalEarnings.toFixed(2)}</div>*/}
-						<div className="text-2xl font-bold">0</div>
-						<p className="text-xs text-muted-foreground">
-							Available for withdrawal
-						</p>
-					</CardContent>
-				</Card>
-
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">This Month</CardTitle>
-						<BarChart3 className="h-4 w-4 text-muted-foreground" />
-					</CardHeader>
-					<CardContent>
-						<div className="text-2xl font-bold">$89.99</div>
-						<p className="text-xs text-muted-foreground">
-							+12% from last month
-						</p>
-					</CardContent>
-				</Card>
-
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">
-							Pending Payment
-						</CardTitle>
-						<Wallet className="h-4 w-4 text-muted-foreground" />
-					</CardHeader>
-					<CardContent>
-						<div className="text-2xl font-bold">$156.78</div>
-						<p className="text-xs text-muted-foreground">
-							Next payment: Feb 15
-						</p>
-					</CardContent>
-				</Card>
-			</div>
-
-			{/* Quick Actions */}
-			<Card>
-				<CardHeader>
-					<CardTitle>Quick Actions</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div className="flex flex-wrap gap-4">
-						<Link to="/earnings">
-							<Button className="bg-gradient-primary">
-								<BarChart3 className="w-4 h-4 mr-2" />
-								View Detailed Earnings
-							</Button>
-						</Link>
-						<Button variant="outline">
-							<CreditCard className="w-4 h-4 mr-2" />
-							Request Payout
-						</Button>
-						<Button variant="outline">
-							<Building2 className="w-4 h-4 mr-2" />
-							Update Bank Details
-						</Button>
-					</div>
-				</CardContent>
-			</Card>
-
-			{/* Recent Transactions */}
-			<Card>
-				<CardHeader>
-					<CardTitle>Recent Transactions</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div className="space-y-4">
-						{[
-							{
-								date: "2024-01-28",
-								amount: 2.99,
-								plugin: "Git Manager",
-								type: "Sale",
-							},
-							{
-								date: "2024-01-27",
-								amount: 1.99,
-								plugin: "Code Formatter Pro",
-								type: "Sale",
-							},
-							{
-								date: "2024-01-26",
-								amount: 4.99,
-								plugin: "My Theme Studio",
-								type: "Sale",
-							},
-						].map((transaction, index) => (
-							<div
-								key={index}
-								className="flex items-center justify-between p-3 border border-border/50 rounded-lg"
-							>
-								<div>
-									<h4 className="font-medium">{transaction.plugin}</h4>
-									<p className="text-sm text-muted-foreground">
-										{transaction.type} • {transaction.date}
-									</p>
-								</div>
-								<div className="text-right">
-									<p className="font-medium text-primary">
-										+${transaction.amount.toFixed(2)}
-									</p>
-								</div>
-							</div>
-						))}
-					</div>
-				</CardContent>
-			</Card>
-		</div>
-	);
-
-	return isLoading ? (
-		<div className="min-h-screen bg-gradient-dark flex items-center justify-center">
-			<div className="text-center">
-				<div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-				<p className="text-muted-foreground">Loading dashboard...</p>
-			</div>
-		</div>
+	return isLoading || isError ? (
+		<LoadingDashboard />
 	) : (
 		<div className="container mx-auto px-4 py-8">
 			{/* Header */}
@@ -830,18 +788,43 @@ export default function Dashboard() {
 			</div>
 
 			{/* Tabs */}
-			<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+			<Tabs defaultValue="overview" className="w-full">
 				<TabsList className="grid w-full grid-cols-2">
 					<TabsTrigger value="overview">Overview</TabsTrigger>
 					<TabsTrigger value="profile">Profile</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="overview" className="space-y-6 mt-6">
-					<UserDashboard />
+					{UserDashboard}
 				</TabsContent>
 
 				<TabsContent value="profile" className="space-y-6 mt-6">
-					<ProfileManagement />
+					<ProfileManagement
+						currentUser={currentUser}
+						name={name}
+						currentEmail={currentEmail}
+						originalEmail={originalEmail}
+						website={website}
+						github={github}
+						handleSubmit={handleSubmit}
+						isSubmitting={isSubmitting}
+						showOTPDialog={showOTPDialog}
+						otpValue={otpValue}
+						otpError={otpError}
+						isSendingOTP={isSendingOTP}
+						isVerifyingOTP={isVerifyingOTP}
+						handleOTPVerification={handleOTPVerification}
+						handleResendOTP={handleResendOTP}
+						handleCancel={handleCancel}
+						queryClient={queryClient}
+						handleLogOut={handleLogOut}
+						setName={setName}
+						setCurrentEmail={setCurrentEmail}
+						setWebsite={setWebsite}
+						setGithub={setGithub}
+						setOtpValue={setOtpValue}
+						setOtpError={setOtpError}
+					/>
 				</TabsContent>
 			</Tabs>
 		</div>
