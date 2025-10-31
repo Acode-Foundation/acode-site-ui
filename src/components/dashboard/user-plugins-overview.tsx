@@ -119,6 +119,7 @@ export function UserPluginsOverview() {
 	);
 
 	// Reset pagination when filters change
+	// biome-ignore lint/correctness/useExhaustiveDependencies: It's necessary, for resetting of pagination
 	useEffect(() => {
 		setCurrentPage(1);
 	}, [searchQuery, statusFilter, sortBy, sortOrder]);
@@ -328,6 +329,7 @@ export function UserPluginsOverview() {
 												const target = e.target as HTMLImageElement;
 												target.style.display = "none";
 											}}
+											loading="lazy"
 										/>
 										<div className="flex-1 min-w-0">
 											<div className="font-medium truncate">{plugin.name}</div>
@@ -444,6 +446,7 @@ export function UserPluginsOverview() {
 															const target = e.target as HTMLImageElement;
 															target.style.display = "none";
 														}}
+														loading="lazy"
 													/>
 													<div>
 														<div className="font-medium">{plugin.name}</div>

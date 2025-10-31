@@ -1,6 +1,6 @@
 import { Eye, EyeOff, Github, Lock, LogIn, Mail } from "lucide-react";
 import { useState } from "react";
-import { Link, redirect, useParams } from "react-router-dom";
+import { Link, redirect, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,11 +9,13 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
+	// States & Hooks.
 	const [showPassword, setShowPassword] = useState(false);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const { toast } = useToast();
+	const navigate = useNavigate();
 	const params = useParams();
 
 	const handleLogin = async (e: React.FormEvent) => {
@@ -67,7 +69,7 @@ export default function Login() {
 					redirectUrl = `acode://user/login/${responseData.token}`;
 				}
 
-				window.location.href = redirectUrl || "/dashboard";
+				navigate(`${redirectUrl || "/dashboard"}`);
 			}, 1000);
 		} catch (error) {
 			console.error(`Login attempt Failed: `, error);

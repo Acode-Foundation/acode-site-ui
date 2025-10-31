@@ -7,7 +7,7 @@ import {
 	Trash2,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { DeletePluginDialog } from "@/components/ui/delete-plugin-dialog";
@@ -73,6 +73,7 @@ const adminFilters = [
 	},
 ];
 export default function Plugins() {
+	const navigate = useNavigate()
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedFilter, setSelectedFilter] = useState("default");
 
@@ -287,7 +288,7 @@ export default function Plugins() {
 						variant="outline"
 						size="sm"
 						onClick={() => {
-							window.location.href = "/submit-plugin";
+							 navigate("/submit-plugin");
 						}}
 					>
 						<ExternalLink className="w-4 h-4 mr-2" />
