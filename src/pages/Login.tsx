@@ -24,12 +24,6 @@ export default function Login() {
 
 		try {
 			const formData = new FormData(e.target as HTMLFormElement);
-			console.log(
-				formData.get("email"),
-				formData.get("password"),
-				formData.get("password"),
-			);
-			console.log(import.meta.env);
 			const response = await fetch(
 				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/login`,
 				{
@@ -44,7 +38,7 @@ export default function Login() {
 				.includes("application/json")
 				? await response.json()
 				: null;
-			console.log(responseData);
+
 			if (responseData?.error || !response.ok) {
 				setIsLoading(false);
 				return toast({
