@@ -1,63 +1,19 @@
 import {
-	type QueryClient,
-	useMutation,
-	useQuery,
-	useQueryClient,
-} from "@tanstack/react-query";
-import {
 	BarChart3,
-	Building2,
-	CheckCircle,
-	Clock,
-	CreditCard,
-	DollarSign,
-	Edit,
-	Eye,
-	LogOut,
 	Plus,
-	Settings,
-	Shield,
-	X,
 	XCircle,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { EarningsOverview } from "@/components/dashboard/earnings-overview";
 import { UserPluginsOverview } from "@/components/dashboard/user-plugins-overview";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DeletePluginDialog } from "@/components/ui/delete-plugin-dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/hooks/use-toast.ts";
-import { useDeletePlugin } from "@/hooks/use-user-plugins";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser.ts";
-import { User } from "@/types";
 import ProfileManagement from "@/components/dashboard/profile-management";
-
-// Mock user data
-const currentMockUser = {
-	name: "John Doe",
-	email: "john@example.com",
-	role: "user", // "user" or "admin"
-	avatar: "JD",
-	joinDate: "2024-01-15",
-	bio: "Full-stack developer passionate about mobile development and creating tools that enhance productivity.",
-	website: "https://johndoe.dev",
-	github: "johndoe",
-	location: "San Francisco, CA",
-	totalEarnings: 245.67,
-	bankAccount: {
-		accountHolder: "John Doe",
-		bankName: "Chase Bank",
-		accountNumber: "****1234",
-		routingNumber: "****567",
-	},
-};
 
 // Note: Mock data removed - using real API data
 
@@ -422,8 +378,6 @@ export default function Dashboard() {
 
 	// const queryClient = useQueryClient();
 	// const deletePluginMutation = useDeletePlugin();
-	// Used for Navigation instead of `window.href.location`
-	const navigate = useNavigate()
 
 	const {
 		data: currentLoggedUser,
@@ -434,7 +388,6 @@ export default function Dashboard() {
 
 	// Memoize currentUser to prevent unnecessary re-renders
 	const currentUser = useMemo(() => ({
-		...currentMockUser,
 		...currentLoggedUser,
 	}), [currentLoggedUser]);
 
