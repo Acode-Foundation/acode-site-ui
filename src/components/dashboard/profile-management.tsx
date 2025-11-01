@@ -84,7 +84,7 @@ const handleLogOut = async (
 		);
 
 		const responseData =
-			response.headers.get("content-type") === "application/json"
+			response.headers.get("content-type").includes("application/json")
 				? await response.json()
 				: null;
 		if (responseData?.error || !response.ok) {
@@ -93,6 +93,9 @@ const handleLogOut = async (
 				description:
 					responseData.error ||
 					`Something went wrong, server responded empty (request status code: ${response.status}). Please try again.`,
+				duration: 1500,
+				variant: "destructive",
+				type: "background"
 			});
 			// Bad Request, in this case means: response as {error: 'Not Logged in'}
 			if (response.status === 400) {
@@ -102,23 +105,27 @@ const handleLogOut = async (
 			}
 		} else if (response.ok) {
 			toast({
-				title: "Logged Out!",
+				title: "Logged Out! Redirecting....",
 				description:
-					responseData.message || "Logged Out Successfully, redirecting....",
+					responseData.message || "Logged Out Successfully",
+				duration: 4000,
+				type: "background"
 			});
 		}
+
+		setTimeout(() => {
+			handleRedirect("/login")
+		}, 1000);
 
 		await queryClient.invalidateQueries({
 			queryKey: ["loggedInUser"],
 		});
 
-		setTimeout(() => {
-			window.location.href = "/login";
-		}, 1000);
 	} catch (error) {
 		toast({
 			title: "Unable to Log Out!",
-			description: `Something went wrong, server responded empty (error: ${error.message}). Please try again.`,
+			description: `Something went wrong, server responded empty (error: ${error?.message}). Please try again.`,
+			duration: 4000,
 		});
 	}
 };
@@ -159,6 +166,8 @@ const handleUpdateProfile = async (
 				title: "Failed to Update Profile",
 				description: `${responseData?.error} | redirecting....`,
 				variant: "destructive",
+				duration: 1500,
+				type: "background"
 			});
 			setTimeout(() => {
 				handleRedirect("/login");
@@ -207,10 +216,10 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 	const [showOTPDialog, setShowOTPDialog] = useState(false);
 
 	// State to track the OTP input value
-	const otpRef = useRef(null);
+	const otpRef = useRef<HTMLInputElement>(null);
 
 	// biome-ignore lint: Kept for Reference Only Should be Removed in PROD.
-	console.log(otpRef.current)
+	console.log("otpRef current Value", otpRef.current?.value)
 
 	// State to track loading states
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -237,11 +246,13 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 				toast({
 					title: "Successfully Updated - User Profile",
 					description: `${body.message}` || "User Updated",
+					duration: 5000,
 				});
 				await queryClient.invalidateQueries({ queryKey: ["LoggedInUser"] });
 
 				setIsSubmitting(false);
 				setIsVerifyingOTP(false);
+				setShowOTPDialog(false);
 				setOriginalEmail(currentEmail);
 				return;
 			}
@@ -253,6 +264,8 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 				title: "Failed to Update Profile",
 				description: `${error.message}`,
 				variant: "destructive",
+				duration: 5000,
+				type: "background"
 			});
 			setIsSubmitting(false)
 			setOtpError(`${error.message}`);
@@ -349,7 +362,9 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 	}, [originalEmail, currentEmail, sendOTPToNewEmail, handleActualSubmit]);
 
 	// Handle OTP verification - memoize callback
-	const handleOTPVerification = useCallback(async () => {
+	const handleOTPVerification = useCallback(async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+		e.preventDefault();
+		e.stopPropagation();
 		console.log(otpRef.current?.value)
 		console.log(otpRef.current?.value)
 		if (!otpRef.current?.value?.trim()) {
@@ -362,7 +377,7 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 
 		if (otpRef.current?.value.length === 6 && /^\d+$/.test(otpRef.current?.value)) {
 			// OTP is valid, proceed with form submission
-			await handleActualSubmit(Number(otpRef.current));
+			await handleActualSubmit(Number(otpRef.current?.value));
 		} else {
 			setOtpError("Invalid OTP. Please check and try again.");
 			setIsVerifyingOTP(false);
@@ -495,7 +510,7 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 
 					{/* Radix-UI Dialog for OTP Verification */}
 
-					<Dialog open={showOTPDialog}>
+					<Dialog open={showOTPDialog} onOpenChange={open => !open && handleCancel()}>
 						<DialogContent className="sm:max-w-md">
 							<DialogTitle>Verify Your New Email</DialogTitle>
 							<DialogDescription>

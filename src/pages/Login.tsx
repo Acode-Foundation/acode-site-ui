@@ -108,11 +108,11 @@ export default function Login() {
 						<div className="space-y-2">
 							<Button
 								variant="outline"
-								className="w-full"
+								className="w-full disabled aria-disabled"
 								onClick={() => handleSocialLogin("GitHub")}
 							>
 								<Github className="w-4 h-4 mr-2" />
-								Continue with GitHub
+								Continue with GitHub (Soon)
 							</Button>
 						</div>
 
