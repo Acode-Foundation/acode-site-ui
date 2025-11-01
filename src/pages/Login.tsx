@@ -103,6 +103,8 @@ export default function Login() {
 							<Button
 								variant="outline"
 								className="w-full disabled aria-disabled"
+								disabled={true}
+								aria-disabled={true}
 								onClick={() => handleSocialLogin("GitHub")}
 							>
 								<Github className="w-4 h-4 mr-2" />
@@ -125,7 +127,7 @@ export default function Login() {
 					<CardContent>
 						<form onSubmit={handleLogin} className="space-y-4">
 							<div className="space-y-2">
-								<Label htmlFor="email">Email</Label>
+								<Label htmlFor="email">Email *</Label>
 								<Input
 									id="email"
 									type="email"
@@ -139,7 +141,7 @@ export default function Login() {
 							</div>
 
 							<div className="space-y-2">
-								<Label htmlFor="password">Password</Label>
+								<Label htmlFor="password">Password *</Label>
 								<div className="relative">
 									<Input
 										id="password"

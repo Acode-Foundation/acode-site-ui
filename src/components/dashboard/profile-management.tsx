@@ -1,28 +1,15 @@
 import {
-	BarChart3,
-	Building2,
-	CheckCircle,
-	Clock,
-	CreditCard,
-	DollarSign,
-	Edit,
-	Eye,
 	LogOut,
-	Plus,
 	Settings,
-	Shield,
-	X,
-	XCircle,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState, useRef, memo } from "react";
-import { Link, redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { type QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
 import { PaymentMethods } from "@/components/dashboard/payment-methods";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DeletePluginDialog } from "@/components/ui/delete-plugin-dialog";
 import {
 	Dialog,
 	DialogClose,
@@ -34,9 +21,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast.ts";
-import { User } from "@/types";
+import type { User } from "@/types";
+import { z } from "zod"
+import { useForm } from '@tanstack/react-form'
+import type { AnyFieldApi } from '@tanstack/react-form'
+import { isValidGithubId } from "@/lib/utils";
 
 // Mock user data
 const currentMockUser = {
@@ -191,17 +181,53 @@ const handleUpdateProfile = async (
 };
 
 const hasEmailChanged = (originalEmail: string, currentEmail: string) => {
+	console.log("hasEmailChanged :: ", { originalEmail, currentEmail})
 	return originalEmail !== currentEmail;
 };
 
+function FieldInfo({ field }: { field: AnyFieldApi }) {
+	console.log(field.state)
+	return (
+		<>
+		  {field.state.meta.isTouched && !field.state.meta.isValid ? (
+			<em className="text-sm text-red-600 mt-1">{field.state.meta.errors.map(e => e?.message).join(", ")}</em>
+		  ) : null}
+		  {field.state.meta.isValidating ? 'Validating...' : null}
+		</>
+	  )
+}
 
 type ProfileManagementProps = {
 	currentUser: User;
 };
 
+const profileManagementSchema = z.object({
+	name: z.string().trim().min(3, "Name must be at least 3 characters long").max(255, "Name must not exceed 255 characters"),
+	email: z.email().max(255, "Email must not exceed 255 characters").toLowerCase(),
+	website: z.url().trim().toLowerCase(),
+	github: z.string().trim().refine(val => isValidGithubId(val), "Github Id Must be Valid").max(255, "Github Id Must Not Exceed 255 characters.")
+})
+
 // Memoized ProfileManagement component to prevent unnecessary re-renders
 const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
+	console.log(currentUser)
 	const navigate = useNavigate()
+	const form = useForm({
+		defaultValues: {
+			name: currentUser?.name || "",
+			email: currentUser?.email || "",
+			website: currentUser?.website || "",
+			github: currentUser?.github || "",
+		},
+
+		onSubmit: async (values) => {
+			console.log("tanstack form :: on-submit values ", values)
+		},
+		validators: {
+			onChange: profileManagementSchema
+		}
+	});
+	
 	// Form input states
 	const [name, setName] = useState(currentUser?.name || "");
 	const [currentEmail, setCurrentEmail] = useState(currentUser?.email || "");
@@ -452,60 +478,114 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 							Change Avatar
 						</Button>
 					</div>
-					<form onSubmit={(e) => handleSubmit(e)} className="space-y-4">
+					<form onSubmit={(e) => {
+						 e.preventDefault()
+						 e.stopPropagation()
+						 form.handleSubmit()
+					}} className="space-y-4">
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<form.Field 
+								name="name" 
+								children={(field) => {
+									return (
+										<>
+										<div className="space-y-2">
+											<Label htmlFor={`${field.name}`}>Full Name</Label>
+											<Input 
+												id={`${field.name}`}
+												name={`${field.name}`}
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+											/>
+											<FieldInfo field={field} />
+										</div>
+										</>
+									)
+								}}
+							/>
+
 							<div className="space-y-2">
-								<Label htmlFor="name">Full Name</Label>
-								<Input 
-									id="name" 
-									name="name"
-									value={name}
-									onChange={(e) => setName(e.target.value)}
+								<form.Field 
+									name="email" 
+									children={(field) => {
+										return (
+											<>
+												<Label htmlFor={`${field.name}`}>Email</Label>
+												<Input 
+													id={`${field.name}`}
+													name={`${field.name}`}
+													value={field.state.value}
+													onBlur={field.handleBlur}
+													onChange={(e) => field.handleChange(e.target.value)}
+												/>
+												<FieldInfo field={field} />
+												{/* FIX: Checks on blurs  */}
+												{/* Visual indicator when email has changed */}
+												{hasEmailChanged(originalEmail, field.state.value) && (
+													<p className="text-sm text-orange-600 mt-1">
+														Email will be changed from: {originalEmail}
+													</p>
+												)}
+											</>
+										)
+									}}
 								/>
 							</div>
 							<div className="space-y-2">
-								<Label htmlFor="email">Email</Label>
-								<Input
-									id="email"
-									name="email"
-									type="email"
-									value={currentEmail}
-									onChange={(e) => setCurrentEmail(e.target.value)}
-								/>
-								{/* Visual indicator when email has changed */}
-								{hasEmailChanged(originalEmail, currentEmail) && (
-									<p className="text-sm text-orange-600 mt-1">
-										Email will be changed from: {originalEmail}
-									</p>
-								)}
-							</div>
-							<div className="space-y-2">
-								<Label htmlFor="website">Website</Label>
-								<Input 
-									id="website" 
-									name="website"
-									value={website}
-									onChange={(e) => setWebsite(e.target.value)}
+							<form.Field 
+									name="website" 
+									children={(field) => {
+										return (
+											<>
+												<Label htmlFor={`${field.name}`}>Website</Label>
+												<Input 
+													id={`${field.name}`}
+													name={`${field.name}`}
+													value={field.state.value}
+													onBlur={field.handleBlur}
+													onChange={(e) => field.handleChange(e.target.value)}
+												/>
+												<FieldInfo field={field} />
+											</>
+										)
+									}}
 								/>
 							</div>
 							<div className="space-y-2">
-								<Label htmlFor="github">GitHub</Label>
-								<Input 
-									id="github" 
-									name="github"
-									value={github}
-									onChange={(e) => setGithub(e.target.value)}
+							<form.Field 
+									name="github" 
+									children={(field) => {
+										return (
+											<>
+												<Label htmlFor={`${field.name}`}>Github</Label>
+												<Input 
+													id={`${field.name}`}
+													name={`${field.name}`}
+													value={field.state.value}
+													onBlur={field.handleBlur}
+													onChange={(e) => field.handleChange(e.target.value)}
+												/>
+												<FieldInfo field={field} />
+											</>
+										)
+									}}
 								/>
 							</div>
 						</div>
 
-						<Button
-							className="bg-gradient-primary transition-colors disabled:bg-gradient-dark"
-							type="submit"
-							disabled={isSubmitting}
-						>
-							{isSubmitting ? "Updating..." : "Update Profile"}
-						</Button>
+						<form.Subscribe
+							selector={(state) => [state.canSubmit, state.isSubmitting]}
+							children={([canSubmit, isSubmitting]) => (
+								<Button
+								className="bg-gradient-primary transition-colors disabled:bg-gradient-dark"
+								type="submit"
+								disabled={!canSubmit}
+								>
+									{isSubmitting ? "Updating..." : "Update Profile"}
+								</Button>
+							)}
+						/>
 					</form>
 
 					{/* Radix-UI Dialog for OTP Verification */}
