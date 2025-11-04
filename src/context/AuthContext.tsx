@@ -3,7 +3,7 @@ import { useQuery, useQueryClient, QueryObserverResult, RefetchOptions, useMutat
 import { fetchLoggedInUser } from "@/hooks/useLoggedInUser"
 import { User } from "@/types"
 
-type AuthContextState = {
+export type AuthContextState = {
     user: User,
     login: ({ formData }: { formData: FormData}) => Promise<Response>
     logout: () => Promise<Response>

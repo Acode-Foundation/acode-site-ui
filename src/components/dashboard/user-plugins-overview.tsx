@@ -54,9 +54,10 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { useDeletePlugin, useUserPlugins } from "@/hooks/use-user-plugins";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
+import { useAuth } from "@/context/AuthContext";
 
 export function UserPluginsOverview() {
-	const { data: user } = useLoggedInUser();
+	const { user } = useAuth();
 	const { data: plugins = [], isLoading } = useUserPlugins(
 		user?.id?.toString() || "",
 	);

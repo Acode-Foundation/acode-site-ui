@@ -27,6 +27,7 @@ import { z } from "zod"
 import { useForm } from '@tanstack/react-form'
 import type { AnyFieldApi } from '@tanstack/react-form'
 import { isValidGithubId } from "@/lib/utils";
+import { AuthContextState, useAuth } from "@/context/AuthContext";
 
 // Mock user data
 const currentMockUser = {
@@ -130,18 +131,12 @@ const handleLogOut = async (
 const handleUpdateProfile = async (
 	formData: FormData,
 	handleRedirect: (to: string) => void,
+	updateProfile: AuthContextState["updateProfile"],
 	emailOtp?: number,
 ) => {
 	if (emailOtp) formData.append("otp", emailOtp.toString());
 
-	const response = await fetch(
-		`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/user`,
-		{
-			method: "PUT",
-			body: formData,
-			credentials: "include",
-		},
-	);
+	const response = await updateProfile(formData, handleRedirect, emailOtp);
 
 	const responseData = response.headers
 		.get("content-type")
@@ -210,6 +205,7 @@ const profileManagementSchema = z.object({
 
 // Memoized ProfileManagement component to prevent unnecessary re-renders
 const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
+	const { updateProfile } = useAuth()
 	console.log(currentUser)
 	const navigate = useNavigate()
 	const form = useForm({
@@ -263,7 +259,7 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 			currentUser: User;
 			emailOtp?: number;
 		}) =>
-			await handleUpdateProfile(body.formData, (toUrl) => navigate(`${toUrl}`), body.emailOtp),
+			await handleUpdateProfile(body.formData, (toUrl) => navigate(`${toUrl}`), updateProfile,body.emailOtp),
 		onSuccess: async (data) => {
 			const { statusCode, body } = data;
 

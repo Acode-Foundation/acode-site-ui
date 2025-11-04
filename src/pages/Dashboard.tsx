@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser.ts";
 import ProfileManagement from "@/components/dashboard/profile-management";
+import { useAuth } from "@/context/AuthContext";
 
 // Note: Mock data removed - using real API data
 
@@ -380,11 +381,11 @@ export default function Dashboard() {
 	// const deletePluginMutation = useDeletePlugin();
 
 	const {
-		data: currentLoggedUser,
+		user: currentLoggedUser,
 		isError,
 		isLoading,
 		...args
-	} = useLoggedInUser();
+	} = useAuth();
 
 	// Memoize currentUser to prevent unnecessary re-renders
 	const currentUser = useMemo(() => ({
