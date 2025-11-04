@@ -26,6 +26,7 @@ import { EXTERNAL_LINKS } from "@/config/links";
 import { useToast } from "@/hooks/use-toast";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 const baseNavItems = [
 	{ name: "FAQ", href: "/faq", external: false },
@@ -45,9 +46,9 @@ export function FloatingNav() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { toast } = useToast();
-	const { data: user, isLoading, error } = useLoggedInUser();
+	const { user, isLoading, isError, logout } = useAuth();
 
-	const isLoggedIn = !isLoading && !error && user;
+	const isLoggedIn = !isLoading && !isError && user;
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -59,13 +60,7 @@ export function FloatingNav() {
 
 	const handleLogout = async () => {
 		try {
-			const response = await fetch(
-				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/login`,
-				{
-					method: "DELETE",
-					credentials: "include",
-				},
-			);
+			const response = await logout()
 
 			if (response.ok) {
 				toast({
