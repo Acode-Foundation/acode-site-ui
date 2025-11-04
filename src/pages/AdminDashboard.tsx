@@ -55,9 +55,9 @@ import {
 import { VerificationToggle } from "@/components/ui/verification-toggle";
 import { usePluginsByStatus } from "@/hooks/use-plugins-by-status";
 import { toast } from "@/hooks/use-toast";
-import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import { formatCurrency, formatDate } from "@/lib/date-utils";
 import { Plugin, User } from "@/types";
+import { useAuth } from "@/context/AuthContext";
 
 interface AdminStats {
 	users: number;
@@ -79,7 +79,7 @@ const LoadingSpinner = () => (
 );
 
 export default function AdminDashboard() {
-	const { data: currentUser, isLoading: userLoading } = useLoggedInUser();
+	const { user: currentUser, isLoading: userLoading } = useAuth();
 	const [currentPage, setCurrentPage] = useState(1);
 	const [searchName, setSearchName] = useState("");
 	const [searchEmail, setSearchEmail] = useState("");

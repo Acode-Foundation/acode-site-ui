@@ -60,8 +60,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { EXTERNAL_LINKS, openExternalLink } from "@/config/links";
 import "highlight.js/styles/github-dark.css";
 
-import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import type { FAQ } from "@/types";
+import { useAuth } from "@/context/AuthContext";
 
 const md = new MarkdownIt({
 	html: true,
@@ -91,7 +91,7 @@ export default function FAQ() {
 	const [loading, setLoading] = useState(true);
 
 	// Admin functionality
-	const { data: currentUser } = useLoggedInUser();
+	const { user: currentUser } = useAuth();
 	const isAdmin = currentUser?.role === "admin";
 
 	// Form state
