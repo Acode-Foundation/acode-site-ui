@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
 	// States & Hooks.
@@ -14,6 +15,7 @@ export default function Login() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
+	const { login } = useAuth()
 	const { toast } = useToast();
 	const navigate = useNavigate();
 	const params = useParams();
@@ -24,14 +26,7 @@ export default function Login() {
 
 		try {
 			const formData = new FormData(e.target as HTMLFormElement);
-			const response = await fetch(
-				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/login`,
-				{
-					method: "POST",
-					body: formData,
-					credentials: "include",
-				},
-			);
+			const response = await login({ formData })
 
 			const responseData = response.headers
 				.get("content-type")
@@ -136,6 +131,7 @@ export default function Login() {
 									value={email}
 									onChange={(e) => setEmail(e.target.value)}
 									required
+									autoComplete="email"
 									className="bg-background/50"
 								/>
 							</div>
@@ -151,6 +147,7 @@ export default function Login() {
 										value={password}
 										onChange={(e) => setPassword(e.target.value)}
 										required
+										autoComplete="current-password"
 										className="bg-background/50 pr-10"
 									/>
 									<Button

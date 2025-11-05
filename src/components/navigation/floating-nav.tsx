@@ -160,6 +160,7 @@ export function FloatingNav() {
 											<AvatarImage
 												src={`https://github.com/${user.github}.png`}
 												alt={`${user.name}'s avatar`}
+												loading="lazy"
 											/>
 										)}
 										<AvatarFallback className="text-xs bg-primary/10 text-primary">

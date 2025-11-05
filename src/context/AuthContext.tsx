@@ -36,7 +36,6 @@ export function AuthProvider({ children }) {
               {
                 method: "POST",
                 credentials: "include",
-                headers: { "Content-Type": "application/json" },
                 body: formData,
               }
             );
@@ -74,7 +73,7 @@ export function AuthProvider({ children }) {
         handleRedirect: (to: string) => void,
         emailOtp?: number
     ): Promise<Response> => {
-        if(!(formData instanceof FormData) || typeof handleRedirect !== "function" || typeof emailOtp !== "number") throw Error(`[updateProfile] Params used must be: 'formData' as FormData, 'handleRedirect' as a typeof Function, (optionally) emailOTP? as a number`)
+        if(!(formData instanceof FormData) || typeof handleRedirect !== "function" || (emailOtp && typeof emailOtp !== "number")) throw Error(`[updateProfile] Params used must be: 'formData' as FormData, 'handleRedirect' as a typeof Function, (optionally) emailOTP? as a number`)
 
         if (emailOtp) formData.append("otp", emailOtp.toString());
 

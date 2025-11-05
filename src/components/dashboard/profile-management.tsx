@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast.ts";
 import type { User } from "@/types";
-import { z } from "zod"
+import { superRefine, z,  } from "zod"
 import { useForm } from '@tanstack/react-form'
 import type { AnyFieldApi } from '@tanstack/react-form'
 import { isValidGithubId } from "@/lib/utils";
@@ -134,7 +134,6 @@ const handleUpdateProfile = async (
 	updateProfile: AuthContextState["updateProfile"],
 	emailOtp?: number,
 ) => {
-	if (emailOtp) formData.append("otp", emailOtp.toString());
 
 	const response = await updateProfile(formData, handleRedirect, emailOtp);
 
@@ -176,37 +175,84 @@ const handleUpdateProfile = async (
 };
 
 const hasEmailChanged = (originalEmail: string, currentEmail: string) => {
-	console.log("hasEmailChanged :: ", { originalEmail, currentEmail})
 	return originalEmail !== currentEmail;
 };
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {
-	console.log(field.state)
 	return (
 		<>
 		  {field.state.meta.isTouched && !field.state.meta.isValid ? (
-			<em className="text-sm text-red-600 mt-1">{field.state.meta.errors.map(e => e?.message).join(", ")}</em>
+			<em className="text-sm text-red-600 mt-1">{field.state.meta.errors.map(e => e?.message || e).join(", ")}</em>
 		  ) : null}
 		  {field.state.meta.isValidating ? 'Validating...' : null}
 		</>
 	  )
 }
 
+// Helper: convert Zod safeParse result into the validator return shape
+function zodToFormValidator<T extends object>(schema: z.ZodTypeAny) {
+	return async ({ value }: { value: T } | any) => {
+	  const parsed = await schema["~standard"].validate(value);
+	  if (!parsed.issues) return undefined; // no errors
+  
+	  // Build { fields: { <path>: <message> } } where path is the field name
+	  const fields: Record<string, string> = {};
+	  for (const issue of parsed.issues) {
+		const path = issue.path.length ? issue.path.join(".") : "_form";
+		fields[path] =  fields[path] ? `${fields[path]}, ${issue.message}` : issue.message;
+	  }
+	  return { fields }; // TanStack Form will map fields -> field.state.meta.errors
+	};
+  }
+
 type ProfileManagementProps = {
 	currentUser: User;
 };
 
 const profileManagementSchema = z.object({
-	name: z.string().trim().min(3, "Name must be at least 3 characters long").max(255, "Name must not exceed 255 characters"),
-	email: z.email().max(255, "Email must not exceed 255 characters").toLowerCase(),
-	website: z.url().trim().toLowerCase(),
-	github: z.string().trim().refine(val => isValidGithubId(val), "Github Id Must be Valid").max(255, "Github Id Must Not Exceed 255 characters.")
-})
+	name: z
+	  .string()
+	  .trim()
+	  .min(3, "Name must be at least 3 characters long")
+	  .max(255, "Name must not exceed 255 characters"),
+	email: z
+	  .email()
+	  .trim()
+	  .max(255, "Email must not exceed 255 characters")
+	  .transform((s) => s.toLowerCase()),
+	website: z.preprocess(
+		(val) => {
+		  if (val === undefined || val === null) return "";
+		  return String(val).trim();
+		},
+		z.union([
+		  z.literal(""),
+		  z.string().max(2048, "Website URL must not exceed 2048 characters.").url("Invalid URL"),
+		])
+	  ),
+	github: z.preprocess(
+		(v) => (v == null ? "" : String(v).trim()),
+		z.string().superRefine((val, ctx) => {
+		  if (val === "") return; // allow empty
+		  if (val.length > 255) {
+			ctx.addIssue("Github Id must not exceed 255 characters");
+			return;
+		  }
+		  if (!isValidGithubId(val)) {
+			ctx.addIssue({ code: "custom", message: "Github Id must be valid" });
+		  }
+		})
+	  ),
+  });
+  
+type ProfileValues = z.infer<typeof profileManagementSchema>;
 
 // Memoized ProfileManagement component to prevent unnecessary re-renders
 const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
+	const name = (currentUser?.name || "");
+	const originalEmail = (currentUser?.email || "")
+
 	const { updateProfile } = useAuth()
-	console.log(currentUser)
 	const navigate = useNavigate()
 	const form = useForm({
 		defaultValues: {
@@ -215,33 +261,43 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 			website: currentUser?.website || "",
 			github: currentUser?.github || "",
 		},
-
-		onSubmit: async (values) => {
-			console.log("tanstack form :: on-submit values ", values)
-		},
 		validators: {
-			onChange: profileManagementSchema
-		}
-	});
+			onSubmitAsync: zodToFormValidator<ProfileValues>(profileManagementSchema),
+			onChangeAsync: zodToFormValidator<ProfileValues>(profileManagementSchema)
+		},
+		onSubmit: async ({ value }) => {
+			try {
+				// value is the validated ProfileValues
+				if (hasEmailChanged(originalEmail, value.email)) {
+					setShowOTPDialog(true);
+					await sendOTPToNewEmail(value.email).catch((err) => {
+						toast({
+							title: `Email OTP Sending Failed to ${value.email} | Try again, by clicking Submit button.`,
+							description: err.message,
+							variant: "destructive",
+						});
+						// not closing the OTP Dialog as User could, click to resend button.
+						return null;
+				  });
+				  
+				  return;
+				}
 	
-	// Form input states
-	const [name, setName] = useState(currentUser?.name || "");
-	const [currentEmail, setCurrentEmail] = useState(currentUser?.email || "");
-	const [originalEmail, setOriginalEmail] = useState(currentUser?.email || "");
-	const [website, setWebsite] = useState(currentUser?.website || "");
-	const [github, setGithub] = useState(currentUser?.github || "");
+				  await handleActualSubmit(value);
+			} catch (error: any) {
+				
+			}
+		},
+	});
 
 	// biome-ignore lint: Kept for Reference Only Should be Removed in PROD.
-	console.table({ name, originalEmail, currentEmail, website, github })
+	// console.table({ name, originalEmail, currentEmail, website, github })
 
 	// State to control when the OTP dialog should be open
 	const [showOTPDialog, setShowOTPDialog] = useState(false);
 
 	// State to track the OTP input value
 	const otpRef = useRef<HTMLInputElement>(null);
-
-	// biome-ignore lint: Kept for Reference Only Should be Removed in PROD.
-	console.log("otpRef current Value", otpRef.current?.value)
 
 	// State to track loading states
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -270,12 +326,12 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 					description: `${body.message}` || "User Updated",
 					duration: 5000,
 				});
-				await queryClient.invalidateQueries({ queryKey: ["LoggedInUser"] });
+				await queryClient.invalidateQueries({ queryKey: ["loggedInUser"] });
 
 				setIsSubmitting(false);
 				setIsVerifyingOTP(false);
 				setShowOTPDialog(false);
-				setOriginalEmail(currentEmail);
+				// setOriginalEmail(currentEmail);
 				return;
 			}
 
@@ -298,11 +354,10 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 
 	// Profile Management Utils - memoize callback functions
 
-	const sendOTPToNewEmail = useCallback(async (
+	const sendOTPToNewEmail = async (
 		email: string,
 		type: "reset" | (string & {}) = "signup",
 	) => {
-		console.log({ email, type })
 		setIsSendingOTP(true);
 		const formData = new FormData();
 		formData.append("email", email);
@@ -337,15 +392,14 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 		} finally {
 			setIsSendingOTP(false);
 		}
-	}, []);
+	};
 
-	const handleActualSubmit = useCallback(async (emailOtp?: number) => {
+	const handleActualSubmit = async ({ name, email, website, github }, emailOtp?: number) => {
 		setIsSubmitting(true);
-
 		// Create FormData from current form state
 		const formData = new FormData();
 		formData.append("name", name);
-		formData.append("email", currentEmail);
+		formData.append("email", email);
 		formData.append("website", website);
 		formData.append("github", github);
 
@@ -357,38 +411,36 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 
 		// not resetting the states here,
 		// as we don't know if it success or failed. We clear/set updated states in mutation itself.
-	}, [name, currentEmail, website, github, currentUser, userMutation]);
+	};
 
-	const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
+	// const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+	// 	e.preventDefault();
 		
-		if (hasEmailChanged(originalEmail, currentEmail)) {
-			// Email has changed, show OTP dialog and send OTP
-			setShowOTPDialog(true);
+	// 	if (hasEmailChanged(originalEmail, currentEmail)) {
+	// 		// Email has changed, show OTP dialog and send OTP
+	// 		setShowOTPDialog(true);
 
-			// send email OTP
-			await sendOTPToNewEmail(currentEmail).catch((e) => {
-				toast({
-					title: `Email OTP Sending Failed to ${currentEmail} | Try again, by clicking Submit button.`,
-					description: e.message,
-					variant: "destructive",
-				});
-				// not closing the OTP Dialog as User could, click to resend button.
-				return null;
-			});
+	// 		// send email OTP
+	// 		await sendOTPToNewEmail(currentEmail).catch((e) => {
+	// 			toast({
+	// 				title: `Email OTP Sending Failed to ${currentEmail} | Try again, by clicking Submit button.`,
+	// 				description: e.message,
+	// 				variant: "destructive",
+	// 			});
+	// 			// not closing the OTP Dialog as User could, click to resend button.
+	// 			return null;
+	// 		});
 
-			return;
-		} else {
-			await handleActualSubmit();
-		}
-	}, [originalEmail, currentEmail, sendOTPToNewEmail, handleActualSubmit]);
+	// 		return;
+	// 	} else {
+	// 		await handleActualSubmit();
+	// 	}
+	// }, [originalEmail, currentEmail, sendOTPToNewEmail, handleActualSubmit]);
 
 	// Handle OTP verification - memoize callback
 	const handleOTPVerification = useCallback(async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		e.preventDefault();
 		e.stopPropagation();
-		console.log(otpRef.current?.value)
-		console.log(otpRef.current?.value)
 		if (!otpRef.current?.value?.trim()) {
 			setOtpError("Please enter the OTP");
 			return;
@@ -399,7 +451,12 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 
 		if (otpRef.current?.value.length === 6 && /^\d+$/.test(otpRef.current?.value)) {
 			// OTP is valid, proceed with form submission
-			await handleActualSubmit(Number(otpRef.current?.value));
+			await handleActualSubmit({ 
+				name: form.getFieldValue("name"), 
+				email: form.getFieldValue("email"),
+				website: form.getFieldValue("website"),
+				github: form.getFieldValue("github")
+			}, Number(otpRef.current?.value));
 		} else {
 			setOtpError("Invalid OTP. Please check and try again.");
 			setIsVerifyingOTP(false);
@@ -412,14 +469,14 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 		otpRef.current.value = "";
 		setOtpError("");
 		if(isVerifyingOTP) setIsVerifyingOTP(false)
-		setCurrentEmail(originalEmail);
+		form.resetField("email")
 	}, [originalEmail]);
 
 	// Handle resending OTP - memoize callback
 	const handleResendOTP = useCallback(async () => {
 		otpRef.current.value = ""; // Clear current OTP input
-		await sendOTPToNewEmail(currentEmail);
-	}, [currentEmail, sendOTPToNewEmail]);
+		await sendOTPToNewEmail(currentUser.email);
+	}, [currentUser?.email, sendOTPToNewEmail]);
 
 	return (
 		<div className="space-y-6">
@@ -591,7 +648,7 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 							<DialogTitle>Verify Your New Email</DialogTitle>
 							<DialogDescription>
 								We've sent a 6-digit verification code to{" "}
-								<strong>{currentEmail}</strong>. Please enter the code below to
+								<strong>{currentUser.email}</strong>. Please enter the code below to
 								confirm your email change.
 							</DialogDescription>
 
