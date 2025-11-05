@@ -23,31 +23,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast.ts";
 import type { User } from "@/types";
-import { superRefine, z,  } from "zod"
+import { z } from "zod"
 import { useForm } from '@tanstack/react-form'
 import type { AnyFieldApi } from '@tanstack/react-form'
 import { isValidGithubId } from "@/lib/utils";
 import { AuthContextState, useAuth } from "@/context/AuthContext";
-
-// Mock user data
-const currentMockUser = {
-	name: "John Doe",
-	email: "john@example.com",
-	role: "user", // "user" or "admin"
-	avatar: "JD",
-	joinDate: "2024-01-15",
-	bio: "Full-stack developer passionate about mobile development and creating tools that enhance productivity.",
-	website: "https://johndoe.dev",
-	github: "johndoe",
-	location: "San Francisco, CA",
-	totalEarnings: 245.67,
-	bankAccount: {
-		accountHolder: "John Doe",
-		bankName: "Chase Bank",
-		accountNumber: "****1234",
-		routingNumber: "****567",
-	},
-};
 
 /**
  * Handles the user log out process.
@@ -343,7 +323,7 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 				duration: 5000,
 				type: "background"
 			});
-			
+
 			setOtpError(`${error.message}`);
 			setIsVerifyingOTP(false)
 			return;
