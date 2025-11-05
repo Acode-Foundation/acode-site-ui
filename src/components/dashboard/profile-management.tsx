@@ -300,7 +300,6 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 	const otpRef = useRef<HTMLInputElement>(null);
 
 	// State to track loading states
-	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isSendingOTP, setIsSendingOTP] = useState(false);
 	const [isVerifyingOTP, setIsVerifyingOTP] = useState(false);
 
@@ -328,7 +327,6 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 				});
 				await queryClient.invalidateQueries({ queryKey: ["loggedInUser"] });
 
-				setIsSubmitting(false);
 				setIsVerifyingOTP(false);
 				setShowOTPDialog(false);
 				// setOriginalEmail(currentEmail);
@@ -345,7 +343,7 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 				duration: 5000,
 				type: "background"
 			});
-			setIsSubmitting(false)
+			
 			setOtpError(`${error.message}`);
 			setIsVerifyingOTP(false)
 			return;
@@ -395,7 +393,6 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 	};
 
 	const handleActualSubmit = async ({ name, email, website, github }, emailOtp?: number) => {
-		setIsSubmitting(true);
 		// Create FormData from current form state
 		const formData = new FormData();
 		formData.append("name", name);
@@ -527,8 +524,8 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 								) || ""}
 							</div>
 						</div>
-						<Button variant="outline" size="sm">
-							Change Avatar
+						<Button variant="outline" size="sm" className="disabled aria-disabled" disabled={true} aria-disabled={true}>
+							Change Avatar (Soon)
 						</Button>
 					</div>
 					<form onSubmit={(e) => {
