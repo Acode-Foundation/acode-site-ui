@@ -1,6 +1,6 @@
 import { Eye, EyeOff, Github, Lock, LogIn, Mail } from "lucide-react";
 import { useState } from "react";
-import { Link, redirect, useNavigate, useParams } from "react-router-dom";
+import { Link, redirect, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,8 +18,8 @@ export default function Login() {
 	const { login } = useAuth()
 	const { toast } = useToast();
 	const navigate = useNavigate();
-	const params = useParams();
-
+	const [searchParams] = useSearchParams();
+	console.log(searchParams)
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
@@ -52,10 +52,13 @@ export default function Login() {
 			});
 
 			setTimeout(() => {
-				let redirectUrl = params?.redirect as string;
+				let redirectUrl = searchParams.get("redirect") as string;
 				setIsLoading(false);
-				if (params.redirect === "app") {
+				console.log(searchParams, redirectUrl)
+				if (searchParams.get("redirect") === "app") {
 					redirectUrl = `acode://user/login/${responseData.token}`;
+					window.location.href = `${redirectUrl}`
+					return;
 				}
 
 				navigate(`${redirectUrl || "/dashboard"}`);
