@@ -246,7 +246,7 @@ export function UserPluginsOverview() {
 			</CardHeader>
 			<CardContent>
 				{/* Stats */}
-				<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+				<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
 					<div className="text-center p-4 bg-muted/30 rounded-lg">
 						<div className="text-2xl font-bold text-primary">
 							{totalPlugins}
