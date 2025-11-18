@@ -1,48 +1,39 @@
 import { Eye, EyeOff, Github, Lock, LogIn, Mail } from "lucide-react";
 import { useState } from "react";
-import { Link, redirect, useParams } from "react-router-dom";
+import { Link, redirect, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
+	// States & Hooks.
 	const [showPassword, setShowPassword] = useState(false);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
+	const { login } = useAuth()
 	const { toast } = useToast();
-	const params = useParams();
-
+	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
+	console.log(searchParams)
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
 
 		try {
 			const formData = new FormData(e.target as HTMLFormElement);
-			console.log(
-				formData.get("email"),
-				formData.get("password"),
-				formData.get("password"),
-			);
-			console.log(import.meta.env);
-			const response = await fetch(
-				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/login`,
-				{
-					method: "POST",
-					body: formData,
-					credentials: "include",
-				},
-			);
+			const response = await login({ formData })
 
 			const responseData = response.headers
 				.get("content-type")
 				.includes("application/json")
 				? await response.json()
 				: null;
-			console.log(responseData);
+
 			if (responseData?.error || !response.ok) {
 				setIsLoading(false);
 				return toast({
@@ -61,13 +52,16 @@ export default function Login() {
 			});
 
 			setTimeout(() => {
-				let redirectUrl = params?.redirect as string;
+				let redirectUrl = searchParams.get("redirect") as string;
 				setIsLoading(false);
-				if (params.redirect === "app") {
+				console.log(searchParams, redirectUrl)
+				if (searchParams.get("redirect") === "app") {
 					redirectUrl = `acode://user/login/${responseData.token}`;
+					window.location.href = `${redirectUrl}`
+					return;
 				}
 
-				window.location.href = redirectUrl || "/dashboard";
+				navigate(`${redirectUrl || "/dashboard"}`);
 			}, 1000);
 		} catch (error) {
 			console.error(`Login attempt Failed: `, error);
@@ -106,11 +100,13 @@ export default function Login() {
 						<div className="space-y-2">
 							<Button
 								variant="outline"
-								className="w-full"
+								className="w-full disabled aria-disabled"
+								disabled={true}
+								aria-disabled={true}
 								onClick={() => handleSocialLogin("GitHub")}
 							>
 								<Github className="w-4 h-4 mr-2" />
-								Continue with GitHub
+								Continue with GitHub (Soon)
 							</Button>
 						</div>
 
@@ -129,7 +125,7 @@ export default function Login() {
 					<CardContent>
 						<form onSubmit={handleLogin} className="space-y-4">
 							<div className="space-y-2">
-								<Label htmlFor="email">Email</Label>
+								<Label htmlFor="email">Email *</Label>
 								<Input
 									id="email"
 									type="email"
@@ -138,12 +134,13 @@ export default function Login() {
 									value={email}
 									onChange={(e) => setEmail(e.target.value)}
 									required
+									autoComplete="email"
 									className="bg-background/50"
 								/>
 							</div>
 
 							<div className="space-y-2">
-								<Label htmlFor="password">Password</Label>
+								<Label htmlFor="password">Password *</Label>
 								<div className="relative">
 									<Input
 										id="password"
@@ -153,6 +150,7 @@ export default function Login() {
 										value={password}
 										onChange={(e) => setPassword(e.target.value)}
 										required
+										autoComplete="current-password"
 										className="bg-background/50 pr-10"
 									/>
 									<Button

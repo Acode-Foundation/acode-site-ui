@@ -23,6 +23,7 @@ import Privacy from "./pages/Privacy";
 import Signup from "./pages/Signup";
 import SubmitPlugin from "./pages/SubmitPlugin";
 import Terms from "./pages/Terms";
+import { AuthProvider } from "./context/AuthContext";
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -42,39 +43,41 @@ const App = () => (
 		<QueryClientProvider client={queryClient}>
 			<ThemeProvider defaultTheme="dark" storageKey="acode-ui-theme">
 				<TooltipProvider>
-					<Toaster />
-					<Sonner />
-					<BrowserRouter>
-						<MainLayout>
-							<Routes>
-								<Route path="/" element={<Index />} />
-								<Route path="/plugins" element={<Plugins />} />
-								<Route path="/plugins/:id" element={<PluginDetail />} />
-								<Route path="/submit-plugin" element={<SubmitPlugin />} />
-								<Route path="/faq" element={<FAQ />} />
-								<Route path="/privacy" element={<Privacy />} />
-								<Route path="/terms" element={<Terms />} />
-								<Route path="/login" element={<Login />} />
-								<Route path="/signup" element={<Signup />} />
-								<Route path="/register" element={<Signup />} />
-								<Route path="/forgot-password" element={<ForgotPassword />} />
-								<Route path="/dashboard" element={<Dashboard />} />
-								<Route path="/admin" element={<AdminDashboard />} />
-								<Route path="/admin/payments" element={<AdminPayments />} />
-								<Route path="/earnings" element={<Earnings />} />
-								<Route path="/earnings/:userId" element={<Earnings />} />
-								<Route
-									path="/plugin-orders/:pluginId"
-									element={<PluginOrders />}
-								/>
-								<Route
-									path="/developer/:email"
-									element={<DeveloperProfile />}
-								/>
-								<Route path="*" element={<NotFound />} />
-							</Routes>
-						</MainLayout>
-					</BrowserRouter>
+					<AuthProvider>
+						<Toaster />
+						<Sonner />
+						<BrowserRouter>
+							<MainLayout>
+								<Routes>
+									<Route path="/" element={<Index />} />
+									<Route path="/plugins" element={<Plugins />} />
+									<Route path="/plugins/:id" element={<PluginDetail />} />
+									<Route path="/submit-plugin" element={<SubmitPlugin />} />
+									<Route path="/faq" element={<FAQ />} />
+									<Route path="/privacy" element={<Privacy />} />
+									<Route path="/terms" element={<Terms />} />
+									<Route path="/login" element={<Login />} />
+									<Route path="/signup" element={<Signup />} />
+									<Route path="/register" element={<Signup />} />
+									<Route path="/forgot-password" element={<ForgotPassword />} />
+									<Route path="/dashboard" element={<Dashboard />} />
+									<Route path="/admin" element={<AdminDashboard />} />
+									<Route path="/admin/payments" element={<AdminPayments />} />
+									<Route path="/earnings" element={<Earnings />} />
+									<Route path="/earnings/:userId" element={<Earnings />} />
+									<Route
+										path="/plugin-orders/:pluginId"
+										element={<PluginOrders />}
+									/>
+									<Route
+										path="/developer/:email"
+										element={<DeveloperProfile />}
+									/>
+									<Route path="*" element={<NotFound />} />
+								</Routes>
+							</MainLayout>
+						</BrowserRouter>
+					</AuthProvider>
 				</TooltipProvider>
 			</ThemeProvider>
 		</QueryClientProvider>

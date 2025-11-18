@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# ignore Environmental & setup Files
+.env
+.env.production
+.env.prod
+*/certs/**
+_cert.pem

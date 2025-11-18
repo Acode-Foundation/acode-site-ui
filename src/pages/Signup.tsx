@@ -134,7 +134,6 @@ export default function Signup() {
 				});
 
 				setTimeout(() => {					
-					// window.location.href = `/login${params?.redirect ? `?redirect=${params?.redirect}` : ""}`
 					navigate(`/login${params?.redirect ? `?redirect=${params?.redirect}` : ""}`)
 				}, 2000)
 			} else {

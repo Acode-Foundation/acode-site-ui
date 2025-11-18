@@ -26,6 +26,7 @@ import { useDeletePlugin } from "@/hooks/use-user-plugins";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import { DeveloperProfile as DeveloperType } from "@/types/developer";
 import { Plugin } from "@/types/plugin";
+import { useAuth } from "@/context/AuthContext";
 
 interface Developer extends DeveloperType {
 	role: string;
@@ -62,7 +63,7 @@ const fetchDeveloperPlugins = async (userId: string): Promise<Plugin[]> => {
 export default function DeveloperProfile() {
 	const { email } = useParams<{ email: string }>();
 	const { toast } = useToast();
-	const { data: loggedInUser } = useLoggedInUser();
+	const { user: loggedInUser } = useAuth();
 	const deleteMutation = useDeletePlugin();
 
 	const {

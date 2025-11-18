@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import type { Plugin, PluginFilterType } from "@/types";
+import { useAuth } from "@/context/AuthContext";
 
 const fallbackPlugins: Plugin[] = [
 	{
@@ -111,7 +112,7 @@ const fetchPlugins = async (
 };
 
 export const usePlugins = (filter: PluginFilterType = "default") => {
-	const { data: loggedInUser } = useLoggedInUser();
+	const { user: loggedInUser } = useAuth();
 	const isAuthenticated = !!loggedInUser;
 
 	return useInfiniteQuery({
