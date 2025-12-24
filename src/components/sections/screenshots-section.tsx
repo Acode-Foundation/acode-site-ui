@@ -30,7 +30,7 @@ const screenshots = [
 		title: "Syntax Highlighting",
 		description: "Beautiful syntax highlighting for all major languages",
 		image: syntaxImage,
-		device: "mobile",
+		// device: "mobile",
 		type: "screenshot",
 	},
 	{
@@ -38,7 +38,7 @@ const screenshots = [
 		title: "Plugin Ecosystem",
 		description: "Extend functionality with powerful plugins",
 		image: pluginsImage,
-		device: "tablet",
+		// device: "tablet",
 		type: "screenshot",
 	},
 	{
@@ -46,7 +46,7 @@ const screenshots = [
 		title: "Integrated Terminal (Alpine Linux)",
 		description: "Powered by Alpine Linux, with touch and mouse support.",
 		image: terminalImage,
-		device: "mobile",
+		// device: "mobile",
 		type: "screenshot",
 	},
 	{
@@ -54,7 +54,7 @@ const screenshots = [
 		title: "File Management",
 		description: "Intuitive file tabs and project organization",
 		image: fileManagement,
-		device: "desktop",
+		// device: "desktop",
 		type: "screenshot",
 	},
 	{
@@ -62,7 +62,7 @@ const screenshots = [
 		title: "Smart Settings",
 		description: "Customizable settings for your workflow",
 		image: settingsImage,
-		device: "mobile",
+		// device: "mobile",
 		type: "screenshot",
 	},
 	{
@@ -70,8 +70,8 @@ const screenshots = [
 		title: "Theme Editor",
 		description: "Create and customize beautiful themes",
 		image: customThemeEditor,
-		device: "tablet",
-		type: "clip",
+		// device: "tablet",
+		type: "screenshot",
 	},
 ];
 
@@ -134,22 +134,22 @@ export function ScreenshotsSection() {
 											)}
 
 											{/* Device Badge */}
-											<div className="absolute top-4 left-4">
-												<div className="flex items-center space-x-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1">
-													{screenshot.device === "mobile" && (
-														<Smartphone className="w-4 h-4 text-white" />
-													)}
-													{screenshot.device === "tablet" && (
-														<Tablet className="w-4 h-4 text-white" />
-													)}
-													{screenshot.device === "desktop" && (
-														<Monitor className="w-4 h-4 text-white" />
-													)}
-													<span className="text-white text-xs font-medium capitalize">
-														{screenshot.device}
-													</span>
-												</div>
-											</div>
+											{/* <div className="absolute top-4 left-4"> */}
+											{/* 	<div className="flex items-center space-x-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1"> */}
+											{/* 		{screenshot.device === "mobile" && ( */}
+											{/* 			<Smartphone className="w-4 h-4 text-white" /> */}
+											{/* 		)} */}
+											{/* 		{screenshot.device === "tablet" && ( */}
+											{/* 			<Tablet className="w-4 h-4 text-white" /> */}
+											{/* 		)} */}
+											{/* 		{screenshot.device === "desktop" && ( */}
+											{/* 			<Monitor className="w-4 h-4 text-white" /> */}
+											{/* 		)} */}
+											{/* 		<span className="text-white text-xs font-medium capitalize"> */}
+											{/* 			{screenshot.device} */}
+											{/* 		</span> */}
+											{/* 	</div> */}
+											{/* </div> */}
 
 											{/* Content Type Badge */}
 											<div className="absolute top-4 right-4">
