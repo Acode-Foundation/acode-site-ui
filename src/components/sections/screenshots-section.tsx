@@ -17,14 +17,19 @@ import {
 	CarouselNext,
 	CarouselPrevious,
 } from "@/components/ui/carousel";
+import syntaxImage from "@/assets/syntax_highlighting.jpeg"
+import fileManagement from "@/assets/filemanagement.png"
+import settingsImage from "@/assets/settings.jpg"
+import pluginsImage from "@/assets/plugins.jpg"
+import customThemeEditor from "@/assets/customThemeEditor.jpg"
+import terminalImage from "@/assets/terminal.jpg"
 
 const screenshots = [
 	{
 		id: 1,
 		title: "Syntax Highlighting",
 		description: "Beautiful syntax highlighting for all major languages",
-		image:
-			"https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+		image: syntaxImage,
 		device: "mobile",
 		type: "screenshot",
 	},
@@ -32,26 +37,23 @@ const screenshots = [
 		id: 2,
 		title: "Plugin Ecosystem",
 		description: "Extend functionality with powerful plugins",
-		image:
-			"https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+		image: pluginsImage,
 		device: "tablet",
 		type: "screenshot",
 	},
 	{
 		id: 3,
-		title: "Live Preview",
-		description: "Real-time preview and testing capabilities",
-		image:
-			"https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-		device: "desktop",
-		type: "clip",
+		title: "Integrated Terminal (Alpine Linux)",
+		description: "Powered by Alpine Linux, with touch and mouse support.",
+		image: terminalImage,
+		device: "mobile",
+		type: "screenshot",
 	},
 	{
 		id: 4,
 		title: "File Management",
 		description: "Intuitive file tabs and project organization",
-		image:
-			"https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+		image: fileManagement,
 		device: "desktop",
 		type: "screenshot",
 	},
@@ -59,8 +61,7 @@ const screenshots = [
 		id: 5,
 		title: "Smart Settings",
 		description: "Customizable settings for your workflow",
-		image:
-			"https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+		image: settingsImage,
 		device: "mobile",
 		type: "screenshot",
 	},
@@ -68,8 +69,7 @@ const screenshots = [
 		id: 6,
 		title: "Theme Editor",
 		description: "Create and customize beautiful themes",
-		image:
-			"https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+		image: customThemeEditor,
 		device: "tablet",
 		type: "clip",
 	},
@@ -116,7 +116,7 @@ export function ScreenshotsSection() {
 									className="pl-2 md:pl-4 basis-[280px] sm:basis-[320px] md:basis-[380px] lg:basis-[400px]"
 								>
 									<div className="group relative overflow-hidden rounded-2xl border border-border/20 bg-card/50 backdrop-blur-sm hover:border-primary/20 transition-all duration-300 h-full">
-										<div className="aspect-[4/3] relative overflow-hidden">
+										<div className="aspect-[1/1] relative overflow-hidden">
 											<img
 												src={screenshot.image}
 												alt={screenshot.title}

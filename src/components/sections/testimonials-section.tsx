@@ -6,11 +6,11 @@ import { Card, CardContent } from "@/components/ui/card";
 const testimonials = [
 	{
 		id: 1,
-		name: "Sarah Chen",
+		name: "(Anonymized)",
 		role: "Mobile Developer",
 		company: "TechCorp",
 		content:
-			"Acode has revolutionized my mobile development workflow. The Git integration and AI assistance make coding on mobile actually enjoyable.",
+			"I mean, what do you expect from me. the app is amazing, as someone who creates plugins for the app it's so fun seeing people use your plugins and share comments. also I love when I see that a new plugin has been created, makes me happy that I know there's still people out there with me!",
 		rating: 5,
 		avatar: "/api/placeholder/60/60",
 	},
