@@ -56,17 +56,6 @@ export function HeroModern() {
 
 			<div className="container mx-auto px-6 relative z-10">
 				<div className="text-center max-w-4xl mx-auto">
-					{/* Logo & Badge */}
-					<div className="flex flex-col items-center mb-8 animate-slide-up">
-						<img src={acodeLogoSvg} alt="Acode" className="h-20 w-20 mb-6" />
-						<Badge
-							variant="secondary"
-							className="bg-primary/10 text-primary border-primary/20 mb-4"
-						>
-							<Star className="w-3 h-3 mr-1" />
-							{githubStats?.stars.toLocaleString() || "3,000"} stars on GitHub
-						</Badge>
-					</div>
 
 					{/* Main Heading */}
 					<h1
