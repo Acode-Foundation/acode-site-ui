@@ -86,20 +86,20 @@ export function HeroModern() {
 					>
 						<Button
 							size="lg"
-							className="bg-primary hover:bg-primary/90 text-primary-foreground hover:shadow-lg transition-all duration-300 group text-lg px-8 py-4 h-14"
+							className="bg-primary hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 group rounded-full"
 						>
-							<Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-							Download for Android
-							<ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+							<Play className="w-4 h-4 mr-2 group-hover:scale-105 transition-transform duration-300" />
+							Download
+							<ArrowRight className="w-4 h-4 ml-1 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300" />
 						</Button>
 
 						<Button
 							variant="outline"
 							size="lg"
-							className="border-border hover:bg-accent/10 group text-lg px-8 py-4 h-14"
+							className="border-border/60 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group rounded-full"
 						>
-							<Download className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-							Get from F-Droid
+							<Download className="w-4 h-4 mr-2 group-hover:scale-105 transition-transform duration-300" />
+							F-Droid
 						</Button>
 					</div>
 

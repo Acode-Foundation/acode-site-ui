@@ -36,47 +36,21 @@ export function CTASection() {
 					>
 						<Button
 							size="lg"
-							className="bg-gradient-primary hover:shadow-glow-primary transition-all duration-300 group min-w-[200px]"
+							className="bg-primary hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 group rounded-full min-w-[200px]"
 						>
-							<Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+							<Play className="w-4 h-4 mr-2 group-hover:scale-105 transition-transform duration-300" />
 							Get on Play Store
-							<ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+							<ArrowRight className="w-4 h-4 ml-1 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300" />
 						</Button>
 
 						<Button
 							variant="outline"
 							size="lg"
-							className="border-border hover:bg-secondary/50 group min-w-[200px]"
+							className="border-border/60 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group rounded-full min-w-[200px]"
 						>
-							<Download className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+							<Download className="w-4 h-4 mr-2 group-hover:scale-105 transition-transform duration-300" />
 							Download F-Droid
-							<ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
 						</Button>
-					</div>
-
-					{/* Stats */}
-					<div
-						className="grid grid-cols-1 sm:grid-cols-3 gap-8 animate-fade-in"
-						style={{ animationDelay: "0.6s" }}
-					>
-						<div>
-							<div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-								100K+
-							</div>
-							<p className="text-muted-foreground">Active Users</p>
-						</div>
-						<div>
-							<div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-								4.7★
-							</div>
-							<p className="text-muted-foreground">App Store Rating</p>
-						</div>
-						<div>
-							<div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-								50+
-							</div>
-							<p className="text-muted-foreground">Supported Languages</p>
-						</div>
 					</div>
 				</div>
 			</div>
