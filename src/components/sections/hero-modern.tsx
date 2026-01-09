@@ -56,7 +56,6 @@ export function HeroModern() {
 
 			<div className="container mx-auto px-6 relative z-10">
 				<div className="text-center max-w-4xl mx-auto">
-
 					{/* Main Heading */}
 					<h1
 						className="text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-8 animate-slide-up"
