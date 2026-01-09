@@ -1,13 +1,19 @@
 import { Eye, EyeOff, Github, Lock, LogIn, Mail } from "lucide-react";
 import { useState } from "react";
-import { Link, redirect, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+	Link,
+	redirect,
+	useNavigate,
+	useParams,
+	useSearchParams,
+} from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
 	// States & Hooks.
@@ -15,18 +21,18 @@ export default function Login() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
-	const { login } = useAuth()
+	const { login } = useAuth();
 	const { toast } = useToast();
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
-	console.log(searchParams)
+	console.log(searchParams);
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
 
 		try {
 			const formData = new FormData(e.target as HTMLFormElement);
-			const response = await login({ formData })
+			const response = await login({ formData });
 
 			const responseData = response.headers
 				.get("content-type")
@@ -54,10 +60,10 @@ export default function Login() {
 			setTimeout(() => {
 				let redirectUrl = searchParams.get("redirect") as string;
 				setIsLoading(false);
-				console.log(searchParams, redirectUrl)
+				console.log(searchParams, redirectUrl);
 				if (searchParams.get("redirect") === "app") {
 					redirectUrl = `acode://user/login/${responseData.token}`;
-					window.location.href = `${redirectUrl}`
+					window.location.href = `${redirectUrl}`;
 					return;
 				}
 

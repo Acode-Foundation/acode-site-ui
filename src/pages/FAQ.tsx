@@ -60,8 +60,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { EXTERNAL_LINKS, openExternalLink } from "@/config/links";
 import "highlight.js/styles/github-dark.css";
 
-import type { FAQ } from "@/types";
 import { useAuth } from "@/context/AuthContext";
+import type { FAQ } from "@/types";
 
 const md = new MarkdownIt({
 	html: true,

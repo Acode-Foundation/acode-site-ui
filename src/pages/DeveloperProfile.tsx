@@ -21,12 +21,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DeletePluginDialog } from "@/components/ui/delete-plugin-dialog";
 import { PluginCard } from "@/components/ui/plugin-card";
 import { VerificationToggle } from "@/components/ui/verification-toggle";
+import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useDeletePlugin } from "@/hooks/use-user-plugins";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import { DeveloperProfile as DeveloperType } from "@/types/developer";
 import { Plugin } from "@/types/plugin";
-import { useAuth } from "@/context/AuthContext";
 
 interface Developer extends DeveloperType {
 	role: string;

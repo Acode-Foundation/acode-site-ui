@@ -10,6 +10,12 @@ import {
 	Tablet,
 	Zap,
 } from "lucide-react";
+import customThemeEditor from "@/assets/customThemeEditor.jpg";
+import fileManagement from "@/assets/filemanagement.png";
+import pluginsImage from "@/assets/plugins.jpg";
+import settingsImage from "@/assets/settings.jpg";
+import syntaxImage from "@/assets/syntax_highlighting.jpeg";
+import terminalImage from "@/assets/terminal.jpg";
 import {
 	Carousel,
 	CarouselContent,
@@ -17,12 +23,6 @@ import {
 	CarouselNext,
 	CarouselPrevious,
 } from "@/components/ui/carousel";
-import syntaxImage from "@/assets/syntax_highlighting.jpeg"
-import fileManagement from "@/assets/filemanagement.png"
-import settingsImage from "@/assets/settings.jpg"
-import pluginsImage from "@/assets/plugins.jpg"
-import customThemeEditor from "@/assets/customThemeEditor.jpg"
-import terminalImage from "@/assets/terminal.jpg"
 
 const screenshots = [
 	{

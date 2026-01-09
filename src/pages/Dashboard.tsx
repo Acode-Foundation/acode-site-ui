@@ -1,20 +1,16 @@
-import {
-	BarChart3,
-	Plus,
-	XCircle,
-} from "lucide-react";
+import { BarChart3, Plus, XCircle } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { EarningsOverview } from "@/components/dashboard/earnings-overview";
+import ProfileManagement from "@/components/dashboard/profile-management";
 import { UserPluginsOverview } from "@/components/dashboard/user-plugins-overview";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useLoggedInUser } from "@/hooks/useLoggedInUser.ts";
-import ProfileManagement from "@/components/dashboard/profile-management";
 import { useAuth } from "@/context/AuthContext";
+import { useLoggedInUser } from "@/hooks/useLoggedInUser.ts";
 
 // Note: Mock data removed - using real API data
 
@@ -29,7 +25,7 @@ const LoadingDashboard = () => {
 	);
 };
 
-// Kept for Reference. 
+// Kept for Reference.
 // biome-ignore lint: Kept for Reference Only Should be Removed in PROD.
 // const handleLogOut = async (
 // 	queryClient: QueryClient,
@@ -141,22 +137,22 @@ const LoadingDashboard = () => {
 // };
 
 // Memoized ProfileManagement component to prevent unnecessary re-renders
-// const ProfileManagement = memo(({ 
-// 	currentUser, 
-// 	name, 
-// 	currentEmail, 
-// 	originalEmail, 
-// 	website, 
-// 	github, 
-// 	handleSubmit, 
-// 	isSubmitting, 
-// 	showOTPDialog, 
-// 	otpValue, 
-// 	otpError, 
-// 	isSendingOTP, 
-// 	isVerifyingOTP, 
-// 	handleOTPVerification, 
-// 	handleResendOTP, 
+// const ProfileManagement = memo(({
+// 	currentUser,
+// 	name,
+// 	currentEmail,
+// 	originalEmail,
+// 	website,
+// 	github,
+// 	handleSubmit,
+// 	isSubmitting,
+// 	showOTPDialog,
+// 	otpValue,
+// 	otpError,
+// 	isSendingOTP,
+// 	isVerifyingOTP,
+// 	handleOTPVerification,
+// 	handleResendOTP,
 // 	handleCancel,
 // 	queryClient,
 // 	handleLogOut,
@@ -248,8 +244,8 @@ const LoadingDashboard = () => {
 // 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 // 						<div className="space-y-2">
 // 							<Label htmlFor="name">Full Name</Label>
-// 							<Input 
-// 								id="name" 
+// 							<Input
+// 								id="name"
 // 								name="name"
 // 								value={name}
 // 								onChange={(e) => setName(e.target.value)}
@@ -273,8 +269,8 @@ const LoadingDashboard = () => {
 // 						</div>
 // 						<div className="space-y-2">
 // 							<Label htmlFor="website">Website</Label>
-// 							<Input 
-// 								id="website" 
+// 							<Input
+// 								id="website"
 // 								name="website"
 // 								value={website}
 // 								onChange={(e) => setWebsite(e.target.value)}
@@ -282,8 +278,8 @@ const LoadingDashboard = () => {
 // 						</div>
 // 						<div className="space-y-2">
 // 							<Label htmlFor="github">GitHub</Label>
-// 							<Input 
-// 								id="github" 
+// 							<Input
+// 								id="github"
 // 								name="github"
 // 								value={github}
 // 								onChange={(e) => setGithub(e.target.value)}
@@ -380,65 +376,65 @@ export default function Dashboard() {
 	// const queryClient = useQueryClient();
 	// const deletePluginMutation = useDeletePlugin();
 
-	const {
-		user: currentLoggedUser,
-		isError,
-		isLoading,
-		...args
-	} = useAuth();
+	const { user: currentLoggedUser, isError, isLoading, ...args } = useAuth();
 
 	// Memoize currentUser to prevent unnecessary re-renders
-	const currentUser = useMemo(() => ({
-		...currentLoggedUser,
-	}), [currentLoggedUser]);
+	const currentUser = useMemo(
+		() => ({
+			...currentLoggedUser,
+		}),
+		[currentLoggedUser],
+	);
 
 	// biome-ignore lint: Kept for Reference Only Should be Removed in PROD.
-	console.log(currentUser)
+	console.log(currentUser);
 
 	useEffect(() => {
 		if (currentLoggedUser?.email) {
-			console.log("useEffect :: ran on change of currentUser")
+			console.log("useEffect :: ran on change of currentUser");
 		}
 	}, [currentLoggedUser?.email]);
 
 	// Memoize UserDashboard component to prevent unnecessary re-renders
-	const UserDashboard = useMemo(() => (
-		<div className="space-y-6">
-			{/* Overview Grid */}
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-				<div className="lg:col-span-2">
-					<UserPluginsOverview />
-				</div>
-				<div className="space-y-6">
-					<EarningsOverview />
+	const UserDashboard = useMemo(
+		() => (
+			<div className="space-y-6">
+				{/* Overview Grid */}
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+					<div className="lg:col-span-2">
+						<UserPluginsOverview />
+					</div>
+					<div className="space-y-6">
+						<EarningsOverview />
 
-					{/* Quick Actions */}
-					<Card>
-						<CardHeader>
-							<CardTitle>Quick Actions</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<div className="space-y-3">
-								<Link to="/submit-plugin" className="block">
-									<Button className="w-full bg-gradient-primary hover:shadow-glow-primary">
-										<Plus className="w-4 h-4 mr-2" />
-										Submit New Plugin
-									</Button>
-								</Link>
-								<Link to="/earnings" className="block">
-									<Button variant="outline" className="w-full">
-										<BarChart3 className="w-4 h-4 mr-2" />
-										View Earnings
-									</Button>
-								</Link>
-							</div>
-						</CardContent>
-					</Card>
+						{/* Quick Actions */}
+						<Card>
+							<CardHeader>
+								<CardTitle>Quick Actions</CardTitle>
+							</CardHeader>
+							<CardContent>
+								<div className="space-y-3">
+									<Link to="/submit-plugin" className="block">
+										<Button className="w-full bg-gradient-primary hover:shadow-glow-primary">
+											<Plus className="w-4 h-4 mr-2" />
+											Submit New Plugin
+										</Button>
+									</Link>
+									<Link to="/earnings" className="block">
+										<Button variant="outline" className="w-full">
+											<BarChart3 className="w-4 h-4 mr-2" />
+											View Earnings
+										</Button>
+									</Link>
+								</div>
+							</CardContent>
+						</Card>
+					</div>
 				</div>
 			</div>
-		</div>
-	), []);
-
+		),
+		[],
+	);
 
 	// const {
 	// 	data: userPlugins,
@@ -505,22 +501,23 @@ export default function Dashboard() {
 	// 	}
 	// };
 
-
 	if (isError) {
 		// TODO: Move this to Middleware or make use of contexts.
 		// biome-ignore lint: Kept for Reference Only Should be Removed in PROD.
-		console.log("User Not Logged in. redirecting...")
+		console.log("User Not Logged in. redirecting...");
 		// setTimeout(() => {
-			// navigate("/login")
+		// navigate("/login")
 		// }, 1000)
 		return (
 			<div className="min-h-80 bg-gradient-dark flex flex-col items-center justify-center">
-					<XCircle className="w-16 h-16 text-destructive mb-4" />
-					<h2 className="text-2xl font-bold mb-2 text-primary-foreground">User Not Logged In.</h2>
-					<p className="text-muted-foreground mb-6 max-w-md">
-						You're not logged in! Redirecting...
-					</p>
-				</div>
+				<XCircle className="w-16 h-16 text-destructive mb-4" />
+				<h2 className="text-2xl font-bold mb-2 text-primary-foreground">
+					User Not Logged In.
+				</h2>
+				<p className="text-muted-foreground mb-6 max-w-md">
+					You're not logged in! Redirecting...
+				</p>
+			</div>
 		);
 	}
 
@@ -573,9 +570,7 @@ export default function Dashboard() {
 				</TabsContent>
 
 				<TabsContent value="profile" className="space-y-6 mt-6">
-					<ProfileManagement
-						currentUser={currentUser}
-					/>
+					<ProfileManagement currentUser={currentUser} />
 				</TabsContent>
 			</Tabs>
 		</div>

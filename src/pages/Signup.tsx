@@ -23,12 +23,12 @@ export default function Signup() {
 	const [otp, setOtp] = useState("");
 	const [isOtpLoading, setIsOtpLoading] = useState(false);
 	const params = useParams();
-	const navigate = useNavigate()
+	const navigate = useNavigate();
 
 	const handleSendOtp = async () => {
 		const emailInput = document.getElementById("email") as HTMLInputElement;
 		const email = emailInput?.value;
-		
+
 		if (!email) {
 			toast({
 				description: "Please enter your email first",
@@ -39,14 +39,15 @@ export default function Signup() {
 		setIsOtpLoading(true);
 		try {
 			const response = await fetch(
-				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/otp`, {
+				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/otp`,
+				{
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({ email }),
 					credentials: "include",
-				}
+				},
 			);
 
 			if (response.ok) {
@@ -54,13 +55,13 @@ export default function Signup() {
 				// alert("OTP sent to your email!");
 				toast({
 					description: "OTP sent to your email!",
-					duration: 2000
-				})
+					duration: 2000,
+				});
 			} else {
 				toast({
 					title: "Failed to send OTP.",
-					description: `Something went wrong, server responded empty (request status code: ${response.status}). Please try again.`, 
-					variant: "destructive"
+					description: `Something went wrong, server responded empty (request status code: ${response.status}). Please try again.`,
+					variant: "destructive",
 				});
 			}
 		} catch (error) {
@@ -84,36 +85,40 @@ export default function Signup() {
 			toast({
 				description: "Please verify your email with OTP first",
 				// destructive = bg Red (shown as error)
-				variant: "destructive"
-			})
+				variant: "destructive",
+			});
 			return;
 		}
 
 		const formData = new FormData(e.target as HTMLFormElement);
 
-		console.log("Signup FormData", formData,
+		console.log(
+			"Signup FormData",
+			formData,
 			formData.get("email"),
 			formData.get("password").toString(),
 			formData.get("confirmPassword").toString(),
 			formData.get("otp"),
-			(formData.get("password").toString().localeCompare(formData.get("confirmPassword").toString()))
+			formData
+				.get("password")
+				.toString()
+				.localeCompare(formData.get("confirmPassword").toString()),
 		);
 
-		if(formData.get("password") !== formData.get("confirmPassword")) {
-
+		if (formData.get("password") !== formData.get("confirmPassword")) {
 			toast({
 				description: "Password & Confirm Password both Must be the same.",
 				variant: "destructive",
-			})
+			});
 			return;
 		}
 
 		try {
-
 			console.log("Signup env", import.meta.env);
 
 			const response = await fetch(
-				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/user`, {
+				`${import.meta.env.DEV ? import.meta.env.VITE_SERVER_URL : ""}/api/user`,
+				{
 					method: "POST",
 					body: formData,
 					credentials: "include",
@@ -130,12 +135,14 @@ export default function Signup() {
 				toast({
 					title: "Account Created Successfully",
 					description: `Redirecting ${params.redirect ? `to ${params.redirect}` : ""}....`,
-					lang: "en-US"
+					lang: "en-US",
 				});
 
-				setTimeout(() => {					
-					navigate(`/login${params?.redirect ? `?redirect=${params?.redirect}` : ""}`)
-				}, 2000)
+				setTimeout(() => {
+					navigate(
+						`/login${params?.redirect ? `?redirect=${params?.redirect}` : ""}`,
+					);
+				}, 2000);
 			} else {
 				toast({
 					title: "Failed to create account.",
@@ -157,7 +164,7 @@ export default function Signup() {
 				variant: "destructive",
 			});
 		}
-	}
+	};
 
 	return (
 		<div className="flex items-center justify-center py-8 px-4">
@@ -176,7 +183,12 @@ export default function Signup() {
 				<Card className="bg-card/50 backdrop-blur-sm border-border">
 					<CardHeader className="space-y-1 pb-4">
 						<div className="space-y-2">
-							<Button variant="outline" className="w-full" disabled aria-disabled>
+							<Button
+								variant="outline"
+								className="w-full"
+								disabled
+								aria-disabled
+							>
 								<Github className="w-4 h-4 mr-2" />
 								Continue with GitHub (Soon)
 							</Button>
@@ -196,7 +208,6 @@ export default function Signup() {
 
 					<CardContent>
 						<form className="space-y-4" onSubmit={handleSignup}>
-
 							<div className="space-y-2">
 								<Label htmlFor="username">Username</Label>
 								<div className="relative">
@@ -234,7 +245,11 @@ export default function Signup() {
 									title="Press it, After entering your Email Above"
 									className="w-full border-slate-700 hover:border-none"
 								>
-									{isOtpLoading ? "Sending..." : otpSent ? "Resend OTP" : "Send OTP"}
+									{isOtpLoading
+										? "Sending..."
+										: otpSent
+											? "Resend OTP"
+											: "Send OTP"}
 								</Button>
 							</div>
 
@@ -247,7 +262,9 @@ export default function Signup() {
 										placeholder="Enter 6-digit OTP"
 										name="otp"
 										value={otp}
-										onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+										onChange={(e) =>
+											setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+										}
 										required
 										min={6}
 										max={6}
@@ -309,7 +326,7 @@ export default function Signup() {
 							</div>
 
 							<div className="flex items-center space-x-2">
-								<Checkbox id="terms" aria-required={true} required={true}/>
+								<Checkbox id="terms" aria-required={true} required={true} />
 								<Label htmlFor="terms" className="text-sm">
 									I agree to the{" "}
 									<Link to="/terms" className="text-primary hover:underline">

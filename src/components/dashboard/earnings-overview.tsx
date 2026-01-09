@@ -1,7 +1,7 @@
 import { DollarSign, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useCurrentMonthEarnings } from "@/hooks/use-earnings";
 import { useAuth } from "@/context/AuthContext";
+import { useCurrentMonthEarnings } from "@/hooks/use-earnings";
 
 export function EarningsOverview() {
 	const { user } = useAuth();

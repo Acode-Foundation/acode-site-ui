@@ -1,10 +1,14 @@
+import type { AnyFieldApi } from "@tanstack/react-form";
+import { useForm } from "@tanstack/react-form";
 import {
-	LogOut,
-	Settings,
-} from "lucide-react";
-import { useCallback, useEffect, useMemo, useState, useRef, memo } from "react";
+	type QueryClient,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { LogOut, Settings } from "lucide-react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { type QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import { PaymentMethods } from "@/components/dashboard/payment-methods";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -21,13 +25,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/hooks/use-toast.ts";
-import type { User } from "@/types";
-import { z } from "zod"
-import { useForm } from '@tanstack/react-form'
-import type { AnyFieldApi } from '@tanstack/react-form'
-import { isValidGithubId } from "@/lib/utils";
 import { AuthContextState, useAuth } from "@/context/AuthContext";
+import { toast } from "@/hooks/use-toast.ts";
+import { isValidGithubId } from "@/lib/utils";
+import type { User } from "@/types";
 
 /**
  * Handles the user log out process.
@@ -54,10 +55,11 @@ const handleLogOut = async (
 			},
 		);
 
-		const responseData =
-			response.headers.get("content-type").includes("application/json")
-				? await response.json()
-				: null;
+		const responseData = response.headers
+			.get("content-type")
+			.includes("application/json")
+			? await response.json()
+			: null;
 		if (responseData?.error || !response.ok) {
 			toast({
 				title: "Unable to Log Out!",
@@ -66,7 +68,7 @@ const handleLogOut = async (
 					`Something went wrong, server responded empty (request status code: ${response.status}). Please try again.`,
 				duration: 1500,
 				variant: "destructive",
-				type: "background"
+				type: "background",
 			});
 			// Bad Request, in this case means: response as {error: 'Not Logged in'}
 			if (response.status === 400) {
@@ -77,21 +79,19 @@ const handleLogOut = async (
 		} else if (response.ok) {
 			toast({
 				title: "Logged Out! Redirecting....",
-				description:
-					responseData.message || "Logged Out Successfully",
+				description: responseData.message || "Logged Out Successfully",
 				duration: 4000,
-				type: "background"
+				type: "background",
 			});
 		}
 
 		setTimeout(() => {
-			handleRedirect("/login")
+			handleRedirect("/login");
 		}, 1000);
 
 		await queryClient.invalidateQueries({
 			queryKey: ["loggedInUser"],
 		});
-
 	} catch (error) {
 		toast({
 			title: "Unable to Log Out!",
@@ -106,7 +106,7 @@ const handleLogOut = async (
  * @param formData the formData received from the event or mutation (from Tanstack query).
  * @param {(to: string) => void} handleRedirect - A callback function used to redirect the user to a new URL after successful log out.
  * @param emailOtp email OTP only required if Email has been changed/opted to update the email.
- * @returns 
+ * @returns
  */
 const handleUpdateProfile = async (
 	formData: FormData,
@@ -114,7 +114,6 @@ const handleUpdateProfile = async (
 	updateProfile: AuthContextState["updateProfile"],
 	emailOtp?: number,
 ) => {
-
 	const response = await updateProfile(formData, handleRedirect, emailOtp);
 
 	const responseData = response.headers
@@ -131,7 +130,7 @@ const handleUpdateProfile = async (
 				description: `${responseData?.error} | redirecting....`,
 				variant: "destructive",
 				duration: 1500,
-				type: "background"
+				type: "background",
 			});
 			setTimeout(() => {
 				handleRedirect("/login");
@@ -161,29 +160,33 @@ const hasEmailChanged = (originalEmail: string, currentEmail: string) => {
 function FieldInfo({ field }: { field: AnyFieldApi }) {
 	return (
 		<>
-		  {field.state.meta.isTouched && !field.state.meta.isValid ? (
-			<em className="text-sm text-red-600 mt-1">{field.state.meta.errors.map(e => e?.message || e).join(", ")}</em>
-		  ) : null}
-		  {field.state.meta.isValidating ? 'Validating...' : null}
+			{field.state.meta.isTouched && !field.state.meta.isValid ? (
+				<em className="text-sm text-red-600 mt-1">
+					{field.state.meta.errors.map((e) => e?.message || e).join(", ")}
+				</em>
+			) : null}
+			{field.state.meta.isValidating ? "Validating..." : null}
 		</>
-	  )
+	);
 }
 
 // Helper: convert Zod safeParse result into the validator return shape
 function zodToFormValidator<T extends object>(schema: z.ZodTypeAny) {
 	return async ({ value }: { value: T } | any) => {
-	  const parsed = await schema["~standard"].validate(value);
-	  if (!parsed.issues) return undefined; // no errors
-  
-	  // Build { fields: { <path>: <message> } } where path is the field name
-	  const fields: Record<string, string> = {};
-	  for (const issue of parsed.issues) {
-		const path = issue.path.length ? issue.path.join(".") : "_form";
-		fields[path] =  fields[path] ? `${fields[path]}, ${issue.message}` : issue.message;
-	  }
-	  return { fields }; // TanStack Form will map fields -> field.state.meta.errors
+		const parsed = await schema["~standard"].validate(value);
+		if (!parsed.issues) return undefined; // no errors
+
+		// Build { fields: { <path>: <message> } } where path is the field name
+		const fields: Record<string, string> = {};
+		for (const issue of parsed.issues) {
+			const path = issue.path.length ? issue.path.join(".") : "_form";
+			fields[path] = fields[path]
+				? `${fields[path]}, ${issue.message}`
+				: issue.message;
+		}
+		return { fields }; // TanStack Form will map fields -> field.state.meta.errors
 	};
-  }
+}
 
 type ProfileManagementProps = {
 	currentUser: User;
@@ -191,49 +194,52 @@ type ProfileManagementProps = {
 
 const profileManagementSchema = z.object({
 	name: z
-	  .string()
-	  .trim()
-	  .min(3, "Name must be at least 3 characters long")
-	  .max(255, "Name must not exceed 255 characters"),
+		.string()
+		.trim()
+		.min(3, "Name must be at least 3 characters long")
+		.max(255, "Name must not exceed 255 characters"),
 	email: z
-	  .email()
-	  .trim()
-	  .max(255, "Email must not exceed 255 characters")
-	  .transform((s) => s.toLowerCase()),
+		.email()
+		.trim()
+		.max(255, "Email must not exceed 255 characters")
+		.transform((s) => s.toLowerCase()),
 	website: z.preprocess(
 		(val) => {
-		  if (val === undefined || val === null) return "";
-		  return String(val).trim();
+			if (val === undefined || val === null) return "";
+			return String(val).trim();
 		},
 		z.union([
-		  z.literal(""),
-		  z.string().max(2048, "Website URL must not exceed 2048 characters.").url("Invalid URL"),
-		])
-	  ),
+			z.literal(""),
+			z
+				.string()
+				.max(2048, "Website URL must not exceed 2048 characters.")
+				.url("Invalid URL"),
+		]),
+	),
 	github: z.preprocess(
 		(v) => (v == null ? "" : String(v).trim()),
 		z.string().superRefine((val, ctx) => {
-		  if (val === "") return; // allow empty
-		  if (val.length > 255) {
-			ctx.addIssue("Github Id must not exceed 255 characters");
-			return;
-		  }
-		  if (!isValidGithubId(val)) {
-			ctx.addIssue({ code: "custom", message: "Github Id must be valid" });
-		  }
-		})
-	  ),
-  });
-  
+			if (val === "") return; // allow empty
+			if (val.length > 255) {
+				ctx.addIssue("Github Id must not exceed 255 characters");
+				return;
+			}
+			if (!isValidGithubId(val)) {
+				ctx.addIssue({ code: "custom", message: "Github Id must be valid" });
+			}
+		}),
+	),
+});
+
 type ProfileValues = z.infer<typeof profileManagementSchema>;
 
 // Memoized ProfileManagement component to prevent unnecessary re-renders
 const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
-	const name = (currentUser?.name || "");
-	const originalEmail = (currentUser?.email || "")
+	const name = currentUser?.name || "";
+	const originalEmail = currentUser?.email || "";
 
-	const { updateProfile } = useAuth()
-	const navigate = useNavigate()
+	const { updateProfile } = useAuth();
+	const navigate = useNavigate();
 	const form = useForm({
 		defaultValues: {
 			name: currentUser?.name || "",
@@ -243,7 +249,7 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 		},
 		validators: {
 			onSubmitAsync: zodToFormValidator<ProfileValues>(profileManagementSchema),
-			onChangeAsync: zodToFormValidator<ProfileValues>(profileManagementSchema)
+			onChangeAsync: zodToFormValidator<ProfileValues>(profileManagementSchema),
 		},
 		onSubmit: async ({ value }) => {
 			try {
@@ -258,15 +264,13 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 						});
 						// not closing the OTP Dialog as User could, click to resend button.
 						return null;
-				  });
-				  
-				  return;
+					});
+
+					return;
 				}
-	
-				  await handleActualSubmit(value);
-			} catch (error: any) {
-				
-			}
+
+				await handleActualSubmit(value);
+			} catch (error: any) {}
 		},
 	});
 
@@ -294,7 +298,12 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 			currentUser: User;
 			emailOtp?: number;
 		}) =>
-			await handleUpdateProfile(body.formData, (toUrl) => navigate(`${toUrl}`), updateProfile,body.emailOtp),
+			await handleUpdateProfile(
+				body.formData,
+				(toUrl) => navigate(`${toUrl}`),
+				updateProfile,
+				body.emailOtp,
+			),
 		onSuccess: async (data) => {
 			const { statusCode, body } = data;
 
@@ -321,11 +330,11 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 				description: `${error.message}`,
 				variant: "destructive",
 				duration: 5000,
-				type: "background"
+				type: "background",
 			});
 
 			setOtpError(`${error.message}`);
-			setIsVerifyingOTP(false)
+			setIsVerifyingOTP(false);
 			return;
 		},
 	});
@@ -348,7 +357,7 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 					credentials: "include",
 					body: formData,
 					cache: "no-store",
-				}
+				},
 			);
 			const responseData = res.headers
 				.get("content-type")
@@ -372,7 +381,10 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 		}
 	};
 
-	const handleActualSubmit = async ({ name, email, website, github }, emailOtp?: number) => {
+	const handleActualSubmit = async (
+		{ name, email, website, github },
+		emailOtp?: number,
+	) => {
 		// Create FormData from current form state
 		const formData = new FormData();
 		formData.append("name", name);
@@ -392,7 +404,7 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 
 	// const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
 	// 	e.preventDefault();
-		
+
 	// 	if (hasEmailChanged(originalEmail, currentEmail)) {
 	// 		// Email has changed, show OTP dialog and send OTP
 	// 		setShowOTPDialog(true);
@@ -415,38 +427,47 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 	// }, [originalEmail, currentEmail, sendOTPToNewEmail, handleActualSubmit]);
 
 	// Handle OTP verification - memoize callback
-	const handleOTPVerification = useCallback(async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-		e.preventDefault();
-		e.stopPropagation();
-		if (!otpRef.current?.value?.trim()) {
-			setOtpError("Please enter the OTP");
-			return;
-		}
+	const handleOTPVerification = useCallback(
+		async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+			e.preventDefault();
+			e.stopPropagation();
+			if (!otpRef.current?.value?.trim()) {
+				setOtpError("Please enter the OTP");
+				return;
+			}
 
-		setIsVerifyingOTP(true);
-		setOtpError("");
+			setIsVerifyingOTP(true);
+			setOtpError("");
 
-		if (otpRef.current?.value.length === 6 && /^\d+$/.test(otpRef.current?.value)) {
-			// OTP is valid, proceed with form submission
-			await handleActualSubmit({ 
-				name: form.getFieldValue("name"), 
-				email: form.getFieldValue("email"),
-				website: form.getFieldValue("website"),
-				github: form.getFieldValue("github")
-			}, Number(otpRef.current?.value));
-		} else {
-			setOtpError("Invalid OTP. Please check and try again.");
-			setIsVerifyingOTP(false);
-		}
-	}, [otpRef?.current?.value, handleActualSubmit]);
+			if (
+				otpRef.current?.value.length === 6 &&
+				/^\d+$/.test(otpRef.current?.value)
+			) {
+				// OTP is valid, proceed with form submission
+				await handleActualSubmit(
+					{
+						name: form.getFieldValue("name"),
+						email: form.getFieldValue("email"),
+						website: form.getFieldValue("website"),
+						github: form.getFieldValue("github"),
+					},
+					Number(otpRef.current?.value),
+				);
+			} else {
+				setOtpError("Invalid OTP. Please check and try again.");
+				setIsVerifyingOTP(false);
+			}
+		},
+		[otpRef?.current?.value, handleActualSubmit],
+	);
 
 	// Handle when user cancels the OTP dialog - memoize callback
 	const handleCancel = useCallback(() => {
 		setShowOTPDialog(false);
 		otpRef.current.value = "";
 		setOtpError("");
-		if(isVerifyingOTP) setIsVerifyingOTP(false)
-		form.resetField("email")
+		if (isVerifyingOTP) setIsVerifyingOTP(false);
+		form.resetField("email");
 	}, [originalEmail]);
 
 	// Handle resending OTP - memoize callback
@@ -468,7 +489,9 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 						<Button
 							variant="destructive"
 							size="sm"
-							onClick={(e) => handleLogOut(queryClient, e, (toUrl) => navigate(`${toUrl}`))}
+							onClick={(e) =>
+								handleLogOut(queryClient, e, (toUrl) => navigate(`${toUrl}`))
+							}
 						>
 							<LogOut className="w-4 h-4 mr-2" />
 							Logout
@@ -497,52 +520,62 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 							<p className="text-muted-foreground">{currentUser.email}</p>
 							<div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
 								<Badge variant="outline">{currentUser.role}</Badge>
-								{currentUser.verified && (
+								{(currentUser.verified && (
 									<Badge variant="default" className="bg-green-500">
 										Verified
 									</Badge>
-								) || ""}
+								)) ||
+									""}
 							</div>
 						</div>
-						<Button variant="outline" size="sm" className="disabled aria-disabled" disabled={true} aria-disabled={true}>
+						<Button
+							variant="outline"
+							size="sm"
+							className="disabled aria-disabled"
+							disabled={true}
+							aria-disabled={true}
+						>
 							Change Avatar (Soon)
 						</Button>
 					</div>
-					<form onSubmit={(e) => {
-						 e.preventDefault()
-						 e.stopPropagation()
-						 form.handleSubmit()
-					}} className="space-y-4">
+					<form
+						onSubmit={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							form.handleSubmit();
+						}}
+						className="space-y-4"
+					>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<form.Field 
-								name="name" 
+							<form.Field
+								name="name"
 								children={(field) => {
 									return (
 										<>
-										<div className="space-y-2">
-											<Label htmlFor={`${field.name}`}>Full Name</Label>
-											<Input 
-												id={`${field.name}`}
-												name={`${field.name}`}
-												value={field.state.value}
-												onBlur={field.handleBlur}
-												onChange={(e) => field.handleChange(e.target.value)}
-											/>
-											<FieldInfo field={field} />
-										</div>
+											<div className="space-y-2">
+												<Label htmlFor={`${field.name}`}>Full Name</Label>
+												<Input
+													id={`${field.name}`}
+													name={`${field.name}`}
+													value={field.state.value}
+													onBlur={field.handleBlur}
+													onChange={(e) => field.handleChange(e.target.value)}
+												/>
+												<FieldInfo field={field} />
+											</div>
 										</>
-									)
+									);
 								}}
 							/>
 
 							<div className="space-y-2">
-								<form.Field 
-									name="email" 
+								<form.Field
+									name="email"
 									children={(field) => {
 										return (
 											<>
 												<Label htmlFor={`${field.name}`}>Email</Label>
-												<Input 
+												<Input
 													id={`${field.name}`}
 													name={`${field.name}`}
 													value={field.state.value}
@@ -558,18 +591,18 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 													</p>
 												)}
 											</>
-										)
+										);
 									}}
 								/>
 							</div>
 							<div className="space-y-2">
-							<form.Field 
-									name="website" 
+								<form.Field
+									name="website"
 									children={(field) => {
 										return (
 											<>
 												<Label htmlFor={`${field.name}`}>Website</Label>
-												<Input 
+												<Input
 													id={`${field.name}`}
 													name={`${field.name}`}
 													value={field.state.value}
@@ -578,18 +611,18 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 												/>
 												<FieldInfo field={field} />
 											</>
-										)
+										);
 									}}
 								/>
 							</div>
 							<div className="space-y-2">
-							<form.Field 
-									name="github" 
+								<form.Field
+									name="github"
 									children={(field) => {
 										return (
 											<>
 												<Label htmlFor={`${field.name}`}>Github</Label>
-												<Input 
+												<Input
 													id={`${field.name}`}
 													name={`${field.name}`}
 													value={field.state.value}
@@ -598,7 +631,7 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 												/>
 												<FieldInfo field={field} />
 											</>
-										)
+										);
 									}}
 								/>
 							</div>
@@ -608,9 +641,9 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 							selector={(state) => [state.canSubmit, state.isSubmitting]}
 							children={([canSubmit, isSubmitting]) => (
 								<Button
-								className="bg-gradient-primary transition-colors disabled:bg-gradient-dark"
-								type="submit"
-								disabled={!canSubmit}
+									className="bg-gradient-primary transition-colors disabled:bg-gradient-dark"
+									type="submit"
+									disabled={!canSubmit}
 								>
 									{isSubmitting ? "Updating..." : "Update Profile"}
 								</Button>
@@ -620,13 +653,16 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 
 					{/* Radix-UI Dialog for OTP Verification */}
 
-					<Dialog open={showOTPDialog} onOpenChange={open => !open && handleCancel()}>
+					<Dialog
+						open={showOTPDialog}
+						onOpenChange={(open) => !open && handleCancel()}
+					>
 						<DialogContent className="sm:max-w-md">
 							<DialogTitle>Verify Your New Email</DialogTitle>
 							<DialogDescription>
 								We've sent a 6-digit verification code to{" "}
-								<strong>{currentUser.email}</strong>. Please enter the code below to
-								confirm your email change.
+								<strong>{currentUser.email}</strong>. Please enter the code
+								below to confirm your email change.
 							</DialogDescription>
 
 							<div className="space-y-4">
@@ -672,7 +708,7 @@ const ProfileManagement = memo(({ currentUser }: ProfileManagementProps) => {
 											{isVerifyingOTP ? "Verifying..." : "Verify & Update"}
 										</Button>
 									</DialogClose>
-									<DialogClose>	
+									<DialogClose>
 										<Button
 											variant="outline"
 											onClick={handleCancel}

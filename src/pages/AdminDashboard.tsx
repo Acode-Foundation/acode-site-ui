@@ -53,11 +53,11 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { VerificationToggle } from "@/components/ui/verification-toggle";
+import { useAuth } from "@/context/AuthContext";
 import { usePluginsByStatus } from "@/hooks/use-plugins-by-status";
 import { toast } from "@/hooks/use-toast";
 import { formatCurrency, formatDate } from "@/lib/date-utils";
 import { Plugin, User } from "@/types";
-import { useAuth } from "@/context/AuthContext";
 
 interface AdminStats {
 	users: number;

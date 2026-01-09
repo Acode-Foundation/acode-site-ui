@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/context/AuthContext";
 import { useLoggedInUser } from "@/hooks/useLoggedInUser";
 import type { Plugin, PluginFilterType } from "@/types";
-import { useAuth } from "@/context/AuthContext";
 
 const fallbackPlugins: Plugin[] = [
 	{

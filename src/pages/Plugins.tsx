@@ -73,7 +73,7 @@ const adminFilters = [
 	},
 ];
 export default function Plugins() {
-	const navigate = useNavigate()
+	const navigate = useNavigate();
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedFilter, setSelectedFilter] = useState("default");
 
@@ -288,7 +288,7 @@ export default function Plugins() {
 						variant="outline"
 						size="sm"
 						onClick={() => {
-							 navigate("/submit-plugin");
+							navigate("/submit-plugin");
 						}}
 					>
 						<ExternalLink className="w-4 h-4 mr-2" />

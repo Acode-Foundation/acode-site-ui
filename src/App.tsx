@@ -6,6 +6,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "./context/AuthContext";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminPayments from "./pages/AdminPayments";
 import Dashboard from "./pages/Dashboard";
@@ -23,7 +24,6 @@ import Privacy from "./pages/Privacy";
 import Signup from "./pages/Signup";
 import SubmitPlugin from "./pages/SubmitPlugin";
 import Terms from "./pages/Terms";
-import { AuthProvider } from "./context/AuthContext";
 
 const queryClient = new QueryClient({
 	defaultOptions: {
