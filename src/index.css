@@ -6,42 +6,43 @@
 
 @layer base {
 	:root {
-		--background: 240 10% 3.9%;
-		--foreground: 0 0% 98%;
+		/* Dark Mode Colors - Modern Minimal */
+		--background: 220 13% 9%;
+		--foreground: 220 13% 95%;
 
-		--card: 240 10% 3.9%;
-		--card-foreground: 0 0% 98%;
+		--card: 220 15% 12%;
+		--card-foreground: 220 13% 95%;
 
-		--popover: 240 5% 6%;
-		--popover-foreground: 0 0% 98%;
+		--popover: 220 15% 14%;
+		--popover-foreground: 220 13% 95%;
 
-		--primary: 212 100% 55%;
-		--primary-foreground: 0 0% 98%;
+		--primary: 207 93% 57%;
+		--primary-foreground: 220 13% 9%;
 
-		--secondary: 263 70% 50%;
-		--secondary-foreground: 0 0% 98%;
+		--secondary: 220 15% 25%;
+		--secondary-foreground: 220 13% 95%;
 
-		--muted: 240 5% 6%;
-		--muted-foreground: 240 5% 64.9%;
+		--muted: 220 15% 20%;
+		--muted-foreground: 220 10% 60%;
 
-		--accent: 212 100% 55%;
-		--accent-foreground: 0 0% 98%;
+		--accent: 207 93% 57%;
+		--accent-foreground: 220 13% 9%;
 
-		--destructive: 0 72% 51%;
-		--destructive-foreground: 0 0% 98%;
+		--destructive: 0 84% 60%;
+		--destructive-foreground: 220 13% 9%;
 
-		--border: 240 6% 10%;
-		--input: 240 6% 10%;
-		--ring: 212 100% 55%;
+		--border: 220 15% 18%;
+		--input: 220 15% 15%;
+		--ring: 207 93% 57%;
 
-		--radius: 0.75rem;
+		--radius: 0.5rem;
 
-		/* Acode Brand Colors - Modern Blue Focus */
-		--acode-blue: 212 100% 55%;
-		--acode-blue-light: 212 90% 65%;
-		--acode-blue-dark: 212 100% 45%;
-		--acode-dark: 240 10% 3.9%;
-		--acode-darker: 240 15% 2%;
+		/* Acode Brand Colors - Beautiful Blue Accent */
+		--acode-blue: 207 93% 57%;
+		--acode-blue-light: 207 90% 67%;
+		--acode-blue-dark: 207 95% 48%;
+		--acode-dark: 220 13% 9%;
+		--acode-darker: 220 18% 5%;
 
 		/* Gradients */
 		--gradient-primary: linear-gradient(
@@ -61,56 +62,57 @@
 		);
 
 		/* Glows and Effects */
-		--glow-primary: 0 0 40px hsl(var(--acode-blue) / 0.3);
-		--glow-blue: 0 0 40px hsl(var(--acode-blue) / 0.3);
-		--shadow-elegant: 0 10px 30px -10px hsl(var(--acode-blue) / 0.4);
+		--glow-primary: 0 0 40px hsl(var(--acode-blue) / 0.25);
+		--glow-blue: 0 0 40px hsl(var(--acode-blue) / 0.25);
+		--shadow-elegant: 0 10px 30px -10px hsl(var(--acode-blue) / 0.3);
 
 		/* Animations */
 		--transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		--transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-		--sidebar-background: 0 0% 98%;
+		--sidebar-background: 220 15% 12%;
 
-		--sidebar-foreground: 240 5.3% 26.1%;
+		--sidebar-foreground: 220 13% 90%;
 
-		--sidebar-primary: 240 5.9% 10%;
+		--sidebar-primary: 207 93% 57%;
 
-		--sidebar-primary-foreground: 0 0% 98%;
+		--sidebar-primary-foreground: 220 13% 9%;
 
-		--sidebar-accent: 240 4.8% 95.9%;
+		--sidebar-accent: 220 15% 20%;
 
-		--sidebar-accent-foreground: 240 5.9% 10%;
+		--sidebar-accent-foreground: 207 93% 57%;
 
-		--sidebar-border: 220 13% 91%;
+		--sidebar-border: 220 15% 18%;
 
-		--sidebar-ring: 217.2 91.2% 59.8%;
+		--sidebar-ring: 207 93% 57%;
 	}
 
 	.light {
+		/* Light Mode Colors - Modern Minimal Clean */
 		--background: 0 0% 100%;
-		--foreground: 240 10% 3.9%;
+		--foreground: 220 18% 12%;
 		--card: 0 0% 100%;
-		--card-foreground: 240 10% 3.9%;
+		--card-foreground: 220 18% 12%;
 		--popover: 0 0% 100%;
-		--popover-foreground: 240 10% 3.9%;
-		--primary: 212 100% 55%;
+		--popover-foreground: 220 18% 12%;
+		--primary: 207 93% 57%;
 		--primary-foreground: 0 0% 100%;
-		--secondary: 240 4.8% 95.9%;
-		--secondary-foreground: 240 10% 3.9%;
-		--muted: 240 4.8% 95.9%;
-		--muted-foreground: 240 3.8% 46.1%;
-		--accent: 212 100% 55%;
+		--secondary: 220 15% 92%;
+		--secondary-foreground: 220 18% 12%;
+		--muted: 220 15% 88%;
+		--muted-foreground: 220 10% 45%;
+		--accent: 207 93% 57%;
 		--accent-foreground: 0 0% 100%;
-		--border: 240 5.9% 90%;
-		--input: 240 5.9% 90%;
-		--ring: 212 100% 55%;
+		--border: 220 15% 90%;
+		--input: 220 15% 93%;
+		--ring: 207 93% 57%;
 
 		/* Acode Brand Colors - Light Mode */
-		--acode-blue: 212 100% 55%;
-		--acode-blue-light: 212 90% 65%;
-		--acode-blue-dark: 212 100% 45%;
+		--acode-blue: 207 93% 57%;
+		--acode-blue-light: 207 90% 67%;
+		--acode-blue-dark: 207 95% 48%;
 		--acode-dark: 0 0% 100%;
-		--acode-darker: 240 4.8% 95.9%;
+		--acode-darker: 220 15% 94%;
 
 		/* Gradients - Light Mode */
 		--gradient-primary: linear-gradient(
@@ -130,9 +132,25 @@
 		);
 
 		/* Glows and Effects - Light Mode */
-		--glow-primary: 0 0 40px hsl(var(--acode-blue) / 0.2);
-		--glow-blue: 0 0 40px hsl(var(--acode-blue) / 0.2);
-		--shadow-elegant: 0 10px 30px -10px hsl(var(--acode-blue) / 0.3);
+		--glow-primary: 0 0 40px hsl(var(--acode-blue) / 0.15);
+		--glow-blue: 0 0 40px hsl(var(--acode-blue) / 0.15);
+		--shadow-elegant: 0 10px 30px -10px hsl(var(--acode-blue) / 0.2);
+
+		--sidebar-background: 0 0% 100%;
+
+		--sidebar-foreground: 220 18% 12%;
+
+		--sidebar-primary: 207 93% 57%;
+
+		--sidebar-primary-foreground: 0 0% 100%;
+
+		--sidebar-accent: 220 15% 92%;
+
+		--sidebar-accent-foreground: 207 93% 57%;
+
+		--sidebar-border: 220 15% 90%;
+
+		--sidebar-ring: 207 93% 57%;
 	}
 }
 
